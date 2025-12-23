@@ -6,6 +6,12 @@
 <title>Online Art Workshop | Kayıt</title>
 
 <style>
+*,
+*::before,
+*::after{
+  box-sizing:border-box;
+}
+
 body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto;
@@ -16,16 +22,27 @@ body{
   justify-content:center;
   padding:40px 12px;
 }
+
 .card{
   width:100%;
   max-width:520px;
-  background:rgba(12,18,32,.92);
+  background:rgba(12,18,32,.95);
   border-radius:18px;
-  padding:28px;
+  padding:26px;
   box-shadow:0 25px 60px rgba(0,0,0,.55);
 }
-h1{text-align:center;margin:0 0 6px}
-.subtitle{text-align:center;font-size:14px;opacity:.8;margin-bottom:16px}
+
+h1{
+  text-align:center;
+  margin:0 0 6px;
+}
+
+.subtitle{
+  text-align:center;
+  font-size:14px;
+  opacity:.8;
+  margin-bottom:16px;
+}
 
 /* 🌍 DİL */
 .langbar{
@@ -35,10 +52,10 @@ h1{text-align:center;margin:0 0 6px}
   margin-bottom:18px;
 }
 .langbtn{
-  padding:8px 12px;
+  padding:8px 14px;
   border-radius:999px;
-  background:#1f2937;
   border:1px solid #374151;
+  background:#1f2937;
   color:#fff;
   cursor:pointer;
 }
@@ -47,47 +64,84 @@ h1{text-align:center;margin:0 0 6px}
 }
 
 /* FORM */
-label{font-size:13px;margin:10px 0 6px;display:block}
-input,select,textarea{
+label{
+  font-size:13px;
+  margin:12px 0 6px;
+  display:block;
+}
+
+input,
+select,
+textarea{
   width:100%;
   padding:12px;
   border-radius:12px;
-  border:1px solid rgba(255,255,255,.15);
-  background:#fff;
+  border:1px solid rgba(255,255,255,.18);
+  background:#ffffff;
   color:#000;
   font-size:14px;
 }
-select option{color:#000;background:#fff}
-textarea{min-height:80px}
 
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(max-width:520px){.row{grid-template-columns:1fr}}
+select option{
+  color:#000;
+  background:#fff;
+}
 
+textarea{
+  min-height:80px;
+}
+
+/* 🟣 GRID DÜZELTME */
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+@media (max-width:520px){
+  .row{
+    grid-template-columns:1fr;
+  }
+}
+
+/* ⚠️ UYARI */
 .warn{
-  margin-top:14px;
+  margin-top:16px;
   background:#3a2f12;
   border:1px solid #facc15;
   color:#fde68a;
   border-radius:14px;
-  padding:12px;
+  padding:14px;
   text-align:center;
   font-weight:600;
 }
 
+/* 🔘 BUTON */
 .btn{
-  margin-top:16px;
+  margin-top:18px;
   width:100%;
-  padding:14px;
+  padding:15px;
   border:none;
   border-radius:14px;
   background:linear-gradient(135deg,#60a5fa,#a78bfa);
   color:#fff;
-  font-size:15px;
+  font-size:16px;
   cursor:pointer;
 }
 
-.success{display:none;text-align:center}
-.success h2{color:#c4b5fd}
+.btn:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+/* ✅ SUCCESS */
+.success{
+  display:none;
+  text-align:center;
+}
+.success h2{
+  color:#c4b5fd;
+}
 </style>
 </head>
 
@@ -137,7 +191,7 @@ textarea{min-height:80px}
     </div>
 
     <label id="l_price">Ücret</label>
-    <input id="price" placeholder="Örn: 500 TL / 40€" required>
+    <input id="price" required>
 
     <label id="l_note">Not</label>
     <textarea id="note"></textarea>
@@ -147,7 +201,7 @@ textarea{min-height:80px}
       Zoom linki ödeme kontrolünden sonra paylaşılır.
     </div>
 
-    <button class="btn" id="submitBtn">Kaydı Gönder</button>
+    <button class="btn" type="submit" id="submitBtn">Kaydı Gönder</button>
   </form>
 </div>
 
@@ -157,39 +211,27 @@ textarea{min-height:80px}
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwD4chBKNlbOIoymVZtPEYCx-YRhwA2hssBPZck-7695kRMN22xAtgSrW94Ck9HsdEJ0Q/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbwD4chBKNlbOIoymVZtPEYCx-YRhwA2hssBPZck-7695kRMN22xAtgSrW94Ck9HsdEJ0Q/exec";
 
 const dict={
-tr:{
-title:"Online Art Workshop",
-subtitle:"Kayıt Formu • Zoom linki WhatsApp’tan gönderilir",
-name:"Ad Soyad",email:"E-posta",phone:"Telefon (WhatsApp)",
-date:"Tarih",time:"Seans Saati",price:"Ücret",note:"Not",
-warn:"⚠️ Ödeme dekontunu WhatsApp üzerinden gönderiniz.<br>Zoom linki ödeme kontrolünden sonra paylaşılır.",
-submit:"Kaydı Gönder",success:"✨ Kayıt Alındı"
-},
-en:{
-title:"Online Art Workshop",
-subtitle:"Registration Form • Zoom link via WhatsApp",
-name:"Full Name",email:"Email",phone:"Phone (WhatsApp)",
-date:"Date",time:"Session Time",price:"Fee",note:"Note",
-warn:"⚠️ Please send payment receipt via WhatsApp.<br>Zoom link shared after verification.",
-submit:"Submit",success:"✨ Registration Received"
-},
-fa:{
-title:"کارگاه آنلاین هنر",
-subtitle:"فرم ثبت‌نام • لینک زوم از واتساپ",
-name:"نام و نام خانوادگی",email:"ایمیل",phone:"شماره واتساپ",
-date:"تاریخ",time:"ساعت جلسه",price:"هزینه",note:"یادداشت",
-warn:"⚠️ لطفاً رسید پرداخت را از واتساپ ارسال کنید.<br>لینک زوم بعد از بررسی پرداخت ارسال می‌شود.",
-submit:"ارسال ثبت‌نام",success:"✨ ثبت‌نام انجام شد"
-}
+tr:{title:"Online Art Workshop",subtitle:"Kayıt Formu • Zoom linki WhatsApp’tan gönderilir",
+name:"Ad Soyad",email:"E-posta",phone:"Telefon (WhatsApp)",date:"Tarih",time:"Seans Saati",
+price:"Ücret",note:"Not",warn:"⚠️ Ödeme dekontunu WhatsApp üzerinden gönderiniz.<br>Zoom linki ödeme kontrolünden sonra paylaşılır.",
+submit:"Kaydı Gönder",success:"✨ Kayıt Alındı"},
+en:{title:"Online Art Workshop",subtitle:"Registration Form • Zoom link via WhatsApp",
+name:"Full Name",email:"Email",phone:"Phone (WhatsApp)",date:"Date",time:"Session Time",
+price:"Fee",note:"Note",warn:"⚠️ Please send payment receipt via WhatsApp.<br>Zoom link after verification.",
+submit:"Submit Registration",success:"✨ Registration Received"},
+fa:{title:"کارگاه آنلاین هنر",subtitle:"فرم ثبت‌نام • لینک زوم از واتساپ",
+name:"نام و نام خانوادگی",email:"ایمیل",phone:"واتساپ",date:"تاریخ",time:"ساعت جلسه",
+price:"هزینه",note:"یادداشت",warn:"⚠️ رسید پرداخت را از واتساپ ارسال کنید.<br>لینک زوم بعد از بررسی ارسال می‌شود.",
+submit:"ارسال ثبت‌نام",success:"✨ ثبت‌نام انجام شد"}
 };
 
 function setLang(l){
 document.documentElement.dir=(l==="fa")?"rtl":"ltr";
-document.getElementById("t_title").textContent=dict[l].title;
-document.getElementById("t_subtitle").textContent=dict[l].subtitle;
+t_title.textContent=dict[l].title;
+t_subtitle.textContent=dict[l].subtitle;
 l_name.textContent=dict[l].name;
 l_email.textContent=dict[l].email;
 l_phone.textContent=dict[l].phone;
