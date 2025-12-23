@@ -9,7 +9,7 @@
 :root{
   --bg1:#0b1220;
   --bg2:#05060a;
-  --card: rgba(12,18,32,.95);
+  --card:#0f172a;
   --accent1:#60a5fa;
   --accent2:#a78bfa;
 }
@@ -34,6 +34,24 @@ body{
 h1{text-align:center;margin:0}
 .subtitle{text-align:center;opacity:.8;margin-bottom:16px}
 
+.langbar{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin-bottom:14px;
+}
+.langbtn{
+  border:1px solid rgba(255,255,255,.2);
+  background:transparent;
+  color:#fff;
+  padding:6px 10px;
+  border-radius:999px;
+  cursor:pointer;
+}
+.langbtn.active{
+  background:linear-gradient(135deg,var(--accent1),var(--accent2));
+}
+
 label{display:block;margin:12px 0 6px}
 input,select,textarea{
   width:100%;
@@ -48,7 +66,6 @@ textarea{min-height:80px}
 .row{
   display:flex;
   gap:10px;
-  margin-bottom:10px;
 }
 .row>div{flex:1}
 
@@ -82,31 +99,37 @@ button:disabled{opacity:.6}
 <body>
 
 <div class="card" id="formCard">
-<h1>Online Art Workshop</h1>
-<p class="subtitle">Kayıt Formu (Ücretli)</p>
+<h1 id="t_title">Online Art Workshop</h1>
+<p class="subtitle" id="t_sub">Kayıt Formu (Ücretli)</p>
+
+<div class="langbar">
+  <button class="langbtn active" data-lang="tr">TR</button>
+  <button class="langbtn" data-lang="en">EN</button>
+  <button class="langbtn" data-lang="fa">FA</button>
+</div>
 
 <form id="registerForm">
-<label>Ad Soyad</label>
+<label id="l_name">Ad Soyad</label>
 <input id="name" required>
 
 <div class="row">
 <div>
-<label>E-posta</label>
+<label id="l_email">E-posta</label>
 <input id="email" type="email" required>
 </div>
 <div>
-<label>Telefon (WhatsApp)</label>
+<label id="l_phone">Telefon (WhatsApp)</label>
 <input id="phone" required>
 </div>
 </div>
 
 <div class="row">
 <div>
-<label>Tarih</label>
+<label id="l_date">Tarih</label>
 <input id="date" type="date" required>
 </div>
 <div>
-<label>Seans Saati</label>
+<label id="l_time">Seans Saati</label>
 <select id="timeSlot" required>
 <option value="">Saat seç</option>
 <option>09.30 – 11.00</option>
@@ -118,13 +141,13 @@ button:disabled{opacity:.6}
 </div>
 </div>
 
-<label>Ücret</label>
+<label id="l_price">Ücret</label>
 <input id="price" required>
 
-<label>Not</label>
+<label id="l_note">Not</label>
 <textarea id="note"></textarea>
 
-<div class="warn">
+<div class="warn" id="t_warn">
 ⚠️ Ödeme dekontunu WhatsApp üzerinden gönderiniz.<br>
 Zoom linki ödeme sonrası paylaşılır.
 </div>
@@ -134,46 +157,86 @@ Zoom linki ödeme sonrası paylaşılır.
 </div>
 
 <div class="card success" id="successCard">
-<h2>✨ Kayıt Alındı</h2>
-<p>Teşekkürler! Ödeme dekontu sonrası Zoom linki gönderilecektir.</p>
+<h2 id="t_success">✨ Kayıt Alındı</h2>
+<p id="t_success_text">Teşekkürler! Ödeme sonrası Zoom linki gönderilecektir.</p>
 </div>
 
 <script>
 const API_URL="https://script.google.com/macros/s/AKfycbwD4chBKNlbOIoymVZtPEYCx-YRhwA2hssBPZck-7695kRMN22xAtgSrW94Ck9HsdEJ0Q/exec";
 
-document.getElementById("registerForm").addEventListener("submit",async e=>{
-e.preventDefault();
-const btn=document.getElementById("submitBtn");
-btn.disabled=true;btn.textContent="Gönderiliyor…";
-
-try{
-const payload={
-name:name.value,
-email:email.value,
-phone:phone.value,
-date:date.value,
-timeSlot:timeSlot.value,
-price:price.value,
-note:note.value
+const dict={
+tr:{
+title:"Online Art Workshop",
+sub:"Kayıt Formu (Ücretli)",
+name:"Ad Soyad",email:"E-posta",phone:"Telefon (WhatsApp)",
+date:"Tarih",time:"Seans Saati",price:"Ücret",note:"Not",
+warn:"⚠️ Ödeme dekontunu WhatsApp üzerinden gönderiniz.<br>Zoom linki ödeme sonrası paylaşılır.",
+btn:"Kaydı Gönder",success:"✨ Kayıt Alındı",
+successText:"Teşekkürler! Ödeme sonrası Zoom linki gönderilecektir."
+},
+en:{
+title:"Online Art Workshop",
+sub:"Paid Registration Form",
+name:"Full Name",email:"Email",phone:"Phone (WhatsApp)",
+date:"Date",time:"Session Time",price:"Fee",note:"Note",
+warn:"⚠️ Please send payment receipt via WhatsApp.<br>Zoom link will be sent after payment.",
+btn:"Submit Registration",success:"✨ Registration Received",
+successText:"Thank you! Zoom link will be sent after payment."
+},
+fa:{
+title:"کارگاه آنلاین هنر",
+sub:"فرم ثبت‌نام (پرداختی)",
+name:"نام و نام خانوادگی",email:"ایمیل",phone:"شماره واتساپ",
+date:"تاریخ",time:"ساعت جلسه",price:"هزینه",note:"یادداشت",
+warn:"⚠️ لطفاً رسید پرداخت را در واتساپ ارسال کنید.<br>لینک زوم پس از پرداخت ارسال می‌شود.",
+btn:"ارسال ثبت‌نام",success:"✨ ثبت‌نام انجام شد",
+successText:"پس از پرداخت، لینک زوم ارسال می‌شود."
+}
 };
-const r=await fetch(API_URL,{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify(payload)
-});
-const d=await r.json();
-if(!d.ok) throw d;
 
+function setLang(l){
+const t=dict[l];
+document.documentElement.dir=l==="fa"?"rtl":"ltr";
+t_title.textContent=t.title;
+t_sub.textContent=t.sub;
+l_name.textContent=t.name;
+l_email.textContent=t.email;
+l_phone.textContent=t.phone;
+l_date.textContent=t.date;
+l_time.textContent=t.time;
+l_price.textContent=t.price;
+l_note.textContent=t.note;
+t_warn.innerHTML=t.warn;
+submitBtn.textContent=t.btn;
+t_success.textContent=t.success;
+t_success_text.textContent=t.successText;
+document.querySelectorAll(".langbtn").forEach(b=>b.classList.toggle("active",b.dataset.lang===l));
+}
+
+document.querySelectorAll(".langbtn").forEach(b=>{
+b.onclick=()=>setLang(b.dataset.lang);
+});
+
+setLang("tr");
+
+registerForm.onsubmit=async e=>{
+e.preventDefault();
+submitBtn.disabled=true;
+submitBtn.textContent="Gönderiliyor…";
+try{
+const payload={name:name.value,email:email.value,phone:phone.value,date:date.value,timeSlot:timeSlot.value,price:price.value,note:note.value};
+const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+const d=await r.json();
+if(!d.ok)throw d;
 formCard.style.display="none";
 successCard.style.display="block";
-}catch(err){
+}catch{
 alert("Bir hata oluştu");
-btn.disabled=false;
-btn.textContent="Kaydı Gönder";
+submitBtn.disabled=false;
+submitBtn.textContent=dict.tr.btn;
 }
-});
+};
 </script>
 
 </body>
 </html>
-
