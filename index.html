@@ -1,424 +1,171 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Online Art Workshop | Kayıt</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Online Art Workshop | Kayıt</title>
 
-  <style>
-    :root{
-      --bg1:#0b1220;
-      --bg2:#05060a;
-      --card: rgba(12, 18, 32, 0.92);
-      --muted: rgba(255,255,255,.78);
-      --soft: rgba(255,255,255,.08);
-      --accent1:#60a5fa; /* blue */
-      --accent2:#a78bfa; /* purple */
-      --warnBg: rgba(251, 191, 36, .12);
-      --warnText:#fde68a;
-    }
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: radial-gradient(circle at top, var(--bg1), var(--bg2));
-      color:#fff;
-      min-height:100vh;
-      display:flex;
-      justify-content:center;
-      align-items:flex-start;
-      padding:40px 12px;
-    }
-    .card{
-      width:100%;
-      max-width:520px;
-      background: var(--card);
-      border-radius:18px;
-      padding:28px;
-      box-shadow:0 25px 60px rgba(0,0,0,.55);
-      border:1px solid rgba(255,255,255,.06);
-    }
-    h1{
-      margin:0 0 6px 0;
-      text-align:center;
-      font-size:24px;
-      letter-spacing:.2px;
-    }
-    .subtitle{
-      text-align:center;
-      font-size:14px;
-      color: var(--muted);
-      margin:0 0 18px 0;
-    }
-    .langbar{
-      display:flex;
-      justify-content:center;
-      gap:10px;
-      margin: 0 0 16px 0;
-      flex-wrap:wrap;
-    }
-    .langbtn{
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      color:#fff;
-      padding:8px 10px;
-      border-radius:999px;
-      cursor:pointer;
-      font-size:13px;
-    }
-    .langbtn.active{
-      background: linear-gradient(135deg, rgba(96,165,250,.25), rgba(167,139,250,.25));
-      border-color: rgba(167,139,250,.45);
-    }
+<style>
+:root{
+  --bg1:#0b1220; --bg2:#05060a;
+  --card:rgba(12,18,32,.92);
+  --accent1:#60a5fa; --accent2:#a78bfa;
+}
+body{
+  margin:0; min-height:100vh;
+  display:flex; justify-content:center;
+  background:radial-gradient(circle at top,var(--bg1),var(--bg2));
+  color:#fff; font-family:system-ui;
+}
+.card{
+  max-width:520px; width:100%;
+  background:var(--card);
+  border-radius:18px;
+  padding:26px; margin:40px 12px;
+}
+h1{text-align:center}
+.subtitle{text-align:center;opacity:.8}
+.langbar{display:flex;gap:10px;justify-content:center}
+.langbtn{background:#ffffff12;color:#fff;border-radius:999px;padding:6px 12px;border:1px solid #ffffff22;cursor:pointer}
+.langbtn.active{background:#7c3aed55}
 
-    .info{
-      background: rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.07);
-      border-radius:14px;
-      padding:14px;
-      font-size:13px;
-      line-height:1.6;
-      margin-bottom:16px;
-      color: var(--muted);
-    }
-    .pill{
-      display:inline-block;
-      padding:4px 10px;
-      border-radius:999px;
-      font-size:12px;
-      margin-top:8px;
-      background: rgba(96,165,250,.15);
-      border:1px solid rgba(96,165,250,.25);
-      color:#dbeafe;
-    }
+label{display:block;margin-top:12px;font-size:13px}
+input,select,textarea{
+  width:100%;padding:12px;
+  border-radius:12px;
+  background:#ffffff10;
+  border:1px solid #ffffff22;
+  color:#fff;
+}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.row{grid-template-columns:1fr}}
 
-    label{
-      display:block;
-      font-size:13px;
-      margin: 10px 0 6px 0;
-      color: rgba(255,255,255,.9);
-    }
-    input, select, textarea{
-      width:100%;
-      padding:12px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.06);
-      color:#fff;
-      outline:none;
-      font-size:14px;
-      box-sizing:border-box;
-    }
-    input::placeholder, textarea::placeholder{
-      color: rgba(255,255,255,.55);
-    }
-    select option{
-      background:#0b1220;
-      color:#fff;
-    }
-    textarea{ min-height:80px; resize:vertical; }
-
-    .row{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-    }
-    @media (max-width:520px){
-      .row{ grid-template-columns:1fr; }
-    }
-
-    .warn{
-      margin-top:14px;
-      background: var(--warnBg);
-      border: 1px solid rgba(251,191,36,.35);
-      color: var(--warnText);
-      border-radius:14px;
-      padding:12px;
-      font-weight:650;
-      text-align:center;
-      line-height:1.5;
-    }
-    .btn{
-      margin-top:14px;
-      width:100%;
-      padding:14px;
-      border:none;
-      border-radius:14px;
-      cursor:pointer;
-      color:#fff;
-      font-size:15px;
-      background: linear-gradient(135deg, var(--accent1), var(--accent2));
-    }
-    .btn:disabled{ opacity:.55; cursor:not-allowed; }
-
-    .success{
-      display:none;
-      text-align:center;
-    }
-    .success h2{
-      margin:0 0 10px 0;
-      color:#c4b5fd;
-    }
-    .small{
-      margin-top:10px;
-      font-size:12px;
-      color: rgba(255,255,255,.7);
-      text-align:center;
-    }
-  </style>
+.warn{
+  margin-top:14px;
+  padding:12px;
+  border-radius:12px;
+  background:#facc1530;
+  color:#fde68a;
+  font-weight:600;
+  text-align:center;
+}
+.btn{
+  margin-top:16px;
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--accent1),var(--accent2));
+  color:#fff;
+  font-size:16px;
+  cursor:pointer;
+}
+.success{display:none;text-align:center}
+</style>
 </head>
 
 <body>
-  <div class="card" id="formCard">
-    <h1 id="t_title">Online Art Workshop</h1>
-    <p class="subtitle" id="t_subtitle">Kayıt Formu (Ücretli) • Zoom linki WhatsApp’tan gönderilir</p>
 
-    <div class="langbar" aria-label="Language">
-      <button class="langbtn active" type="button" data-lang="tr">🇹🇷 Türkçe</button>
-      <button class="langbtn" type="button" data-lang="en">🇬🇧 English</button>
-      <button class="langbtn" type="button" data-lang="fa">🇮🇷 فارسی</button>
-    </div>
+<div class="card" id="formCard">
+<h1 id="t_title">Online Art Workshop</h1>
+<p class="subtitle" id="t_subtitle">Kayıt Formu (Ücretli)</p>
 
-    <div class="info" id="t_info">
-      Bu form Online Art Workshop kaydı içindir. Ödeme sonrası Zoom bağlantısı WhatsApp üzerinden paylaşılır.
-      <div class="pill" id="t_pill">Dil seçilebilir • TR/EN/FA</div>
-    </div>
+<div class="langbar">
+<button class="langbtn active" data-lang="tr">🇹🇷 TR</button>
+<button class="langbtn" data-lang="en">🇬🇧 EN</button>
+<button class="langbtn" data-lang="fa">🇮🇷 FA</button>
+</div>
 
-    <form id="registerForm">
-      <label id="t_name_label">Ad Soyad</label>
-      <input id="name" type="text" required placeholder="Ad Soyad" />
+<form id="registerForm">
+<label id="t_name">Ad Soyad</label>
+<input id="name" required>
 
-      <div class="row">
-        <div>
-          <label id="t_email_label">E-posta</label>
-          <input id="email" type="email" required placeholder="ornek@mail.com" />
-        </div>
-        <div>
-          <label id="t_phone_label">Telefon (WhatsApp)</label>
-          <input id="phone" type="tel" required placeholder="+90..." />
-        </div>
-      </div>
+<div class="row">
+<div>
+<label id="t_email">E-posta</label>
+<input id="email" type="email" required>
+</div>
+<div>
+<label id="t_phone">Telefon (WhatsApp)</label>
+<input id="phone" required>
+</div>
+</div>
 
-      <div class="row">
-        <div>
-          <label id="t_date_label">Tarih</label>
-          <input id="date" type="date" required />
-        </div>
-        <div>
-          <label id="t_time_label">Seans Saati</label>
-          <select id="timeSlot" required>
-            <option value="" id="t_time_placeholder">Saat seçiniz</option>
-            <option value="09:30 – 11:00">09.30 – 11.00</option>
-            <option value="11:20 – 12:50">11.20 – 12.50</option>
-            <option value="14:10 – 15:40">14.10 – 15.40</option>
-            <option value="16:00 – 17:30">16.00 – 17.30</option>
-            <option value="17:50 – 19:20">17.50 – 19.20</option>
-          </select>
-        </div>
-      </div>
+<div class="row">
+<div>
+<label id="t_date">Tarih</label>
+<input id="date" type="date" required>
+</div>
+<div>
+<label id="t_time">Seans Saati</label>
+<select id="timeSlot" required>
+<option value="">Saat seçiniz</option>
+<option>09.30 – 11.00</option>
+<option>11.20 – 12.50</option>
+<option>14.10 – 15.40</option>
+<option>16.00 – 17.30</option>
+<option>17.50 – 19.20</option>
+</select>
+</div>
+</div>
 
-      <label id="t_price_label">Ücret (Kullanıcı yazar)</label>
-      <input id="price" type="text" required placeholder="Örn: 1200 TL / 40€" />
+<label id="t_price">Ücret</label>
+<input id="price" required placeholder="Örn: 1200 TL / 40€">
 
-      <label id="t_note_label">Not (opsiyonel)</label>
-      <textarea id="note" placeholder="İstersen bir not bırakabilirsin..."></textarea>
+<label id="t_note">Not</label>
+<textarea id="note"></textarea>
 
-      <div class="warn" id="t_warn">
-        ⚠️ Ödeme dekontunu WhatsApp üzerinden gönderiniz. <br>
-        Zoom linki ödeme kontrolünden sonra paylaşılır.
-      </div>
+<div class="warn" id="t_warn">
+⚠️ Ödeme dekontunu WhatsApp üzerinden gönderiniz.<br>
+Zoom linki ödeme kontrolünden sonra paylaşılır.
+</div>
 
-      <button class="btn" type="submit" id="submitBtn">Kaydı Gönder</button>
-      <div class="small" id="t_small">
-        Kayıt gönderirken sorun yaşarsan sayfayı yenileyip tekrar dene.
-      </div>
-    </form>
-  </div>
+<button class="btn" id="submitBtn">Kaydı Gönder</button>
+</form>
+</div>
 
-  <div class="card success" id="successCard">
-    <h2 id="t_success_title">✨ Kayıt Alındı</h2>
-    <p id="t_success_text" style="color:rgba(255,255,255,.85); line-height:1.6;">
-      Teşekkürler! Ödeme dekontunu WhatsApp’tan gönderdiğinde, Zoom linki paylaşılacaktır.
-    </p>
-  </div>
+<div class="card success" id="successCard">
+<h2>✨ Kayıt Alındı</h2>
+<p>Teşekkürler 💜<br>Zoom linki ödeme sonrası WhatsApp’tan gönderilecektir.</p>
+</div>
 
 <script>
-  // ✅ Eğer Google Apps Script kullanacaksan buraya Web App URL'ni yapıştır:
-  // Örnek: "https://script.google.com/macros/s/AKfycb.../exec"
-  sabit API_URL = "https://script.google.com/macros/s/AKfycbwD4chBKNlbOIoymVZtPEYCx-YRhwA2hssBPZck-7695kRMN22xAtgSrW94Ck9HsdEJ0Q/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwD4chBKNlbOIoymVZtPEYCx-YRhwA2hssBPZck-7695kRMN22xAtgSrW94Ck9HsdEJ0Q/exec";
 
+document.getElementById("registerForm").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const btn=document.getElementById("submitBtn");
+  btn.disabled=true; btn.textContent="Gönderiliyor…";
 
-  const WORKSHOP_TYPE = "live"; // admin panelde ayırmak için
-  let currentLang = "tr";
-
-  const dict = {
-    tr: {
-      dir: "ltr",
-      title: "Online Art Workshop",
-      subtitle: "Kayıt Formu (Ücretli) • Zoom linki WhatsApp’tan gönderilir",
-      info: "Bu form Online Art Workshop kaydı içindir. Ödeme sonrası Zoom bağlantısı WhatsApp üzerinden paylaşılır.",
-      pill: "Dil seçilebilir • TR/EN/FA",
-      nameLabel: "Ad Soyad",
-      emailLabel: "E-posta",
-      phoneLabel: "Telefon (WhatsApp)",
-      dateLabel: "Tarih",
-      timeLabel: "Seans Saati",
-      timePlaceholder: "Saat seçiniz",
-      priceLabel: "Ücret (Kullanıcı yazar)",
-      noteLabel: "Not (opsiyonel)",
-      warn: "⚠️ Ödeme dekontunu WhatsApp üzerinden gönderiniz.<br>Zoom linki ödeme kontrolünden sonra paylaşılır.",
-      submit: "Kaydı Gönder",
-      small: "Kayıt gönderirken sorun yaşarsan sayfayı yenileyip tekrar dene.",
-      successTitle: "✨ Kayıt Alındı",
-      successText: "Teşekkürler! Ödeme dekontunu WhatsApp’tan gönderdiğinde, Zoom linki paylaşılacaktır.",
-      sending: "Gönderiliyor…",
-      apiMissing: "API_URL boş. Sheet'e yazmak için Apps Script URL gerekli. (Şimdilik sadece kayıt ekranına geçiyorum.)"
-    },
-    en: {
-      dir: "ltr",
-      title: "Online Art Workshop",
-      subtitle: "Registration Form (Paid) • Zoom link will be sent via WhatsApp",
-      info: "This form is for Online Art Workshop registration. After payment verification, the Zoom link will be shared via WhatsApp.",
-      pill: "Multi-language • TR/EN/FA",
-      nameLabel: "Full Name",
-      emailLabel: "Email",
-      phoneLabel: "Phone (WhatsApp)",
-      dateLabel: "Date",
-      timeLabel: "Session Time",
-      timePlaceholder: "Select a time",
-      priceLabel: "Fee (participant writes)",
-      noteLabel: "Note (optional)",
-      warn: "⚠️ Please send your payment receipt via WhatsApp.<br>The Zoom link will be shared after payment verification.",
-      submit: "Submit Registration",
-      small: "If you have issues submitting, refresh the page and try again.",
-      successTitle: "✨ Registration Received",
-      successText: "Thank you! Once you send your payment receipt via WhatsApp, the Zoom link will be shared.",
-      sending: "Sending…",
-      apiMissing: "API_URL is empty. To save to Google Sheet, paste your Apps Script Web App URL. (For now, I will show success screen.)"
-    },
-    fa: {
-      dir: "rtl",
-      title: "کارگاه آنلاین هنر (Online Art Workshop)",
-      subtitle: "فرم ثبت‌نام (پرداختی) • لینک زوم از طریق واتساپ ارسال می‌شود",
-      info: "این فرم برای ثبت‌نام کارگاه آنلاین هنر است. پس از تأیید پرداخت، لینک زوم از طریق واتساپ ارسال می‌شود.",
-      pill: "چند زبانه • TR/EN/FA",
-      nameLabel: "نام و نام خانوادگی",
-      emailLabel: "ایمیل",
-      phoneLabel: "شماره (واتساپ)",
-      dateLabel: "تاریخ",
-      timeLabel: "ساعت جلسه",
-      timePlaceholder: "انتخاب ساعت",
-      priceLabel: "هزینه (شرکت‌کننده وارد می‌کند)",
-      noteLabel: "یادداشت (اختیاری)",
-      warn: "⚠️ لطفاً رسید پرداخت را از طریق واتساپ ارسال کنید.<br>لینک زوم پس از بررسی پرداخت ارسال می‌شود.",
-      submit: "ارسال ثبت‌نام",
-      small: "اگر مشکلی بود، صفحه را رفرش کنید و دوباره تلاش کنید.",
-      successTitle: "✨ ثبت‌نام انجام شد",
-      successText: "سپاسگزاریم! پس از ارسال رسید پرداخت در واتساپ، لینک زوم ارسال خواهد شد.",
-      sending: "در حال ارسال…",
-      apiMissing: "API_URL خالی است. برای ذخیره در Google Sheet، لینک Web App Apps Script را وارد کنید. (فعلاً صفحه موفقیت نمایش داده می‌شود.)"
-    }
+  const payload={
+    name:name.value,
+    email:email.value,
+    phone:phone.value,
+    date:date.value,
+    timeSlot:timeSlot.value,
+    price:price.value,
+    note:note.value
   };
 
-  function setLang(lang){
-    currentLang = lang;
-    const t = dict[lang];
-
-    document.documentElement.setAttribute("lang", lang === "fa" ? "fa" : (lang === "en" ? "en" : "tr"));
-    document.documentElement.setAttribute("dir", t.dir);
-
-    // switch alignment a bit for rtl
-    document.querySelector(".card").style.textAlign = (t.dir === "rtl") ? "right" : "left";
-    document.querySelector("h1").style.textAlign = "center";
-    document.querySelector(".subtitle").style.textAlign = "center";
-
-    document.getElementById("t_title").textContent = t.title;
-    document.getElementById("t_subtitle").textContent = t.subtitle;
-    document.getElementById("t_info").childNodes[0].textContent = t.info + " ";
-    document.getElementById("t_pill").textContent = t.pill;
-
-    document.getElementById("t_name_label").textContent = t.nameLabel;
-    document.getElementById("t_email_label").textContent = t.emailLabel;
-    document.getElementById("t_phone_label").textContent = t.phoneLabel;
-    document.getElementById("t_date_label").textContent = t.dateLabel;
-    document.getElementById("t_time_label").textContent = t.timeLabel;
-    document.getElementById("t_time_placeholder").textContent = t.timePlaceholder;
-    document.getElementById("t_price_label").textContent = t.priceLabel;
-    document.getElementById("t_note_label").textContent = t.noteLabel;
-
-    document.getElementById("t_warn").innerHTML = t.warn;
-    document.getElementById("submitBtn").textContent = t.submit;
-    document.getElementById("t_small").textContent = t.small;
-
-    document.getElementById("t_success_title").textContent = t.successTitle;
-    document.getElementById("t_success_text").textContent = t.successText;
-
-    document.querySelectorAll(".langbtn").forEach(b=>{
-      b.classList.toggle("active", b.dataset.lang === lang);
-    });
-  }
-
-  document.querySelectorAll(".langbtn").forEach(btn=>{
-    btn.addEventListener("click", ()=> setLang(btn.dataset.lang));
-  });
-
-  // default TR
-  setLang("tr");
-
-  async function submitToSheet(payload){
-    // API yoksa "çalışsın" diye success gösterelim (sen API_URL ekleyince Sheet'e yazacak)
-    const t = dict[currentLang];
-    if(!API_URL || !API_URL.trim()){
-      alert(t.apiMissing);
-      return { ok:true, mock:true };
-    }
-
-    const res = await fetch(API_URL, {
+  try{
+    const res=await fetch(API_URL,{
       method:"POST",
-      headers: { "Content-Type":"application/json" },
-      body: JSON.stringify(payload)
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(payload)
     });
+    const data=await res.json();
+    if(!data.ok) throw "Hata";
 
-    // Apps Script JSON dönmeli
-    const data = await res.json().catch(()=>null);
-    if(!data || data.ok !== true){
-      throw new Error(data?.error || "Kayıt oluşturulamadı");
-    }
-    return data;
+    document.getElementById("formCard").style.display="none";
+    document.getElementById("successCard").style.display="block";
+  }catch{
+    alert("Bir hata oluştu");
+    btn.disabled=false;
+    btn.textContent="Kaydı Gönder";
   }
-
-  document.getElementById("registerForm").addEventListener("submit", async (e)=>{
-    e.preventDefault();
-    const t = dict[currentLang];
-    const btn = document.getElementById("submitBtn");
-
-    btn.disabled = true;
-    btn.textContent = t.sending;
-
-    try{
-      const payload = {
-        action: "create",
-        workshopType: WORKSHOP_TYPE, // "live"
-        workshopName: "Online Art Workshop",
-        language: currentLang,
-        name: document.getElementById("name").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        phone: document.getElementById("phone").value.trim(),
-        date: document.getElementById("date").value,
-        timeSlot: document.getElementById("timeSlot").value,
-        priceText: document.getElementById("price").value.trim(),
-        note: document.getElementById("note").value.trim()
-      };
-
-      await submitToSheet(payload);
-
-      document.getElementById("formCard").style.display="none";
-      document.getElementById("successCard").style.display="block";
-    }catch(err){
-      alert("Hata: " + (err?.message || err));
-      btn.disabled = false;
-      btn.textContent = t.submit;
-    }
-  });
+});
 </script>
+
 </body>
 </html>
+
