@@ -7,99 +7,108 @@
 
 <style>
 :root{
-  --bg1:#0b1220; --bg2:#05060a;
-  --card:rgba(12,18,32,.92);
-  --accent1:#60a5fa; --accent2:#a78bfa;
+  --bg1:#0b1220;
+  --bg2:#05060a;
+  --card: rgba(12,18,32,.95);
+  --accent1:#60a5fa;
+  --accent2:#a78bfa;
 }
+*{box-sizing:border-box}
 body{
-  margin:0; min-height:100vh;
-  display:flex; justify-content:center;
+  margin:0;
+  font-family:system-ui, sans-serif;
   background:radial-gradient(circle at top,var(--bg1),var(--bg2));
-  color:#fff; font-family:system-ui;
+  color:#fff;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  padding:40px 12px;
 }
 .card{
-  max-width:520px; width:100%;
+  width:100%;
+  max-width:520px;
   background:var(--card);
   border-radius:18px;
-  padding:26px; margin:40px 12px;
+  padding:26px;
 }
-h1{text-align:center}
-.subtitle{text-align:center;opacity:.8}
-.langbar{display:flex;gap:10px;justify-content:center}
-.langbtn{background:#ffffff12;color:#fff;border-radius:999px;padding:6px 12px;border:1px solid #ffffff22;cursor:pointer}
-.langbtn.active{background:#7c3aed55}
+h1{text-align:center;margin:0}
+.subtitle{text-align:center;opacity:.8;margin-bottom:16px}
 
-label{display:block;margin-top:12px;font-size:13px}
+label{display:block;margin:12px 0 6px}
 input,select,textarea{
-  width:100%;padding:12px;
+  width:100%;
+  padding:12px;
   border-radius:12px;
-  background:#ffffff10;
-  border:1px solid #ffffff22;
+  border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.06);
   color:#fff;
 }
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(max-width:520px){.row{grid-template-columns:1fr}}
+textarea{min-height:80px}
+
+.row{
+  display:flex;
+  gap:10px;
+  margin-bottom:10px;
+}
+.row>div{flex:1}
 
 .warn{
   margin-top:14px;
   padding:12px;
   border-radius:12px;
-  background:#facc1530;
+  background:rgba(251,191,36,.15);
   color:#fde68a;
-  font-weight:600;
   text-align:center;
+  font-weight:600;
 }
-.btn{
+button{
   margin-top:16px;
   width:100%;
   padding:14px;
   border:none;
   border-radius:14px;
-  background:linear-gradient(135deg,var(--accent1),var(--accent2));
+  font-size:15px;
   color:#fff;
-  font-size:16px;
   cursor:pointer;
+  background:linear-gradient(135deg,var(--accent1),var(--accent2));
 }
+button:disabled{opacity:.6}
+
 .success{display:none;text-align:center}
+.success h2{color:#c4b5fd}
 </style>
 </head>
 
 <body>
 
 <div class="card" id="formCard">
-<h1 id="t_title">Online Art Workshop</h1>
-<p class="subtitle" id="t_subtitle">Kayıt Formu (Ücretli)</p>
-
-<div class="langbar">
-<button class="langbtn active" data-lang="tr">🇹🇷 TR</button>
-<button class="langbtn" data-lang="en">🇬🇧 EN</button>
-<button class="langbtn" data-lang="fa">🇮🇷 FA</button>
-</div>
+<h1>Online Art Workshop</h1>
+<p class="subtitle">Kayıt Formu (Ücretli)</p>
 
 <form id="registerForm">
-<label id="t_name">Ad Soyad</label>
+<label>Ad Soyad</label>
 <input id="name" required>
 
 <div class="row">
 <div>
-<label id="t_email">E-posta</label>
+<label>E-posta</label>
 <input id="email" type="email" required>
 </div>
 <div>
-<label id="t_phone">Telefon (WhatsApp)</label>
+<label>Telefon (WhatsApp)</label>
 <input id="phone" required>
 </div>
 </div>
 
 <div class="row">
 <div>
-<label id="t_date">Tarih</label>
+<label>Tarih</label>
 <input id="date" type="date" required>
 </div>
 <div>
-<label id="t_time">Seans Saati</label>
+<label>Seans Saati</label>
 <select id="timeSlot" required>
-<option value="">Saat seçiniz</option>
+<option value="">Saat seç</option>
 <option>09.30 – 11.00</option>
 <option>11.20 – 12.50</option>
 <option>14.10 – 15.40</option>
@@ -109,60 +118,59 @@ input,select,textarea{
 </div>
 </div>
 
-<label id="t_price">Ücret</label>
-<input id="price" required placeholder="Örn: 1200 TL / 40€">
+<label>Ücret</label>
+<input id="price" required>
 
-<label id="t_note">Not</label>
+<label>Not</label>
 <textarea id="note"></textarea>
 
-<div class="warn" id="t_warn">
+<div class="warn">
 ⚠️ Ödeme dekontunu WhatsApp üzerinden gönderiniz.<br>
-Zoom linki ödeme kontrolünden sonra paylaşılır.
+Zoom linki ödeme sonrası paylaşılır.
 </div>
 
-<button class="btn" id="submitBtn">Kaydı Gönder</button>
+<button id="submitBtn">Kaydı Gönder</button>
 </form>
 </div>
 
 <div class="card success" id="successCard">
 <h2>✨ Kayıt Alındı</h2>
-<p>Teşekkürler 💜<br>Zoom linki ödeme sonrası WhatsApp’tan gönderilecektir.</p>
+<p>Teşekkürler! Ödeme dekontu sonrası Zoom linki gönderilecektir.</p>
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwD4chBKNlbOIoymVZtPEYCx-YRhwA2hssBPZck-7695kRMN22xAtgSrW94Ck9HsdEJ0Q/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbwD4chBKNlbOIoymVZtPEYCx-YRhwA2hssBPZck-7695kRMN22xAtgSrW94Ck9HsdEJ0Q/exec";
 
-document.getElementById("registerForm").addEventListener("submit", async e=>{
-  e.preventDefault();
-  const btn=document.getElementById("submitBtn");
-  btn.disabled=true; btn.textContent="Gönderiliyor…";
+document.getElementById("registerForm").addEventListener("submit",async e=>{
+e.preventDefault();
+const btn=document.getElementById("submitBtn");
+btn.disabled=true;btn.textContent="Gönderiliyor…";
 
-  const payload={
-    name:name.value,
-    email:email.value,
-    phone:phone.value,
-    date:date.value,
-    timeSlot:timeSlot.value,
-    price:price.value,
-    note:note.value
-  };
+try{
+const payload={
+name:name.value,
+email:email.value,
+phone:phone.value,
+date:date.value,
+timeSlot:timeSlot.value,
+price:price.value,
+note:note.value
+};
+const r=await fetch(API_URL,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(payload)
+});
+const d=await r.json();
+if(!d.ok) throw d;
 
-  try{
-    const res=await fetch(API_URL,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(payload)
-    });
-    const data=await res.json();
-    if(!data.ok) throw "Hata";
-
-    document.getElementById("formCard").style.display="none";
-    document.getElementById("successCard").style.display="block";
-  }catch{
-    alert("Bir hata oluştu");
-    btn.disabled=false;
-    btn.textContent="Kaydı Gönder";
-  }
+formCard.style.display="none";
+successCard.style.display="block";
+}catch(err){
+alert("Bir hata oluştu");
+btn.disabled=false;
+btn.textContent="Kaydı Gönder";
+}
 });
 </script>
 
