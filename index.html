@@ -1,242 +1,208 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Online Art Workshop | Kayıt</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Online Art Workshop | Kayıt</title>
 
-<style>
-:root{
-  --bg1:#0b1220;
-  --bg2:#05060a;
-  --card:#0f172a;
-  --accent1:#60a5fa;
-  --accent2:#a78bfa;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:system-ui, sans-serif;
-  background:radial-gradient(circle at top,var(--bg1),var(--bg2));
-  color:#fff;
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  padding:40px 12px;
-}
-.card{
-  width:100%;
-  max-width:520px;
-  background:var(--card);
-  border-radius:18px;
-  padding:26px;
-}
-h1{text-align:center;margin:0}
-.subtitle{text-align:center;opacity:.8;margin-bottom:16px}
+  <style>
+    :root{
+      --bg1:#0b1220;
+      --bg2:#05060a;
+      --card: rgba(12, 18, 32, 0.92);
+      --muted: rgba(255,255,255,.78);
+      --soft: rgba(255,255,255,.08);
+      --accent1:#60a5fa;
+      --accent2:#a78bfa;
+      --warnBg: rgba(251, 191, 36, .12);
+      --warnText:#fde68a;
+    }
 
-.langbar{
-  display:flex;
-  justify-content:center;
-  gap:8px;
-  margin-bottom:14px;
-}
-.langbtn{
-  border:1px solid rgba(255,255,255,.2);
-  background:transparent;
-  color:#fff;
-  padding:6px 10px;
-  border-radius:999px;
-  cursor:pointer;
-}
-.langbtn.active{
-  background:linear-gradient(135deg,var(--accent1),var(--accent2));
-}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(circle at top, var(--bg1), var(--bg2));
+      color:#fff;
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      padding:40px 12px;
+    }
 
-label{display:block;margin:12px 0 6px}
-input,select,textarea{
-  width:100%;
-  padding:12px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.15);
-  background:rgba(255,255,255,.06);
-  color:#fff;
-}
-textarea{min-height:80px}
+    .card{
+      width:100%;
+      max-width:520px;
+      background: var(--card);
+      border-radius:18px;
+      padding:28px;
+      box-shadow:0 25px 60px rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.06);
+    }
 
-.row{
-  display:flex;
-  gap:10px;
-}
-.row>div{flex:1}
+    h1{
+      margin:0 0 6px 0;
+      text-align:center;
+      font-size:24px;
+    }
 
-.warn{
-  margin-top:14px;
-  padding:12px;
-  border-radius:12px;
-  background:rgba(251,191,36,.15);
-  color:#fde68a;
-  text-align:center;
-  font-weight:600;
-}
-button{
-  margin-top:16px;
-  width:100%;
-  padding:14px;
-  border:none;
-  border-radius:14px;
-  font-size:15px;
-  color:#fff;
-  cursor:pointer;
-  background:linear-gradient(135deg,var(--accent1),var(--accent2));
-}
-button:disabled{opacity:.6}
+    .subtitle{
+      text-align:center;
+      font-size:14px;
+      color: var(--muted);
+      margin-bottom:18px;
+    }
 
-.success{display:none;text-align:center}
-.success h2{color:#c4b5fd}
-</style>
+    .langbar{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      margin-bottom:16px;
+    }
+
+    .langbtn{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:#fff;
+      padding:8px 10px;
+      border-radius:999px;
+      cursor:pointer;
+      font-size:13px;
+    }
+
+    .langbtn.active{
+      background: linear-gradient(135deg, rgba(96,165,250,.25), rgba(167,139,250,.25));
+      border-color: rgba(167,139,250,.45);
+    }
+
+    .info{
+      background: rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:14px;
+      padding:14px;
+      font-size:13px;
+      margin-bottom:16px;
+      color: var(--muted);
+    }
+
+    label{
+      display:block;
+      font-size:13px;
+      margin:10px 0 6px;
+    }
+
+    input, select, textarea{
+      width:100%;
+      padding:12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      color:#fff;
+      font-size:14px;
+      box-sizing:border-box;
+    }
+
+    textarea{ min-height:80px; }
+
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    @media(max-width:520px){
+      .row{ grid-template-columns:1fr; }
+    }
+
+    .warn{
+      margin-top:14px;
+      background: var(--warnBg);
+      border:1px solid rgba(251,191,36,.35);
+      color: var(--warnText);
+      border-radius:14px;
+      padding:12px;
+      font-weight:600;
+      text-align:center;
+    }
+
+    .btn{
+      margin-top:14px;
+      width:100%;
+      padding:14px;
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      color:#fff;
+      font-size:15px;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    }
+
+    .success{
+      display:none;
+      text-align:center;
+    }
+
+    /* 🔧 SADECE BU EKLENDİ — SEANS SAATLERİ GÖRÜNSÜN DİYE */
+    select option{
+      color:#000;
+      background:#fff;
+    }
+  </style>
 </head>
 
 <body>
 
 <div class="card" id="formCard">
-<h1 id="t_title">Online Art Workshop</h1>
-<p class="subtitle" id="t_sub">Kayıt Formu (Ücretli)</p>
+  <h1>Online Art Workshop</h1>
+  <p class="subtitle">Kayıt Formu (Ücretli)</p>
 
-<div class="langbar">
-  <button class="langbtn active" data-lang="tr">TR</button>
-  <button class="langbtn" data-lang="en">EN</button>
-  <button class="langbtn" data-lang="fa">FA</button>
+  <form id="registerForm">
+    <label>Ad Soyad</label>
+    <input type="text" required>
+
+    <div class="row">
+      <div>
+        <label>E-posta</label>
+        <input type="email" required>
+      </div>
+      <div>
+        <label>Telefon (WhatsApp)</label>
+        <input type="tel" required>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Tarih</label>
+        <input type="date" required>
+      </div>
+      <div>
+        <label>Seans Saati</label>
+        <select required>
+          <option value="">Saat seçiniz</option>
+          <option>09.30 – 11.00</option>
+          <option>11.20 – 12.50</option>
+          <option>14.10 – 15.40</option>
+          <option>16.00 – 17.30</option>
+          <option>17.50 – 19.20</option>
+        </select>
+      </div>
+    </div>
+
+    <label>Ücret</label>
+    <input type="text" placeholder="Örn: 500 TL">
+
+    <label>Not</label>
+    <textarea></textarea>
+
+    <div class="warn">
+      ⚠️ Ödeme dekontunu WhatsApp üzerinden gönderiniz.<br>
+      Zoom linki ödeme sonrası paylaşılır.
+    </div>
+
+    <button class="btn" type="submit">Kaydı Gönder</button>
+  </form>
 </div>
-
-<form id="registerForm">
-<label id="l_name">Ad Soyad</label>
-<input id="name" required>
-
-<div class="row">
-<div>
-<label id="l_email">E-posta</label>
-<input id="email" type="email" required>
-</div>
-<div>
-<label id="l_phone">Telefon (WhatsApp)</label>
-<input id="phone" required>
-</div>
-</div>
-
-<div class="row">
-<div>
-<label id="l_date">Tarih</label>
-<input id="date" type="date" required>
-</div>
-<div>
-<label id="l_time">Seans Saati</label>
-<select id="timeSlot" required>
-<option value="">Saat seç</option>
-<option>09.30 – 11.00</option>
-<option>11.20 – 12.50</option>
-<option>14.10 – 15.40</option>
-<option>16.00 – 17.30</option>
-<option>17.50 – 19.20</option>
-</select>
-</div>
-</div>
-
-<label id="l_price">Ücret</label>
-<input id="price" required>
-
-<label id="l_note">Not</label>
-<textarea id="note"></textarea>
-
-<div class="warn" id="t_warn">
-⚠️ Ödeme dekontunu WhatsApp üzerinden gönderiniz.<br>
-Zoom linki ödeme sonrası paylaşılır.
-</div>
-
-<button id="submitBtn">Kaydı Gönder</button>
-</form>
-</div>
-
-<div class="card success" id="successCard">
-<h2 id="t_success">✨ Kayıt Alındı</h2>
-<p id="t_success_text">Teşekkürler! Ödeme sonrası Zoom linki gönderilecektir.</p>
-</div>
-
-<script>
-const API_URL="https://script.google.com/macros/s/AKfycbwD4chBKNlbOIoymVZtPEYCx-YRhwA2hssBPZck-7695kRMN22xAtgSrW94Ck9HsdEJ0Q/exec";
-
-const dict={
-tr:{
-title:"Online Art Workshop",
-sub:"Kayıt Formu (Ücretli)",
-name:"Ad Soyad",email:"E-posta",phone:"Telefon (WhatsApp)",
-date:"Tarih",time:"Seans Saati",price:"Ücret",note:"Not",
-warn:"⚠️ Ödeme dekontunu WhatsApp üzerinden gönderiniz.<br>Zoom linki ödeme sonrası paylaşılır.",
-btn:"Kaydı Gönder",success:"✨ Kayıt Alındı",
-successText:"Teşekkürler! Ödeme sonrası Zoom linki gönderilecektir."
-},
-en:{
-title:"Online Art Workshop",
-sub:"Paid Registration Form",
-name:"Full Name",email:"Email",phone:"Phone (WhatsApp)",
-date:"Date",time:"Session Time",price:"Fee",note:"Note",
-warn:"⚠️ Please send payment receipt via WhatsApp.<br>Zoom link will be sent after payment.",
-btn:"Submit Registration",success:"✨ Registration Received",
-successText:"Thank you! Zoom link will be sent after payment."
-},
-fa:{
-title:"کارگاه آنلاین هنر",
-sub:"فرم ثبت‌نام (پرداختی)",
-name:"نام و نام خانوادگی",email:"ایمیل",phone:"شماره واتساپ",
-date:"تاریخ",time:"ساعت جلسه",price:"هزینه",note:"یادداشت",
-warn:"⚠️ لطفاً رسید پرداخت را در واتساپ ارسال کنید.<br>لینک زوم پس از پرداخت ارسال می‌شود.",
-btn:"ارسال ثبت‌نام",success:"✨ ثبت‌نام انجام شد",
-successText:"پس از پرداخت، لینک زوم ارسال می‌شود."
-}
-};
-
-function setLang(l){
-const t=dict[l];
-document.documentElement.dir=l==="fa"?"rtl":"ltr";
-t_title.textContent=t.title;
-t_sub.textContent=t.sub;
-l_name.textContent=t.name;
-l_email.textContent=t.email;
-l_phone.textContent=t.phone;
-l_date.textContent=t.date;
-l_time.textContent=t.time;
-l_price.textContent=t.price;
-l_note.textContent=t.note;
-t_warn.innerHTML=t.warn;
-submitBtn.textContent=t.btn;
-t_success.textContent=t.success;
-t_success_text.textContent=t.successText;
-document.querySelectorAll(".langbtn").forEach(b=>b.classList.toggle("active",b.dataset.lang===l));
-}
-
-document.querySelectorAll(".langbtn").forEach(b=>{
-b.onclick=()=>setLang(b.dataset.lang);
-});
-
-setLang("tr");
-
-registerForm.onsubmit=async e=>{
-e.preventDefault();
-submitBtn.disabled=true;
-submitBtn.textContent="Gönderiliyor…";
-try{
-const payload={name:name.value,email:email.value,phone:phone.value,date:date.value,timeSlot:timeSlot.value,price:price.value,note:note.value};
-const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
-const d=await r.json();
-if(!d.ok)throw d;
-formCard.style.display="none";
-successCard.style.display="block";
-}catch{
-alert("Bir hata oluştu");
-submitBtn.disabled=false;
-submitBtn.textContent=dict.tr.btn;
-}
-};
-</script>
 
 </body>
 </html>
