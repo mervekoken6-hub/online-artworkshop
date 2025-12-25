@@ -204,13 +204,14 @@ function setLang(l){
 document.querySelectorAll(".langbtn").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
 setLang("tr");
 
-registerForm.addEventListener("submit",async e=>{
+registerForm.addEventListener("submit", async e=>{
   e.preventDefault();
   submitBtn.disabled=true;
 
   try{
-    const res=await fetch(API_URL,{
+    await fetch(API_URL,{
       method:"POST",
+      mode:"no-cors",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
         name:name.value,
@@ -223,11 +224,9 @@ registerForm.addEventListener("submit",async e=>{
       })
     });
 
-    const json=await res.json();
-    if(!json.ok) throw new Error("Kayıt başarısız");
-
     formCard.style.display="none";
     successCard.style.display="block";
+
   }catch(err){
     alert("Hata oluştu. Lütfen tekrar deneyin.");
     submitBtn.disabled=false;
