@@ -3,23 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <title>Admin Panel • Online Art Workshop</title>
+
 <style>
+:root{
+  --bg1:#0b1220;
+  --bg2:#05060a;
+  --card:rgba(12,18,32,.95);
+  --soft:rgba(255,255,255,.1);
+  --a1:#6366f1;
+  --ok:#34d399;
+  --bad:#fb7185;
+}
+*{box-sizing:border-box}
 body{
   margin:0;
   font-family:system-ui;
-  background:#0b1220;
+  background:radial-gradient(circle at top,var(--bg1),var(--bg2));
   color:#fff;
+  min-height:100vh;
   padding:30px;
+}
+h1{margin-bottom:20px}
+.card{
+  background:var(--card);
+  padding:20px;
+  border-radius:16px;
+  max-width:1100px;
 }
 button{
   padding:10px 16px;
   border-radius:10px;
   border:none;
   cursor:pointer;
-  background:#6366f1;
+  background:var(--a1);
   color:#fff;
   font-weight:600;
-  margin-right:8px;
+  margin-right:6px;
 }
 input{
   padding:10px;
@@ -30,13 +49,18 @@ input{
 table{
   width:100%;
   border-collapse:collapse;
-  margin-top:20px;
+  margin-top:18px;
+  font-size:14px;
 }
 th,td{
   padding:8px;
   border-bottom:1px solid #333;
-  font-size:14px;
+  text-align:left;
 }
+.hidden{display:none}
+.status{margin-top:8px;font-size:13px}
+.ok{color:var(--ok)}
+.bad{color:var(--bad)}
 </style>
 </head>
 
@@ -44,68 +68,124 @@ th,td{
 
 <h1>🧙 Admin Panel • Online Art Workshop</h1>
 
-<div>
-  <input id="apiUrl" placeholder="Apps Script API URL">
-  <button onclick="saveApi()">Kaydet</button>
+<!-- LOGIN -->
+<div class="card" id="loginCard">
+  <h3>Giriş</h3>
+  <input type="password" id="password" placeholder="Şifre">
+  <button onclick="login()">Giriş Yap</button>
+  <div class="status bad hidden" id="loginErr">Şifre yanlış</div>
 </div>
 
-<br>
+<!-- PANEL -->
+<div class="card hidden" id="panelCard">
 
-<div>
-  <button onclick="loadData('cadi')">Cadı Atölyesi Kayıtları</button>
-  <button onclick="loadData('canli')">Canlı Ders Kayıtları</button>
+  <div style="margin-bottom:14px">
+    <input id="apiUrl" placeholder="Apps Script API URL">
+    <button onclick="saveApi()">Kaydet</button>
+    <button onclick="logout()">Çıkış</button>
+    <div class="status" id="apiStatus"></div>
+  </div>
+
+  <div style="margin-bottom:10px">
+    <button onclick="loadData('cadi')">Cadı Atölyesi Kayıtları</button>
+    <button onclick="loadData('canli')">Canlı Ders Kayıtları</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Kayıt Tarihi</th>
+        <th>Ad Soyad</th>
+        <th>E-posta</th>
+        <th>Telefon</th>
+        <th>Tarih</th>
+        <th>Seans</th>
+        <th>Ücret</th>
+        <th>Not</th>
+        <th>Dil</th>
+        <th>Durum</th>
+      </tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+
 </div>
-
-<table>
-  <thead>
-    <tr>
-      <th>Kayıt Tarihi</th>
-      <th>Ad Soyad</th>
-      <th>E-posta</th>
-      <th>Telefon</th>
-      <th>Tarih</th>
-      <th>Seans</th>
-      <th>Ücret</th>
-      <th>Not</th>
-      <th>Dil</th>
-      <th>Durum</th>
-    </tr>
-  </thead>
-  <tbody id="rows"></tbody>
-</table>
 
 <script>
-const LS_API = "admin_api";
+/* === AYARLAR === */
+const ADMIN_PASSWORD = "cadimagic2025";
+const LS_AUTH = "admin_auth_ok";
+const LS_API  = "admin_api_url";
 
+/* === LOGIN === */
+function login(){
+  if(password.value === ADMIN_PASSWORD){
+    localStorage.setItem(LS_AUTH,"1");
+    showPanel();
+  }else{
+    loginErr.classList.remove("hidden");
+  }
+}
+function logout(){
+  localStorage.removeItem(LS_AUTH);
+  location.reload();
+}
+function showPanel(){
+  loginCard.classList.add("hidden");
+  panelCard.classList.remove("hidden");
+}
+
+/* === API === */
 function saveApi(){
-  localStorage.setItem(LS_API, apiUrl.value);
-  alert("API kaydedildi");
+  localStorage.setItem(LS_API, apiUrl.value.trim());
+  apiStatus.textContent="API kaydedildi";
+  apiStatus.className="status ok";
 }
 
 async function loadData(type){
   const url = localStorage.getItem(LS_API);
-  if(!url){ alert("API gir"); return; }
+  if(!url){
+    apiStatus.textContent="API URL girilmedi";
+    apiStatus.className="status bad";
+    return;
+  }
 
-  const res = await fetch(url + "?type=" + type);
-  const json = await res.json();
+  apiStatus.textContent="Yükleniyor...";
+  apiStatus.className="status";
 
-  const body = document.getElementById("rows");
-  body.innerHTML = "";
+  try{
+    const res = await fetch(url + "?type=" + type);
+    const json = await res.json();
+    render(json.rows || []);
+    apiStatus.textContent="Yüklendi";
+    apiStatus.className="status ok";
+  }catch{
+    apiStatus.textContent="API ulaşılamıyor";
+    apiStatus.className="status bad";
+  }
+}
 
-  json.rows.forEach(r=>{
-    const tr = document.createElement("tr");
+/* === TABLO === */
+function render(rows){
+  rowsEl = document.getElementById("rows");
+  rowsEl.innerHTML="";
+  rows.forEach(r=>{
+    const tr=document.createElement("tr");
     r.forEach(c=>{
-      const td = document.createElement("td");
-      td.textContent = c;
+      const td=document.createElement("td");
+      td.textContent=c;
       tr.appendChild(td);
     });
-    body.appendChild(tr);
+    rowsEl.appendChild(tr);
   });
 }
 
+/* === BAŞLANGIÇ === */
+if(localStorage.getItem(LS_AUTH)==="1"){
+  showPanel();
+}
 apiUrl.value = localStorage.getItem(LS_API) || "";
 </script>
 
 </body>
 </html>
-
