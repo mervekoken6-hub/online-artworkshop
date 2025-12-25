@@ -1,187 +1,91 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Panel • Online Art Workshop</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Panel • Online Art Workshop</title>
 
-  <style>
-    :root{
-      --bg1:#0b1220;
-      --bg2:#05060a;
-      --card:rgba(12,18,32,.95);
-      --soft:rgba(255,255,255,.1);
-      --muted:rgba(255,255,255,.75);
-      --a1:#60a5fa;
-      --a2:#a78bfa;
-      --ok:#34d399;
-      --bad:#fb7185;
-      --warn:#facc15;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto;
-      background:radial-gradient(circle at top,var(--bg1),var(--bg2));
-      color:#fff;
-      min-height:100vh;
-      padding:32px 12px;
-      display:flex;
-      justify-content:center;
-    }
-    .wrap{width:100%;max-width:1100px}
-    h1{margin:0 0 12px}
-    .card{
-      background:var(--card);
-      border-radius:18px;
-      padding:20px;
-      box-shadow:0 25px 60px rgba(0,0,0,.55);
-      margin-bottom:18px;
-    }
-    .row{display:flex;gap:12px;flex-wrap:wrap}
-    .btn{
-      padding:10px 16px;
-      border:none;
-      border-radius:12px;
-      background:linear-gradient(135deg,var(--a1),var(--a2));
-      color:#fff;
-      cursor:pointer;
-      font-weight:600;
-    }
-    .btn.ghost{
-      background:transparent;
-      border:1px solid var(--soft);
-    }
-    input,select{
-      padding:10px;
-      border-radius:10px;
-      border:1px solid var(--soft);
-      background:#fff;
-      color:#000;
-      min-width:260px;
-    }
-    .status{font-size:13px;margin-top:6px}
-    .ok{color:var(--ok)}
-    .bad{color:var(--bad)}
-    table{
-      width:100%;
-      border-collapse:collapse;
-      margin-top:12px;
-      font-size:13px;
-    }
-    th,td{
-      padding:8px;
-      border-bottom:1px solid var(--soft);
-      text-align:left;
-    }
-    th{color:var(--muted)}
-    .topbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-    .tabs button{
-      margin-right:6px;
-    }
-    .hidden{display:none}
-  </style>
+<style>
+:root{
+  --bg1:#0b1220; --bg2:#05060a; --card:rgba(12,18,32,.95);
+  --soft:rgba(255,255,255,.1); --muted:rgba(255,255,255,.75);
+  --a1:#60a5fa; --a2:#a78bfa; --ok:#34d399; --bad:#fb7185;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:system-ui;background:radial-gradient(circle at top,var(--bg1),var(--bg2));
+  color:#fff;min-height:100vh;padding:32px 12px;display:flex;justify-content:center;
+}
+.wrap{width:100%;max-width:1100px}
+.card{background:var(--card);border-radius:18px;padding:20px;margin-bottom:18px}
+.btn{padding:10px 16px;border:none;border-radius:12px;
+  background:linear-gradient(135deg,var(--a1),var(--a2));color:#fff;cursor:pointer}
+.btn.ghost{background:transparent;border:1px solid var(--soft)}
+input{padding:10px;border-radius:10px;border:1px solid var(--soft)}
+.hidden{display:none}
+.status{font-size:13px;margin-top:6px}
+.ok{color:var(--ok)} .bad{color:var(--bad)}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+th,td{padding:8px;border-bottom:1px solid var(--soft)}
+</style>
 </head>
 
 <body>
 <div class="wrap">
+<h1>🧙 Admin Panel • Online Art Workshop</h1>
 
-  <h1>🧙 Admin Panel • Online Art Workshop</h1>
+<div class="card" id="loginCard">
+  <input type="password" id="password" placeholder="Şifre">
+  <button class="btn" onclick="login()">Giriş</button>
+  <div class="status bad hidden" id="loginErr">Şifre yanlış</div>
+</div>
 
-  <!-- GİRİŞ -->
-  <div class="card" id="loginCard">
-    <h3>Giriş</h3>
-    <input type="password" id="password" placeholder="Şifre">
-    <button class="btn" onclick="login()">Giriş Yap</button>
-    <div class="status bad hidden" id="loginErr">Şifre yanlış</div>
-  </div>
+<div class="card hidden" id="panelCard">
+  <button class="btn ghost" onclick="loadData()">Kayıtları Yükle</button>
+  <input id="apiUrl" placeholder="Apps Script API URL">
+  <button class="btn ghost" onclick="saveApi()">Kaydet</button>
+  <div class="status" id="apiStatus"></div>
 
-  <!-- PANEL -->
-  <div class="card hidden" id="panelCard">
-    <div class="topbar">
-      <div class="tabs">
-        <button class="btn ghost" onclick="loadData('cadi')">Cadı Atölyesi Kayıtları</button>
-        <button class="btn ghost" onclick="loadData('canli')">Canlı Ders Kayıtları</button>
-      </div>
-      <div>
-        <input id="apiUrl" placeholder="Apps Script API URL">
-        <button class="btn ghost" onclick="saveApi()">Kaydet</button>
-        <button class="btn ghost" onclick="logout()">Çıkış</button>
-        <div class="status" id="apiStatus"></div>
-      </div>
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Kayıt Tarihi</th>
-          <th>Ad Soyad</th>
-          <th>E-posta</th>
-          <th>Telefon</th>
-          <th>Tarih</th>
-          <th>Seans</th>
-          <th>Ücret</th>
-          <th>Not</th>
-          <th>Dil</th>
-          <th>Durum</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-    </table>
-  </div>
-
+  <table>
+    <thead>
+      <tr>
+        <th>Kayıt Tarihi</th><th>Ad Soyad</th><th>E-posta</th>
+        <th>Telefon</th><th>Tarih</th><th>Seans</th>
+        <th>Ücret</th><th>Not</th><th>Dil</th><th>Durum</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
 </div>
 
 <script>
-/* === AYARLAR === */
-const ADMIN_PASSWORD = "cadimagic2025";
-const LS_AUTH = "admin_auth_ok";
-const LS_API = "admin_api_url";
+const ADMIN_PASSWORD="cadimagic2025";
+const LS_AUTH="admin_auth_ok", LS_API="admin_api_url";
 
-/* === GİRİŞ === */
 function login(){
-  if(password.value === ADMIN_PASSWORD){
-    localStorage.setItem(LS_AUTH,"1");
-    showPanel();
-  }else{
-    loginErr.classList.remove("hidden");
-  }
-}
-function logout(){
-  localStorage.removeItem(LS_AUTH);
-  location.reload();
+  if(password.value===ADMIN_PASSWORD){
+    localStorage.setItem(LS_AUTH,"1"); showPanel();
+  } else loginErr.classList.remove("hidden");
 }
 function showPanel(){
   loginCard.classList.add("hidden");
   panelCard.classList.remove("hidden");
 }
-
-/* === API === */
 function saveApi(){
-  localStorage.setItem(LS_API, apiUrl.value.trim());
-  apiStatus.textContent="API kaydedildi";
-  apiStatus.className="status ok";
+  localStorage.setItem(LS_API,apiUrl.value.trim());
+  apiStatus.textContent="API kaydedildi"; apiStatus.className="status ok";
 }
 
-async function loadData(type){
-  const url = localStorage.getItem(LS_API);
-  if(!url){
-    apiStatus.textContent="API URL girilmedi";
-    apiStatus.className="status bad";
-    return;
-  }
+async function loadData(){
+  const url=localStorage.getItem(LS_API);
+  if(!url){apiStatus.textContent="API URL girilmedi";apiStatus.className="status bad";return;}
   apiStatus.textContent="Yükleniyor...";
   try{
-    const res = await fetch(url+"?type="+type);
-    const json = await res.json();
+    const res=await fetch(url,{mode:"cors"});
+    const json=await res.json();
     render(json.rows||[]);
-    apiStatus.textContent="Yüklendi";
+    apiStatus.textContent="Bağlandı (kayıt yoksa boş görünür)";
     apiStatus.className="status ok";
   }catch(e){
     apiStatus.textContent="API ulaşılamıyor";
@@ -189,26 +93,20 @@ async function loadData(type){
   }
 }
 
-/* === TABLO === */
 function render(rows){
   tableBody.innerHTML="";
   rows.forEach(r=>{
     const tr=document.createElement("tr");
     r.forEach(c=>{
       const td=document.createElement("td");
-      td.textContent=c;
-      tr.appendChild(td);
+      td.textContent=c; tr.appendChild(td);
     });
     tableBody.appendChild(tr);
   });
 }
 
-/* === BAŞLANGIÇ === */
-if(localStorage.getItem(LS_AUTH)==="1"){
-  showPanel();
-}
-apiUrl.value = localStorage.getItem(LS_API)||"";
+if(localStorage.getItem(LS_AUTH)==="1") showPanel();
+apiUrl.value=localStorage.getItem(LS_API)||"";
 </script>
-
 </body>
 </html>
