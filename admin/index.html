@@ -68,7 +68,6 @@ th,td{
 
 <h1>🧙 Admin Panel • Online Art Workshop</h1>
 
-<!-- LOGIN -->
 <div class="card" id="loginCard">
   <h3>Giriş</h3>
   <input type="password" id="password" placeholder="Şifre">
@@ -76,7 +75,6 @@ th,td{
   <div class="status bad hidden" id="loginErr">Şifre yanlış</div>
 </div>
 
-<!-- PANEL -->
 <div class="card hidden" id="panelCard">
 
   <div style="margin-bottom:14px">
@@ -112,12 +110,10 @@ th,td{
 </div>
 
 <script>
-/* === AYARLAR === */
 const ADMIN_PASSWORD = "cadimagic2025";
 const LS_AUTH = "admin_auth_ok";
 const LS_API  = "admin_api_url";
 
-/* === LOGIN === */
 function login(){
   if(password.value === ADMIN_PASSWORD){
     localStorage.setItem(LS_AUTH,"1");
@@ -135,7 +131,6 @@ function showPanel(){
   panelCard.classList.remove("hidden");
 }
 
-/* === API === */
 function saveApi(){
   localStorage.setItem(LS_API, apiUrl.value.trim());
   apiStatus.textContent="API kaydedildi";
@@ -156,7 +151,15 @@ async function loadData(type){
   try{
     const res = await fetch(url + "?type=" + type);
     const json = await res.json();
-    render(json.rows || []);
+
+    if(json.rows){
+      renderRows(json.rows);
+    }else if(json.records){
+      renderRecords(json.records);
+    }else{
+      renderRows([]);
+    }
+
     apiStatus.textContent="Yüklendi";
     apiStatus.className="status ok";
   }catch{
@@ -165,10 +168,9 @@ async function loadData(type){
   }
 }
 
-/* === TABLO === */
-function render(rows){
-  rowsEl = document.getElementById("rows");
-  rowsEl.innerHTML="";
+function renderRows(rows){
+  const el=document.getElementById("rows");
+  el.innerHTML="";
   rows.forEach(r=>{
     const tr=document.createElement("tr");
     r.forEach(c=>{
@@ -176,11 +178,36 @@ function render(rows){
       td.textContent=c;
       tr.appendChild(td);
     });
-    rowsEl.appendChild(tr);
+    el.appendChild(tr);
   });
 }
 
-/* === BAŞLANGIÇ === */
+function renderRecords(records){
+  const el=document.getElementById("rows");
+  el.innerHTML="";
+  records.forEach(r=>{
+    const tr=document.createElement("tr");
+    const cols=[
+      r.createdAt || "",
+      r.name || "",
+      r.email || "",
+      r.phone || "",
+      r.date || "",
+      r.timeSlot || "",
+      r.price || "",
+      "",
+      "",
+      r.status || ""
+    ];
+    cols.forEach(c=>{
+      const td=document.createElement("td");
+      td.textContent=c;
+      tr.appendChild(td);
+    });
+    el.appendChild(tr);
+  });
+}
+
 if(localStorage.getItem(LS_AUTH)==="1"){
   showPanel();
 }
