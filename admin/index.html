@@ -154,8 +154,6 @@ async function loadData(type){
 
     if(json.rows){
       renderRows(json.rows);
-    }else if(json.records){
-      renderRecords(json.records);
     }else{
       renderRows([]);
     }
@@ -171,39 +169,29 @@ async function loadData(type){
 function renderRows(rows){
   const el=document.getElementById("rows");
   el.innerHTML="";
+
   rows.forEach(r=>{
     const tr=document.createElement("tr");
-    r.forEach(c=>{
-      const td=document.createElement("td");
-      td.textContent=c;
-      tr.appendChild(td);
-    });
-    el.appendChild(tr);
-  });
-}
 
-function renderRecords(records){
-  const el=document.getElementById("rows");
-  el.innerHTML="";
-  records.forEach(r=>{
-    const tr=document.createElement("tr");
     const cols=[
-      r.createdAt || "",
-      r.name || "",
-      r.email || "",
-      r.phone || "",
-      r.date || "",
-      r.timeSlot || "",
-      r.price || "",
-      "",
-      "",
-      r.status || ""
+      r[0] || "", // kayıt tarihi
+      r[1] || "", // ad soyad
+      r[2] || "", // e-posta
+      r[3] || "", // telefon
+      r[4] || "", // tarih
+      r[5] || "", // seans
+      r[6] || "", // ücret
+      r[7] || "", // not
+      r[8] || "", // dil
+      r[9] || ""  // durum
     ];
+
     cols.forEach(c=>{
       const td=document.createElement("td");
       td.textContent=c;
       tr.appendChild(td);
     });
+
     el.appendChild(tr);
   });
 }
