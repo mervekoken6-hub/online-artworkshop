@@ -9,7 +9,6 @@
   --bg1:#0b1220;
   --bg2:#05060a;
   --card:rgba(12,18,32,.95);
-  --soft:rgba(255,255,255,.1);
   --a1:#6366f1;
   --ok:#34d399;
   --bad:#fb7185;
@@ -85,7 +84,6 @@ th,td{
   </div>
 
   <div style="margin-bottom:10px">
-    <button onclick="loadData('cadi')">Cadı Atölyesi Kayıtları</button>
     <button onclick="loadData('canli')">Canlı Ders Kayıtları</button>
   </div>
 
@@ -130,7 +128,6 @@ function showPanel(){
   loginCard.classList.add("hidden");
   panelCard.classList.remove("hidden");
 }
-
 function saveApi(){
   localStorage.setItem(LS_API, apiUrl.value.trim());
   apiStatus.textContent="API kaydedildi";
@@ -144,20 +141,11 @@ async function loadData(type){
     apiStatus.className="status bad";
     return;
   }
-
   apiStatus.textContent="Yükleniyor...";
-  apiStatus.className="status";
-
   try{
     const res = await fetch(url + "?type=" + type);
     const json = await res.json();
-
-    if(json.rows){
-      renderRows(json.rows);
-    }else{
-      renderRows([]);
-    }
-
+    renderRows(json.rows || []);
     apiStatus.textContent="Yüklendi";
     apiStatus.className="status ok";
   }catch{
@@ -176,14 +164,14 @@ function renderRows(rows){
     const cols=[
       r[0] || "", // kayıt tarihi
       r[1] || "", // ad soyad
-      r[2] || "", // e-posta
+      r[2] || "", // email
       r[3] || "", // telefon
       r[4] || "", // tarih
       r[5] || "", // seans
       r[6] || "", // ücret
       r[7] || "", // not
       r[8] || "", // dil
-      r[9] || ""  // durum
+      r[9] || r[7] || "" // durum (9 yoksa 7'yi al)
     ];
 
     cols.forEach(c=>{
@@ -196,9 +184,7 @@ function renderRows(rows){
   });
 }
 
-if(localStorage.getItem(LS_AUTH)==="1"){
-  showPanel();
-}
+if(localStorage.getItem(LS_AUTH)==="1") showPanel();
 apiUrl.value = localStorage.getItem(LS_API) || "";
 </script>
 
