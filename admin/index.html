@@ -132,17 +132,33 @@ async function loadData(type){
   }
 }
 
+/* 🔴 SADECE BURASI DÜZELTİLDİ */
 function renderRows(rows){
-  const el=document.getElementById("rows");
-  el.innerHTML="";
+  const el = document.getElementById("rows");
+  el.innerHTML = "";
 
-  rows.forEach(r=>{
-    const tr=document.createElement("tr");
-    for(let i=0;i<10;i++){
-      const td=document.createElement("td");
-      td.textContent=r[i]||"";
+  rows.forEach(r => {
+    const tr = document.createElement("tr");
+
+    const mapped = [
+      r[0] || "", // Kayıt Tarihi
+      r[1] || "", // Ad Soyad
+      r[2] || "", // E-posta
+      r[3] || "", // Telefon
+      r[4] || "", // Tarih
+      r[5] || "", // Seans
+      r[6] || "", // Ücret
+      r[7] || "", // Not
+      r[8] || "", // Dil
+      r[9] || ""  // Durum
+    ];
+
+    mapped.forEach(val => {
+      const td = document.createElement("td");
+      td.textContent = val;
       tr.appendChild(td);
-    }
+    });
+
     el.appendChild(tr);
   });
 }
