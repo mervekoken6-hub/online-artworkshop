@@ -25,6 +25,7 @@ button{
   background:#6366f1;
   color:#fff;
   cursor:pointer;
+  margin-right:6px;
 }
 input{
   padding:10px;
@@ -42,6 +43,7 @@ th,td{
   border-bottom:1px solid #333;
 }
 .hidden{display:none}
+.status{margin-left:10px}
 </style>
 </head>
 
@@ -58,14 +60,17 @@ th,td{
 
 <div class="card hidden" id="panelCard">
 
-  <div style="margin-bottom:12px">
+  <div style="margin-bottom:14px">
     <input id="apiUrl" placeholder="Apps Script API URL">
     <button onclick="saveApi()">Kaydet</button>
     <button onclick="logout()">Çıkış</button>
-    <span id="status"></span>
+    <span id="status" class="status"></span>
   </div>
 
-  <button onclick="loadData()">Canlı Ders Kayıtları</button>
+  <div style="margin-bottom:10px">
+    <button onclick="loadData('cadi')">🧙 Cadı Atölyesi Kayıtları</button>
+    <button onclick="loadData('canli')">🎥 Canlı Ders Kayıtları</button>
+  </div>
 
   <table>
     <thead>
@@ -77,6 +82,8 @@ th,td{
         <th>Tarih</th>
         <th>Seans</th>
         <th>Ücret</th>
+        <th>Not</th>
+        <th>Dil</th>
         <th>Durum</th>
       </tr>
     </thead>
@@ -102,26 +109,41 @@ function logout(){
 }
 
 function saveApi(){
-  localStorage.setItem("api", apiUrl.value);
-  status.textContent="Kaydedildi";
+  localStorage.setItem("api", apiUrl.value.trim());
+  status.textContent="API kaydedildi";
 }
 
-async function loadData(){
+async function loadData(type){
   const url = localStorage.getItem("api");
-  if(!url) return alert("API yok");
+  if(!url){
+    alert("API URL girilmedi");
+    return;
+  }
 
-  const res = await fetch(url);
-  const json = await res.json();
+  status.textContent="Yükleniyor...";
 
-  rows.innerHTML="";
-  json.rows.forEach(r=>{
+  try{
+    const res = await fetch(url + "?type=" + type);
+    const json = await res.json();
+    renderRows(json.rows || []);
+    status.textContent="Yüklendi";
+  }catch{
+    status.textContent="API hatası";
+  }
+}
+
+function renderRows(rows){
+  const el=document.getElementById("rows");
+  el.innerHTML="";
+
+  rows.forEach(r=>{
     const tr=document.createElement("tr");
-    [r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[9]].forEach(c=>{
+    for(let i=0;i<10;i++){
       const td=document.createElement("td");
-      td.textContent=c||"";
+      td.textContent=r[i]||"";
       tr.appendChild(td);
-    });
-    rows.appendChild(tr);
+    }
+    el.appendChild(tr);
   });
 }
 
