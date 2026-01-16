@@ -167,8 +167,8 @@ textarea{min-height:80px}
 </div>
 
 <script>
-// ✅ BURAYI kendi Apps Script Web App URL’in ile değiştir
-const API_URL="PASTE_YOUR_WEB_APP_URL_HERE";
+// ✅ Buraya EN SON Deploy’dan aldığın /exec linkini yaz
+const API_URL="PASTE_YOUR_NEW_EXEC_URL_HERE";
 
 const dict={
 tr:{title:"Online Art Workshop",subtitle:"Kayıt Formu • Zoom linki WhatsApp’tan gönderilir",
@@ -205,31 +205,40 @@ function setLang(l){
 document.querySelectorAll(".langbtn").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
 setLang("tr");
 
-registerForm.addEventListener("submit", async e=>{
+// ✅ Apps Script için en sağlam gönderim: POST ama veriler querystring (URLSearchParams)
+registerForm.addEventListener("submit", async (e)=>{
   e.preventDefault();
   submitBtn.disabled=true;
 
   try{
-    const fd = new FormData();
-    fd.append("type", "canli");
-    fd.append("name", name.value);
-    fd.append("email", email.value);
-    fd.append("phone", phone.value);
-    fd.append("date", date.value);
-    fd.append("seans", timeSlot.value);
-    fd.append("ucret", price.value);
-    fd.append("not", note.value);
-    fd.append("dil", "tr");
-    fd.append("durum", "Beklemede");
+    const params = new URLSearchParams({
+      type: "canli",
+      name: name.value,
+      email: email.value,
+      phone: phone.value,
+      date: date.value,
+      seans: timeSlot.value,
+      ucret: price.value,
+      not: note.value,
+      dil: "tr",
+      durum: "Beklemede"
+    });
 
-    const res = await fetch(API_URL, { method:"POST", body: fd });
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+      body: params.toString()
+    });
 
-    // fetch bazen CORS / redirect yüzünden okunamaz; ama network hatası yoksa kayıt düşer.
+    const json = await res.json();
+    if(!json || json.ok !== true){
+      throw new Error((json && json.error) ? json.error : "API ok:false");
+    }
+
     formCard.style.display="none";
     successCard.style.display="block";
-
   }catch(err){
-    alert("Hata oluştu. Lütfen tekrar deneyin.");
+    alert("Hata oluştu: " + (err && err.message ? err.message : err));
     submitBtn.disabled=false;
   }
 });
