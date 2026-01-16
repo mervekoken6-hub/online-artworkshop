@@ -186,38 +186,49 @@ submit:"ارسال ثبت‌نام",success:"✨ ثبت‌نام انجام شد
 
 function setLang(l){
   document.documentElement.dir=(l==="fa")?"rtl":"ltr";
-  t_title.textContent=dict[l].title;
-  t_subtitle.textContent=dict[l].subtitle;
-  l_name.textContent=dict[l].name;
-  l_email.textContent=dict[l].email;
-  l_phone.textContent=dict[l].phone;
-  l_date.textContent=dict[l].date;
-  l_time.textContent=dict[l].time;
-  l_price.textContent=dict[l].price;
-  l_note.textContent=dict[l].note;
-  t_warn.innerHTML=dict[l].warn;
-  submitBtn.textContent=dict[l].submit;
-  t_success.textContent=dict[l].success;
+  document.getElementById("t_title").textContent=dict[l].title;
+  document.getElementById("t_subtitle").textContent=dict[l].subtitle;
+  document.getElementById("l_name").textContent=dict[l].name;
+  document.getElementById("l_email").textContent=dict[l].email;
+  document.getElementById("l_phone").textContent=dict[l].phone;
+  document.getElementById("l_date").textContent=dict[l].date;
+  document.getElementById("l_time").textContent=dict[l].time;
+  document.getElementById("l_price").textContent=dict[l].price;
+  document.getElementById("l_note").textContent=dict[l].note;
+  document.getElementById("t_warn").innerHTML=dict[l].warn;
+  document.getElementById("submitBtn").textContent=dict[l].submit;
+  document.getElementById("t_success").textContent=dict[l].success;
   document.querySelectorAll(".langbtn").forEach(b=>b.classList.toggle("active",b.dataset.lang===l));
 }
 
 document.querySelectorAll(".langbtn").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
 setLang("tr");
 
-registerForm.addEventListener("submit", async (e)=>{
+document.getElementById("registerForm").addEventListener("submit", async (e)=>{
   e.preventDefault();
-  submitBtn.disabled=true;
+
+  const submitBtn = document.getElementById("submitBtn");
+  submitBtn.disabled = true;
+
+  // ✅ Elementleri ID ile garanti alıyoruz (undefined sorunu burada bitiyor)
+  const nameEl = document.getElementById("name");
+  const emailEl = document.getElementById("email");
+  const phoneEl = document.getElementById("phone");
+  const dateEl = document.getElementById("date");
+  const timeSlotEl = document.getElementById("timeSlot");
+  const priceEl = document.getElementById("price");
+  const noteEl = document.getElementById("note");
 
   try{
     const params = new URLSearchParams({
       type: "canli",
-      name: name.value,
-      email: email.value,
-      phone: phone.value,
-      date: date.value,
-      seans: timeSlot.value,
-      ucret: price.value,
-      not: note.value,
+      name: (nameEl.value || "").trim(),
+      email: (emailEl.value || "").trim(),
+      phone: (phoneEl.value || "").trim(),
+      date: (dateEl.value || "").trim(),
+      seans: (timeSlotEl.value || "").trim(),
+      ucret: (priceEl.value || "").trim(),
+      not: (noteEl.value || "").trim(),
       dil: "tr",
       durum: "Beklemede"
     });
@@ -229,23 +240,17 @@ registerForm.addEventListener("submit", async (e)=>{
     });
 
     const text = await res.text();
-
     let json;
-    try{
-      json = JSON.parse(text);
-    }catch{
-      throw new Error("API JSON dönmedi. Gelen cevap HTML gibi: " + text.slice(0,120));
-    }
+    try{ json = JSON.parse(text); }
+    catch{ throw new Error("API JSON dönmedi: " + text.slice(0,120)); }
 
-    if(!json.ok){
-      throw new Error(json.error || "API ok:false");
-    }
+    if(!json.ok) throw new Error(json.error || "API ok:false");
 
-    formCard.style.display="none";
-    successCard.style.display="block";
+    document.getElementById("formCard").style.display="none";
+    document.getElementById("successCard").style.display="block";
 
   }catch(err){
-    alert("Hata oluştu: " + (err && err.message ? err.message : err));
+    alert("Hata oluştu: " + (err?.message || err));
     submitBtn.disabled=false;
   }
 });
