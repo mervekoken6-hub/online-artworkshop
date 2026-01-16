@@ -41,9 +41,12 @@ table{
 th,td{
   padding:8px;
   border-bottom:1px solid #333;
+  vertical-align:top;
 }
 .hidden{display:none}
-.status{margin-left:10px}
+.status{margin-left:10px; font-size:13px}
+.bad{color:#fb7185}
+.ok{color:#34d399}
 </style>
 </head>
 
@@ -61,7 +64,7 @@ th,td{
 <div class="card hidden" id="panelCard">
 
   <div style="margin-bottom:14px">
-    <input id="apiUrl" placeholder="Apps Script API URL">
+    <input id="apiUrl" placeholder="Apps Script WEB APP URL (…/exec)">
     <button onclick="saveApi()">Kaydet</button>
     <button onclick="logout()">Çıkış</button>
     <span id="status" class="status"></span>
@@ -94,11 +97,13 @@ th,td{
 
 <script>
 const PASSWORD = "cadimagic2025";
+const LS_API = "admin_api_url";
 
 function login(){
   if(password.value === PASSWORD){
     loginCard.classList.add("hidden");
     panelCard.classList.remove("hidden");
+    err.style.display="none";
   }else{
     err.style.display="block";
   }
@@ -109,63 +114,74 @@ function logout(){
 }
 
 function saveApi(){
-  localStorage.setItem("api", apiUrl.value.trim());
-  status.textContent="API kaydedildi";
+  localStorage.setItem(LS_API, apiUrl.value.trim());
+  status.textContent="✅ API kaydedildi";
+  status.className="status ok";
+}
+
+function fmt(v){
+  // ISO tarihleri biraz güzelleştir
+  if(typeof v === "string" && v.includes("T") && v.endsWith("Z")){
+    try{
+      const d = new Date(v);
+      if(!isNaN(d.getTime())) return d.toLocaleString("tr-TR");
+    }catch{}
+  }
+  return (v === null || v === undefined) ? "" : String(v);
 }
 
 async function loadData(type){
-  const url = localStorage.getItem("api");
+  const url = localStorage.getItem(LS_API);
   if(!url){
-    alert("API URL girilmedi");
+    status.textContent="❌ API URL girilmedi";
+    status.className="status bad";
     return;
   }
 
-  status.textContent="Yükleniyor...";
+  status.textContent="⏳ Yükleniyor...";
+  status.className="status";
 
   try{
-    const res = await fetch(url + "?type=" + type);
+    const res = await fetch(url + "?type=" + encodeURIComponent(type));
     const json = await res.json();
+
+    if(!json.ok){
+      status.textContent="❌ API hata: " + (json.error || "Bilinmeyen");
+      status.className="status bad";
+      renderRows([]);
+      return;
+    }
+
     renderRows(json.rows || []);
-    status.textContent="Yüklendi";
-  }catch{
-    status.textContent="API hatası";
+    status.textContent="✅ Yüklendi (" + (json.rows ? json.rows.length : 0) + ")";
+    status.className="status ok";
+  }catch(e){
+    status.textContent="❌ API ulaşılamıyor / JSON okunamıyor";
+    status.className="status bad";
   }
 }
 
-/* 🔴 SADECE BURASI DÜZELTİLDİ */
 function renderRows(rows){
-  const el = document.getElementById("rows");
-  el.innerHTML = "";
+  const el=document.getElementById("rows");
+  el.innerHTML="";
 
-  rows.forEach(r => {
-    const tr = document.createElement("tr");
+  rows.forEach(r=>{
+    const tr=document.createElement("tr");
 
-    const mapped = [
-      r[0] || "", // Kayıt Tarihi
-      r[1] || "", // Ad Soyad
-      r[2] || "", // E-posta
-      r[3] || "", // Telefon
-      r[4] || "", // Tarih
-      r[5] || "", // Seans
-      r[6] || "", // Ücret
-      r[7] || "", // Not
-      r[8] || "", // Dil
-      r[9] || ""  // Durum
-    ];
-
-    mapped.forEach(val => {
-      const td = document.createElement("td");
-      td.textContent = val;
+    // A-J (10 sütun) garanti
+    for(let i=0;i<10;i++){
+      const td=document.createElement("td");
+      td.textContent = fmt(r[i]);
       tr.appendChild(td);
-    });
+    }
 
     el.appendChild(tr);
   });
 }
 
-apiUrl.value = localStorage.getItem("api") || "";
+// load saved url
+apiUrl.value = localStorage.getItem(LS_API) || "";
 </script>
 
 </body>
-  
 </html>
