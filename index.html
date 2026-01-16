@@ -163,32 +163,29 @@ textarea{min-height:80px}
 
 <div class="card success" id="successCard">
   <h2 id="t_success">✨ Kayıt Alındı</h2>
-  <p id="t_success_text">Teşekkürler! WhatsApp üzerinden dekontu gönderdiğinizde Zoom linki paylaşılacaktır.</p>
+  <p>Teşekkürler! WhatsApp üzerinden dekontu gönderdiğinizde Zoom linki paylaşılacaktır.</p>
 </div>
 
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbwD4chBKNlbOIoymVZtPEYCx-YRhwA2hssBPZck-7695kRMN22xAtgSrW94Ck9HsdEJ0Q/exec";
-
-// aktif dil (FormData içine bunu basacağız)
-let currentLang = "tr";
+// ✅ BURAYI kendi Apps Script Web App URL’in ile değiştir
+const API_URL="PASTE_YOUR_WEB_APP_URL_HERE";
 
 const dict={
 tr:{title:"Online Art Workshop",subtitle:"Kayıt Formu • Zoom linki WhatsApp’tan gönderilir",
 name:"Ad Soyad",email:"E-posta",phone:"Telefon (WhatsApp)",date:"Tarih",time:"Seans Saati",
 price:"Ücret",note:"Not",warn:"⚠️ Ödeme dekontunu WhatsApp üzerinden gönderiniz.<br>Zoom linki ödeme kontrolünden sonra paylaşılır.",
-submit:"Kaydı Gönder",success:"✨ Kayıt Alındı",successText:"Teşekkürler! WhatsApp üzerinden dekontu gönderdiğinizde Zoom linki paylaşılacaktır."},
+submit:"Kaydı Gönder",success:"✨ Kayıt Alındı"},
 en:{title:"Online Art Workshop",subtitle:"Registration Form • Zoom link via WhatsApp",
 name:"Full Name",email:"Email",phone:"Phone (WhatsApp)",date:"Date",time:"Session Time",
 price:"Fee",note:"Note",warn:"⚠️ Please send payment receipt via WhatsApp.<br>Zoom link after verification.",
-submit:"Submit Registration",success:"✨ Registration Received",successText:"Thanks! After you send the receipt via WhatsApp, the Zoom link will be shared."},
+submit:"Submit Registration",success:"✨ Registration Received"},
 fa:{title:"کارگاه آنلاین هنر",subtitle:"فرم ثبت‌نام • لینک زوم از واتساپ",
 name:"نام و نام خانوادگی",email:"ایمیل",phone:"واتساپ",date:"تاریخ",time:"ساعت جلسه",
 price:"هزینه",note:"یادداشت",warn:"⚠️ رسید پرداخت را از واتساپ ارسال کنید.<br>لینک زوم بعد از بررسی ارسال می‌شود.",
-submit:"ارسال ثبت‌نام",success:"✨ ثبت‌نام انجام شد",successText:"سپاس! پس از ارسال رسید در واتساپ، لینک زوم ارسال می‌شود."}
+submit:"ارسال ثبت‌نام",success:"✨ ثبت‌نام انجام شد"}
 };
 
 function setLang(l){
-  currentLang = l;
   document.documentElement.dir=(l==="fa")?"rtl":"ltr";
   t_title.textContent=dict[l].title;
   t_subtitle.textContent=dict[l].subtitle;
@@ -202,7 +199,6 @@ function setLang(l){
   t_warn.innerHTML=dict[l].warn;
   submitBtn.textContent=dict[l].submit;
   t_success.textContent=dict[l].success;
-  t_success_text.textContent=dict[l].successText;
   document.querySelectorAll(".langbtn").forEach(b=>b.classList.toggle("active",b.dataset.lang===l));
 }
 
@@ -213,38 +209,27 @@ registerForm.addEventListener("submit", async e=>{
   e.preventDefault();
   submitBtn.disabled=true;
 
-  // basit doğrulama (seans boşsa gönderme)
-  if(!timeSlot.value){
-    alert(currentLang==="tr" ? "Lütfen seans seçiniz." : (currentLang==="en" ? "Please select a session time." : "لطفاً ساعت جلسه را انتخاب کنید."));
-    submitBtn.disabled=false;
-    return;
-  }
-
   try{
-    // ✅ JSON yerine FormData (Apps Script e.parameter ile %100 uyumlu)
     const fd = new FormData();
-    fd.append("type", "canli");              // CanliDers sheet
-    fd.append("name", name.value.trim());
-    fd.append("email", email.value.trim());
-    fd.append("phone", phone.value.trim());
-    fd.append("date", date.value);           // yyyy-mm-dd
-    fd.append("seans", timeSlot.value);      // seçilen seans
-    fd.append("ucret", price.value.trim());  // ücret
-    fd.append("not", note.value.trim());     // not
-    fd.append("dil", currentLang);           // tr/en/fa
-    fd.append("durum", "Beklemede");         // durum
+    fd.append("type", "canli");
+    fd.append("name", name.value);
+    fd.append("email", email.value);
+    fd.append("phone", phone.value);
+    fd.append("date", date.value);
+    fd.append("seans", timeSlot.value);
+    fd.append("ucret", price.value);
+    fd.append("not", note.value);
+    fd.append("dil", "tr");
+    fd.append("durum", "Beklemede");
 
-    await fetch(API_URL, {
-      method: "POST",
-      body: fd
-    });
+    const res = await fetch(API_URL, { method:"POST", body: fd });
 
+    // fetch bazen CORS / redirect yüzünden okunamaz; ama network hatası yoksa kayıt düşer.
     formCard.style.display="none";
     successCard.style.display="block";
-    submitBtn.disabled=false;
 
   }catch(err){
-    alert(currentLang==="tr" ? "Hata oluştu. Lütfen tekrar deneyin." : (currentLang==="en" ? "An error occurred. Please try again." : "خطا رخ داد. لطفاً دوباره تلاش کنید."));
+    alert("Hata oluştu. Lütfen tekrar deneyin.");
     submitBtn.disabled=false;
   }
 });
