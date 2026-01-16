@@ -70,6 +70,7 @@ textarea{min-height:80px}
   grid-template-columns:1fr 1fr;
   gap:12px;
 }
+@media(max-width:520px){.row{grid-template-columns:1fr}}
 
 .warn{
   margin-top:16px;
@@ -93,9 +94,11 @@ textarea{min-height:80px}
   font-size:16px;
   cursor:pointer;
 }
+.btn:disabled{opacity:.6;cursor:not-allowed}
 
 .success{display:none;text-align:center}
-.success h2{color:#c4b5fd}
+.success h2{color:#c4b5fd;margin:0 0 10px}
+.success p{opacity:.9;line-height:1.5;margin:0}
 </style>
 </head>
 
@@ -113,7 +116,7 @@ textarea{min-height:80px}
 
   <form id="registerForm">
     <label id="l_name">Ad Soyad</label>
-    <input id="name" required>
+    <input id="name" type="text" required>
 
     <div class="row">
       <div>
@@ -122,7 +125,7 @@ textarea{min-height:80px}
       </div>
       <div>
         <label id="l_phone">Telefon (WhatsApp)</label>
-        <input id="phone" required>
+        <input id="phone" type="text" required>
       </div>
     </div>
 
@@ -145,7 +148,7 @@ textarea{min-height:80px}
     </div>
 
     <label id="l_price">Ücret</label>
-    <input id="price" required>
+    <input id="price" type="text" required>
 
     <label id="l_note">Not</label>
     <textarea id="note"></textarea>
@@ -159,29 +162,52 @@ textarea{min-height:80px}
   </form>
 </div>
 
+<!-- ✅ Success ekranı eski gibi geri geldi -->
 <div class="card success" id="successCard">
   <h2 id="t_success">✨ Kayıt Alındı</h2>
+  <p id="t_success_desc">Teşekkürler! WhatsApp üzerinden dekontu gönderdiğinizde Zoom linki paylaşılacaktır.</p>
 </div>
 
 <script>
 const API_URL="https://script.google.com/macros/s/AKfycbzTmI7NICLJ9fYiMChA-4jDkh3c9Q75djEU9cE3l3fpldRF3jpPDjWglQHBni7KiRBYjQ/exec";
 
 const dict={
-tr:{title:"Online Art Workshop",subtitle:"Kayıt Formu • Zoom linki WhatsApp’tan gönderilir",
-name:"Ad Soyad",email:"E-posta",phone:"Telefon (WhatsApp)",date:"Tarih",time:"Seans Saati",
-price:"Ücret",note:"Not",warn:"⚠️ Ödeme dekontunu WhatsApp üzerinden gönderiniz.<br>Zoom linki ödeme kontrolünden sonra paylaşılır.",
-submit:"Kaydı Gönder",success:"✨ Kayıt Alındı"},
-en:{title:"Online Art Workshop",subtitle:"Registration Form • Zoom link via WhatsApp",
-name:"Full Name",email:"Email",phone:"Phone (WhatsApp)",date:"Date",time:"Session Time",
-price:"Fee",note:"Note",warn:"⚠️ Please send payment receipt via WhatsApp.<br>Zoom link after verification.",
-submit:"Submit Registration",success:"✨ Registration Received"},
-fa:{title:"کارگاه آنلاین هنر",subtitle:"فرم ثبت‌نام • لینک زوم از واتساپ",
-name:"نام و نام خانوادگی",email:"ایمیل",phone:"واتساپ",date:"تاریخ",time:"ساعت جلسه",
-price:"هزینه",note:"یادداشت",warn:"⚠️ رسید پرداخت را از واتساپ ارسال کنید.<br>لینک زوم بعد از بررسی ارسال می‌شود.",
-submit:"ارسال ثبت‌نام",success:"✨ ثبت‌نام انجام شد"}
+tr:{
+  title:"Online Art Workshop",
+  subtitle:"Kayıt Formu • Zoom linki WhatsApp’tan gönderilir",
+  name:"Ad Soyad",email:"E-posta",phone:"Telefon (WhatsApp)",date:"Tarih",time:"Seans Saati",
+  price:"Ücret",note:"Not",
+  warn:"⚠️ Ödeme dekontunu WhatsApp üzerinden gönderiniz.<br>Zoom linki ödeme kontrolünden sonra paylaşılır.",
+  submit:"Kaydı Gönder",
+  success:"✨ Kayıt Alındı",
+  successDesc:"Teşekkürler! WhatsApp üzerinden dekontu gönderdiğinizde Zoom linki paylaşılacaktır."
+},
+en:{
+  title:"Online Art Workshop",
+  subtitle:"Registration Form • Zoom link via WhatsApp",
+  name:"Full Name",email:"Email",phone:"Phone (WhatsApp)",date:"Date",time:"Session Time",
+  price:"Fee",note:"Note",
+  warn:"⚠️ Please send payment receipt via WhatsApp.<br>Zoom link after verification.",
+  submit:"Submit Registration",
+  success:"✨ Registration Received",
+  successDesc:"Thank you! Once you send the payment receipt via WhatsApp, the Zoom link will be shared."
+},
+fa:{
+  title:"کارگاه آنلاین هنر",
+  subtitle:"فرم ثبت‌نام • لینک زوم از واتساپ",
+  name:"نام و نام خانوادگی",email:"ایمیل",phone:"واتساپ",date:"تاریخ",time:"ساعت جلسه",
+  price:"هزینه",note:"یادداشت",
+  warn:"⚠️ رسید پرداخت را از واتساپ ارسال کنید.<br>لینک زوم بعد از بررسی ارسال می‌شود.",
+  submit:"ارسال ثبت‌نام",
+  success:"✨ ثبت‌نام انجام شد",
+  successDesc:"سپاسگزاریم! پس از ارسال رسید پرداخت در واتساپ، لینک زوم برای شما ارسال می‌شود."
+}
 };
 
+let currentLang="tr";
+
 function setLang(l){
+  currentLang = l;
   document.documentElement.dir=(l==="fa")?"rtl":"ltr";
   t_title.textContent=dict[l].title;
   t_subtitle.textContent=dict[l].subtitle;
@@ -195,6 +221,7 @@ function setLang(l){
   t_warn.innerHTML=dict[l].warn;
   submitBtn.textContent=dict[l].submit;
   t_success.textContent=dict[l].success;
+  t_success_desc.textContent=dict[l].successDesc;
   document.querySelectorAll(".langbtn").forEach(b=>b.classList.toggle("active",b.dataset.lang===l));
 }
 document.querySelectorAll(".langbtn").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
@@ -202,23 +229,29 @@ setLang("tr");
 
 registerForm.addEventListener("submit", async e=>{
   e.preventDefault();
+  submitBtn.disabled=true;
 
-  const fd=new FormData();
-  fd.append("type","canli");
-  fd.append("name",name.value);
-  fd.append("email",email.value);
-  fd.append("phone",phone.value);
-  fd.append("date",date.value);
-  fd.append("seans",timeSlot.value);
-  fd.append("ucret",price.value);
-  fd.append("not",note.value);
-  fd.append("dil","tr");
-  fd.append("durum","Beklemede");
+  try{
+    const fd = new FormData();
+    fd.append("type","canli");
+    fd.append("name", name.value);
+    fd.append("email", email.value);
+    fd.append("phone", phone.value);
+    fd.append("date", date.value);
+    fd.append("seans", timeSlot.value);
+    fd.append("ucret", price.value);
+    fd.append("not", note.value);
+    fd.append("dil", currentLang);
+    fd.append("durum", "Beklemede");
 
-  await fetch(API_URL,{method:"POST",body:fd});
+    await fetch(API_URL,{ method:"POST", body: fd });
 
-  formCard.style.display="none";
-  successCard.style.display="block";
+    formCard.style.display="none";
+    successCard.style.display="block";
+  }catch(err){
+    alert("Hata oluştu. Lütfen tekrar deneyin.");
+    submitBtn.disabled=false;
+  }
 });
 </script>
 
