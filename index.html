@@ -83,6 +83,28 @@ textarea{min-height:80px}
   font-weight:600;
 }
 
+/* ✅ Banka kutusu (görseldeki gibi sade bir kart) */
+.bankbox{
+  margin-top:16px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;
+  padding:14px;
+  line-height:1.45;
+}
+.bankbox .title{
+  font-weight:800;
+  margin-bottom:6px;
+}
+.bankbox .line{
+  font-weight:600;
+  opacity:.95;
+}
+.bankbox .muted{
+  opacity:.85;
+  font-weight:600;
+}
+
 .btn{
   margin-top:18px;
   width:100%;
@@ -152,6 +174,15 @@ textarea{min-height:80px}
     <label id="l_note">Not</label>
     <textarea id="note" name="not"></textarea>
 
+    <!-- ✅ Banka Havalesi Kutusu (3 dilde içerik JS'den basılacak) -->
+    <div class="bankbox" id="bankBox">
+      <div class="title" id="t_bank_title">Banka Havalesi Bilgileri</div>
+      <div class="line" id="t_bank_receiver">Alıcı: Merve Köken</div>
+      <div class="line" id="t_bank_iban">IBAN: TR78 0004 6012 1488 8000 1122 48</div>
+      <div class="muted" id="t_bank_desc">Açıklama: Ad Soyad – Atölye Adı</div>
+    </div>
+
+    <!-- Uyarı -->
     <div class="warn" id="t_warn"></div>
 
     <button class="btn" type="submit" id="submitBtn">Kaydı Gönder</button>
@@ -164,11 +195,20 @@ textarea{min-height:80px}
 </div>
 
 <script>
-/* ✅ SENİN VERDİĞİN YENİ URL */
+/* ✅ API URL (SENİN KULLANDIĞIN) */
 const API_URL="https://script.google.com/macros/s/AKfycbzTmI7NICLJ9fYiMChA-4jDkh3c9Q75djEU9cE3l3fpldRF3jpPDjWglQHBni7KiRBYjQ/exec";
 
 /* ✅ WhatsApp numarası */
 const WHATSAPP_NO = "0530 916 44 25";
+
+/* ✅ Banka bilgileri (bire bir) */
+const BANK = {
+  receiver: "Merve Köken",
+  iban: "TR78 0004 6012 1488 8000 1122 48",
+  desc_tr: "Ad Soyad – Atölye Adı",
+  desc_en: "Full Name – Workshop Name",
+  desc_fa: "نام و نام خانوادگی – نام کارگاه"
+};
 
 const dict={
 tr:{
@@ -176,6 +216,12 @@ tr:{
   subtitle:"Kayıt Formu • Zoom linki WhatsApp’tan gönderilir",
   name:"Ad Soyad", email:"E-posta", phone:"Telefon (WhatsApp)", date:"Tarih", time:"Seans Saati",
   price:"Ücret", note:"Not",
+
+  bankTitle:"Banka Havalesi Bilgileri",
+  bankReceiver:`Alıcı: ${BANK.receiver}`,
+  bankIban:`IBAN: ${BANK.iban}`,
+  bankDesc:`Açıklama: ${BANK.desc_tr}`,
+
   warn:`⚠️ Ödeme dekontunu WhatsApp üzerinden ${WHATSAPP_NO} gönderiniz.<br>Zoom linki ödeme kontrolünden sonra paylaşılır.`,
   submit:"Kaydı Gönder",
   successTitle:"✨ Kayıt Alındı",
@@ -186,6 +232,12 @@ en:{
   subtitle:"Registration Form • Zoom link via WhatsApp",
   name:"Full Name", email:"Email", phone:"Phone (WhatsApp)", date:"Date", time:"Session Time",
   price:"Fee", note:"Note",
+
+  bankTitle:"Bank Transfer Details",
+  bankReceiver:`Recipient: ${BANK.receiver}`,
+  bankIban:`IBAN: ${BANK.iban}`,
+  bankDesc:`Description: ${BANK.desc_en}`,
+
   warn:`⚠️ Please send the payment receipt via WhatsApp to ${WHATSAPP_NO}.<br>The Zoom link will be shared after verification.`,
   submit:"Submit Registration",
   successTitle:"✨ Registration Received",
@@ -196,6 +248,12 @@ fa:{
   subtitle:"فرم ثبت‌نام • لینک زوم از واتساپ",
   name:"نام و نام خانوادگی", email:"ایمیل", phone:"واتساپ", date:"تاریخ", time:"ساعت جلسه",
   price:"هزینه", note:"یادداشت",
+
+  bankTitle:"اطلاعات حواله بانکی",
+  bankReceiver:`گیرنده: ${BANK.receiver}`,
+  bankIban:`IBAN: ${BANK.iban}`,
+  bankDesc:`توضیحات: ${BANK.desc_fa}`,
+
   warn:`⚠️ رسید پرداخت را از واتساپ به شماره ${WHATSAPP_NO} ارسال کنید.<br>لینک زوم بعد از بررسی ارسال می‌شود.`,
   submit:"ارسال ثبت‌نام",
   successTitle:"✨ ثبت‌نام انجام شد",
@@ -220,6 +278,13 @@ function setLang(l){
   l_price.textContent=dict[l].price;
   l_note.textContent=dict[l].note;
 
+  // ✅ Banka kutusu
+  t_bank_title.textContent = dict[l].bankTitle;
+  t_bank_receiver.textContent = dict[l].bankReceiver;
+  t_bank_iban.textContent = dict[l].bankIban;
+  t_bank_desc.textContent = dict[l].bankDesc;
+
+  // ✅ Uyarı + Success metinleri
   t_warn.innerHTML=dict[l].warn;
   submitBtn.textContent=dict[l].submit;
 
