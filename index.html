@@ -83,7 +83,6 @@ textarea{min-height:80px}
   font-weight:600;
 }
 
-/* ✅ Banka kutusu (görseldeki gibi sade bir kart) */
 .bankbox{
   margin-top:16px;
   background:rgba(255,255,255,.06);
@@ -137,7 +136,8 @@ textarea{min-height:80px}
 
   <form id="registerForm">
     <label id="l_name">Ad Soyad</label>
-    <input id="name" name="name" type="text" required>
+    <!-- ✅ id=name yerine fullName -->
+    <input id="fullName" name="name" type="text" required>
 
     <div class="row">
       <div>
@@ -174,7 +174,6 @@ textarea{min-height:80px}
     <label id="l_note">Not</label>
     <textarea id="note" name="not"></textarea>
 
-    <!-- ✅ Banka Havalesi Kutusu (3 dilde içerik JS'den basılacak) -->
     <div class="bankbox" id="bankBox">
       <div class="title" id="t_bank_title">Banka Havalesi Bilgileri</div>
       <div class="line" id="t_bank_receiver">Alıcı: Merve Köken</div>
@@ -182,7 +181,6 @@ textarea{min-height:80px}
       <div class="muted" id="t_bank_desc">Açıklama: Ad Soyad – Atölye Adı</div>
     </div>
 
-    <!-- Uyarı -->
     <div class="warn" id="t_warn"></div>
 
     <button class="btn" type="submit" id="submitBtn">Kaydı Gönder</button>
@@ -195,13 +193,13 @@ textarea{min-height:80px}
 </div>
 
 <script>
-/* ✅ API URL (SENİN KULLANDIĞIN) */
+/* ✅ API URL */
 const API_URL="https://script.google.com/macros/s/AKfycbzTmI7NICLJ9fYiMChA-4jDkh3c9Q75djEU9cE3l3fpldRF3jpPDjWglQHBni7KiRBYjQ/exec";
 
 /* ✅ WhatsApp numarası */
 const WHATSAPP_NO = "0530 916 44 25";
 
-/* ✅ Banka bilgileri (bire bir) */
+/* ✅ Banka bilgileri */
 const BANK = {
   receiver: "Merve Köken",
   iban: "TR78 0004 6012 1488 8000 1122 48",
@@ -209,6 +207,8 @@ const BANK = {
   desc_en: "Full Name – Workshop Name",
   desc_fa: "نام و نام خانوادگی – نام کارگاه"
 };
+
+let currentLang="tr";
 
 const dict={
 tr:{
@@ -261,34 +261,30 @@ fa:{
 }
 };
 
-let currentLang="tr";
-
 function setLang(l){
   currentLang = l;
   document.documentElement.dir=(l==="fa")?"rtl":"ltr";
 
-  t_title.textContent=dict[l].title;
-  t_subtitle.textContent=dict[l].subtitle;
+  document.getElementById("t_title").textContent=dict[l].title;
+  document.getElementById("t_subtitle").textContent=dict[l].subtitle;
 
-  l_name.textContent=dict[l].name;
-  l_email.textContent=dict[l].email;
-  l_phone.textContent=dict[l].phone;
-  l_date.textContent=dict[l].date;
-  l_time.textContent=dict[l].time;
-  l_price.textContent=dict[l].price;
-  l_note.textContent=dict[l].note;
+  document.getElementById("l_name").textContent=dict[l].name;
+  document.getElementById("l_email").textContent=dict[l].email;
+  document.getElementById("l_phone").textContent=dict[l].phone;
+  document.getElementById("l_date").textContent=dict[l].date;
+  document.getElementById("l_time").textContent=dict[l].time;
+  document.getElementById("l_price").textContent=dict[l].price;
+  document.getElementById("l_note").textContent=dict[l].note;
 
-  // ✅ Banka kutusu
-  t_bank_title.textContent = dict[l].bankTitle;
-  t_bank_receiver.textContent = dict[l].bankReceiver;
-  t_bank_iban.textContent = dict[l].bankIban;
-  t_bank_desc.textContent = dict[l].bankDesc;
+  document.getElementById("t_bank_title").textContent = dict[l].bankTitle;
+  document.getElementById("t_bank_receiver").textContent = dict[l].bankReceiver;
+  document.getElementById("t_bank_iban").textContent = dict[l].bankIban;
+  document.getElementById("t_bank_desc").textContent = dict[l].bankDesc;
 
-  // ✅ Uyarı + Success metinleri
-  t_warn.innerHTML=dict[l].warn;
-  submitBtn.textContent=dict[l].submit;
+  document.getElementById("t_warn").innerHTML=dict[l].warn;
+  document.getElementById("submitBtn").textContent=dict[l].submit;
 
-  t_success.textContent=dict[l].successTitle;
+  document.getElementById("t_success").textContent=dict[l].successTitle;
   document.getElementById("t_success_text").textContent = dict[l].successText;
 
   document.querySelectorAll(".langbtn").forEach(b=>b.classList.toggle("active",b.dataset.lang===l));
@@ -297,33 +293,45 @@ function setLang(l){
 document.querySelectorAll(".langbtn").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
 setLang("tr");
 
-registerForm.addEventListener("submit", async e=>{
+document.getElementById("registerForm").addEventListener("submit", async (e)=>{
   e.preventDefault();
-  submitBtn.disabled=true;
+  const submitBtn = document.getElementById("submitBtn");
+  submitBtn.disabled = true;
 
   try{
+    // ✅ güvenli okuma (undefined bitiyor)
+    const fullName = document.getElementById("fullName").value.trim();
+    const email    = document.getElementById("email").value.trim();
+    const phone    = document.getElementById("phone").value.trim();
+    const date     = document.getElementById("date").value;
+    const seans    = document.getElementById("timeSlot").value;
+    const ucret    = document.getElementById("price").value.trim();
+    const note     = document.getElementById("note").value.trim();
+
     const fd = new FormData();
+
+    // ✅ burası: canli/cadi sayfana göre değişir
     fd.append("type", "canli");
 
-    fd.append("name", name.value);
-    fd.append("email", email.value);
-    fd.append("phone", phone.value);
-    fd.append("date", date.value);
-    fd.append("seans", timeSlot.value);
-    fd.append("ucret", price.value);
-    fd.append("not", note.value);
+    fd.append("name", fullName);
+    fd.append("email", email);
+    fd.append("phone", phone);
+    fd.append("date", date);
+    fd.append("seans", seans);
+    fd.append("ucret", ucret);
+    fd.append("not", note);
 
     fd.append("dil", currentLang);
     fd.append("durum", "Beklemede");
 
     await fetch(API_URL, { method:"POST", body: fd });
 
-    formCard.style.display="none";
-    successCard.style.display="block";
+    document.getElementById("formCard").style.display="none";
+    document.getElementById("successCard").style.display="block";
 
   }catch(err){
     alert("Hata oluştu. Lütfen tekrar deneyin.");
-    submitBtn.disabled=false;
+    submitBtn.disabled = false;
   }
 });
 </script>
