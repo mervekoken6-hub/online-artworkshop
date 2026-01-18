@@ -153,7 +153,7 @@ textarea{min-height:80px}
     <textarea id="note"></textarea>
 
     <div class="warn" id="t_warn">
-      ⚠️ Ödeme dekontunu WhatsApp üzerinden gönderiniz.<br>
+      ⚠️ Ödeme dekontunu WhatsApp üzerinden 0530 916 44 25 gönderiniz.<br>
       Zoom linki ödeme kontrolünden sonra paylaşılır.
     </div>
 
@@ -163,29 +163,66 @@ textarea{min-height:80px}
 
 <div class="card success" id="successCard">
   <h2 id="t_success">✨ Kayıt Alındı</h2>
-  <p>Teşekkürler! WhatsApp üzerinden dekontu gönderdiğinizde Zoom linki paylaşılacaktır.</p>
+  <p id="t_success_text">Teşekkürler! WhatsApp üzerinden dekontu gönderdiğinizde Zoom linki paylaşılacaktır.</p>
 </div>
 
 <script>
-// ✅ EN SON verdiğin URL (bunu istedin)
 const API_URL="https://script.google.com/macros/s/AKfycbzTmI7NICLJ9fYiMChA-4jDkh3c9Q75djEU9cE3l3fpldRF3jpPDjWglQHBni7KiRBYjQ/exec";
 
+const WHATSAPP_NUMBER_DISPLAY = "0530 916 44 25";
+
 const dict={
-tr:{title:"Online Art Workshop",subtitle:"Kayıt Formu • Zoom linki WhatsApp’tan gönderilir",
-name:"Ad Soyad",email:"E-posta",phone:"Telefon (WhatsApp)",date:"Tarih",time:"Seans Saati",
-price:"Ücret",note:"Not",warn:"⚠️ Ödeme dekontunu WhatsApp üzerinden gönderiniz.<br>Zoom linki ödeme kontrolünden sonra paylaşılır.",
-submit:"Kaydı Gönder",success:"✨ Kayıt Alındı"},
-en:{title:"Online Art Workshop",subtitle:"Registration Form • Zoom link via WhatsApp",
-name:"Full Name",email:"Email",phone:"Phone (WhatsApp)",date:"Date",time:"Session Time",
-price:"Fee",note:"Note",warn:"⚠️ Please send payment receipt via WhatsApp.<br>Zoom link after verification.",
-submit:"Submit Registration",success:"✨ Registration Received"},
-fa:{title:"کارگاه آنلاین هنر",subtitle:"فرم ثبت‌نام • لینک زوم از واتساپ",
-name:"نام و نام خانوادگی",email:"ایمیل",phone:"واتساپ",date:"تاریخ",time:"ساعت جلسه",
-price:"هزینه",note:"یادداشت",warn:"⚠️ رسید پرداخت را از واتساپ ارسال کنید.<br>لینک زوم بعد از بررسی ارسال می‌شود.",
-submit:"ارسال ثبت‌نام",success:"✨ ثبت‌نام انجام شد"}
+tr:{
+  title:"Online Art Workshop",
+  subtitle:"Kayıt Formu • Zoom linki WhatsApp’tan gönderilir",
+  name:"Ad Soyad",
+  email:"E-posta",
+  phone:"Telefon (WhatsApp)",
+  date:"Tarih",
+  time:"Seans Saati",
+  price:"Ücret",
+  note:"Not",
+  warn:`⚠️ Ödeme dekontunu WhatsApp üzerinden ${WHATSAPP_NUMBER_DISPLAY} gönderiniz.<br>Zoom linki ödeme kontrolünden sonra paylaşılır.`,
+  submit:"Kaydı Gönder",
+  success:"✨ Kayıt Alındı",
+  successText:"Teşekkürler! WhatsApp üzerinden dekontu gönderdiğinizde Zoom linki paylaşılacaktır."
+},
+en:{
+  title:"Online Art Workshop",
+  subtitle:"Registration Form • Zoom link via WhatsApp",
+  name:"Full Name",
+  email:"Email",
+  phone:"Phone (WhatsApp)",
+  date:"Date",
+  time:"Session Time",
+  price:"Fee",
+  note:"Note",
+  warn:`⚠️ Please send the payment receipt via WhatsApp to ${WHATSAPP_NUMBER_DISPLAY}.<br>The Zoom link will be shared after payment verification.`,
+  submit:"Submit Registration",
+  success:"✨ Registration Received",
+  successText:"Thank you! After you send the receipt via WhatsApp, the Zoom link will be shared."
+},
+fa:{
+  title:"کارگاه آنلاین هنر",
+  subtitle:"فرم ثبت‌نام • لینک زوم از واتساپ",
+  name:"نام و نام خانوادگی",
+  email:"ایمیل",
+  phone:"واتساپ",
+  date:"تاریخ",
+  time:"ساعت جلسه",
+  price:"هزینه",
+  note:"یادداشت",
+  warn:`⚠️ لطفاً رسید پرداخت را از طریق واتساپ به شماره ${WHATSAPP_NUMBER_DISPLAY} ارسال کنید.<br>لینک زوم بعد از بررسی پرداخت ارسال می‌شود.`,
+  submit:"ارسال ثبت‌نام",
+  success:"✨ ثبت‌نام انجام شد",
+  successText:"متشکریم! بعد از ارسال رسید از طریق واتساپ، لینک زوم برای شما ارسال می‌شود."
+}
 };
 
+let currentLang = "tr";
+
 function setLang(l){
+  currentLang = l;
   document.documentElement.dir=(l==="fa")?"rtl":"ltr";
   t_title.textContent=dict[l].title;
   t_subtitle.textContent=dict[l].subtitle;
@@ -199,47 +236,32 @@ function setLang(l){
   t_warn.innerHTML=dict[l].warn;
   submitBtn.textContent=dict[l].submit;
   t_success.textContent=dict[l].success;
+  t_success_text.textContent = dict[l].successText;
   document.querySelectorAll(".langbtn").forEach(b=>b.classList.toggle("active",b.dataset.lang===l));
 }
 
 document.querySelectorAll(".langbtn").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
 setLang("tr");
 
-// ✅ "undefined" sorununu kesin bitiren kısım: elementleri güvenli şekilde alıyoruz
-const formEl     = document.getElementById("registerForm");
-const nameInput  = document.getElementById("name");
-const emailInput = document.getElementById("email");
-const phoneInput = document.getElementById("phone");
-const dateInput  = document.getElementById("date");
-const timeSelect = document.getElementById("timeSlot");
-const priceInput = document.getElementById("price");
-const noteInput  = document.getElementById("note");
-
-formEl.addEventListener("submit", async e=>{
+registerForm.addEventListener("submit", async e=>{
   e.preventDefault();
   submitBtn.disabled=true;
 
   try{
-    // ✅ Apps Script ile %100 uyumlu (FormData)
     const fd = new FormData();
     fd.append("type", "canli");
-    fd.append("name", (nameInput.value || "").trim());
-    fd.append("email", (emailInput.value || "").trim());
-    fd.append("phone", (phoneInput.value || "").trim());
-    fd.append("date", (dateInput.value || "").trim());
-    fd.append("seans", (timeSelect.value || "").trim());
-    fd.append("ucret", (priceInput.value || "").trim());
-    fd.append("not", (noteInput.value || "").trim());
-    fd.append("dil", "tr");
+    fd.append("name", name.value);
+    fd.append("email", email.value);
+    fd.append("phone", phone.value);
+    fd.append("date", date.value);
+    fd.append("seans", timeSlot.value);
+    fd.append("ucret", price.value);
+    fd.append("not", note.value);
+    fd.append("dil", currentLang);       // ✅ seçilen dil kayda gider
     fd.append("durum", "Beklemede");
 
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: fd
-    });
+    await fetch(API_URL, { method:"POST", body: fd });
 
-    // fetch hata vermezse bile Apps Script bazen HTML döndürebilir.
-    // Biz sadece başarılı gönderimde ekranı gösteriyoruz.
     formCard.style.display="none";
     successCard.style.display="block";
 
