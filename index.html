@@ -115,27 +115,27 @@ textarea{min-height:80px}
 
   <form id="registerForm">
     <label id="l_name">Ad Soyad</label>
-    <input id="name" type="text" required>
+    <input id="name" name="name" type="text" required>
 
     <div class="row">
       <div>
         <label id="l_email">E-posta</label>
-        <input id="email" type="email" required>
+        <input id="email" name="email" type="email" required>
       </div>
       <div>
         <label id="l_phone">Telefon (WhatsApp)</label>
-        <input id="phone" type="text" required>
+        <input id="phone" name="phone" type="text" required>
       </div>
     </div>
 
     <div class="row">
       <div>
         <label id="l_date">Tarih</label>
-        <input id="date" type="date" required>
+        <input id="date" name="date" type="date" required>
       </div>
       <div>
         <label id="l_time">Seans Saati</label>
-        <select id="timeSlot" required>
+        <select id="timeSlot" name="seans" required>
           <option value="">Saat seçiniz</option>
           <option>09.30 – 11.00</option>
           <option>11.20 – 12.50</option>
@@ -147,15 +147,12 @@ textarea{min-height:80px}
     </div>
 
     <label id="l_price">Ücret</label>
-    <input id="price" type="text" required>
+    <input id="price" name="ucret" type="text" required>
 
     <label id="l_note">Not</label>
-    <textarea id="note"></textarea>
+    <textarea id="note" name="not"></textarea>
 
-    <div class="warn" id="t_warn">
-      ⚠️ Ödeme dekontunu WhatsApp üzerinden 0530 916 44 25 gönderiniz.<br>
-      Zoom linki ödeme kontrolünden sonra paylaşılır.
-    </div>
+    <div class="warn" id="t_warn"></div>
 
     <button class="btn" type="submit" id="submitBtn">Kaydı Gönder</button>
   </form>
@@ -167,65 +164,54 @@ textarea{min-height:80px}
 </div>
 
 <script>
+/* ✅ SENİN VERDİĞİN YENİ URL */
 const API_URL="https://script.google.com/macros/s/AKfycbzTmI7NICLJ9fYiMChA-4jDkh3c9Q75djEU9cE3l3fpldRF3jpPDjWglQHBni7KiRBYjQ/exec";
 
-const WHATSAPP_NUMBER_DISPLAY = "0530 916 44 25";
+/* ✅ WhatsApp numarası */
+const WHATSAPP_NO = "0530 916 44 25";
 
 const dict={
 tr:{
   title:"Online Art Workshop",
   subtitle:"Kayıt Formu • Zoom linki WhatsApp’tan gönderilir",
-  name:"Ad Soyad",
-  email:"E-posta",
-  phone:"Telefon (WhatsApp)",
-  date:"Tarih",
-  time:"Seans Saati",
-  price:"Ücret",
-  note:"Not",
-  warn:`⚠️ Ödeme dekontunu WhatsApp üzerinden ${WHATSAPP_NUMBER_DISPLAY} gönderiniz.<br>Zoom linki ödeme kontrolünden sonra paylaşılır.`,
+  name:"Ad Soyad", email:"E-posta", phone:"Telefon (WhatsApp)", date:"Tarih", time:"Seans Saati",
+  price:"Ücret", note:"Not",
+  warn:`⚠️ Ödeme dekontunu WhatsApp üzerinden ${WHATSAPP_NO} gönderiniz.<br>Zoom linki ödeme kontrolünden sonra paylaşılır.`,
   submit:"Kaydı Gönder",
-  success:"✨ Kayıt Alındı",
-  successText:"Teşekkürler! WhatsApp üzerinden dekontu gönderdiğinizde Zoom linki paylaşılacaktır."
+  successTitle:"✨ Kayıt Alındı",
+  successText:`Teşekkürler! WhatsApp üzerinden ${WHATSAPP_NO} dekontu gönderdiğinizde Zoom linki paylaşılacaktır.`
 },
 en:{
   title:"Online Art Workshop",
   subtitle:"Registration Form • Zoom link via WhatsApp",
-  name:"Full Name",
-  email:"Email",
-  phone:"Phone (WhatsApp)",
-  date:"Date",
-  time:"Session Time",
-  price:"Fee",
-  note:"Note",
-  warn:`⚠️ Please send the payment receipt via WhatsApp to ${WHATSAPP_NUMBER_DISPLAY}.<br>The Zoom link will be shared after payment verification.`,
+  name:"Full Name", email:"Email", phone:"Phone (WhatsApp)", date:"Date", time:"Session Time",
+  price:"Fee", note:"Note",
+  warn:`⚠️ Please send the payment receipt via WhatsApp to ${WHATSAPP_NO}.<br>The Zoom link will be shared after verification.`,
   submit:"Submit Registration",
-  success:"✨ Registration Received",
-  successText:"Thank you! After you send the receipt via WhatsApp, the Zoom link will be shared."
+  successTitle:"✨ Registration Received",
+  successText:`Thank you! When you send the receipt via WhatsApp to ${WHATSAPP_NO}, the Zoom link will be shared.`
 },
 fa:{
   title:"کارگاه آنلاین هنر",
   subtitle:"فرم ثبت‌نام • لینک زوم از واتساپ",
-  name:"نام و نام خانوادگی",
-  email:"ایمیل",
-  phone:"واتساپ",
-  date:"تاریخ",
-  time:"ساعت جلسه",
-  price:"هزینه",
-  note:"یادداشت",
-  warn:`⚠️ لطفاً رسید پرداخت را از طریق واتساپ به شماره ${WHATSAPP_NUMBER_DISPLAY} ارسال کنید.<br>لینک زوم بعد از بررسی پرداخت ارسال می‌شود.`,
+  name:"نام و نام خانوادگی", email:"ایمیل", phone:"واتساپ", date:"تاریخ", time:"ساعت جلسه",
+  price:"هزینه", note:"یادداشت",
+  warn:`⚠️ رسید پرداخت را از واتساپ به شماره ${WHATSAPP_NO} ارسال کنید.<br>لینک زوم بعد از بررسی ارسال می‌شود.`,
   submit:"ارسال ثبت‌نام",
-  success:"✨ ثبت‌نام انجام شد",
-  successText:"متشکریم! بعد از ارسال رسید از طریق واتساپ، لینک زوم برای شما ارسال می‌شود."
+  successTitle:"✨ ثبت‌نام انجام شد",
+  successText:`متشکریم! پس از ارسال رسید پرداخت از طریق واتساپ به شماره ${WHATSAPP_NO}، لینک زوم ارسال خواهد شد.`
 }
 };
 
-let currentLang = "tr";
+let currentLang="tr";
 
 function setLang(l){
   currentLang = l;
   document.documentElement.dir=(l==="fa")?"rtl":"ltr";
+
   t_title.textContent=dict[l].title;
   t_subtitle.textContent=dict[l].subtitle;
+
   l_name.textContent=dict[l].name;
   l_email.textContent=dict[l].email;
   l_phone.textContent=dict[l].phone;
@@ -233,10 +219,13 @@ function setLang(l){
   l_time.textContent=dict[l].time;
   l_price.textContent=dict[l].price;
   l_note.textContent=dict[l].note;
+
   t_warn.innerHTML=dict[l].warn;
   submitBtn.textContent=dict[l].submit;
-  t_success.textContent=dict[l].success;
-  t_success_text.textContent = dict[l].successText;
+
+  t_success.textContent=dict[l].successTitle;
+  document.getElementById("t_success_text").textContent = dict[l].successText;
+
   document.querySelectorAll(".langbtn").forEach(b=>b.classList.toggle("active",b.dataset.lang===l));
 }
 
@@ -250,6 +239,7 @@ registerForm.addEventListener("submit", async e=>{
   try{
     const fd = new FormData();
     fd.append("type", "canli");
+
     fd.append("name", name.value);
     fd.append("email", email.value);
     fd.append("phone", phone.value);
@@ -257,7 +247,8 @@ registerForm.addEventListener("submit", async e=>{
     fd.append("seans", timeSlot.value);
     fd.append("ucret", price.value);
     fd.append("not", note.value);
-    fd.append("dil", currentLang);       // ✅ seçilen dil kayda gider
+
+    fd.append("dil", currentLang);
     fd.append("durum", "Beklemede");
 
     await fetch(API_URL, { method:"POST", body: fd });
