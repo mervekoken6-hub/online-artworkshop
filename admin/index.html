@@ -19,7 +19,7 @@ body{
   max-width:1200px;
 }
 button{
-  padding:8px 12px;
+  padding:10px 16px;
   border-radius:8px;
   border:none;
   background:#6366f1;
@@ -53,7 +53,6 @@ th,td{
   height:14px;
   border-radius:50%;
   display:inline-block;
-  cursor:pointer;
   margin-right:6px;
 }
 .green{background:#22c55e}
@@ -131,7 +130,11 @@ function saveApi(){
 }
 
 function fmt(v){
-  return (v === null || v === undefined) ? "" : String(v);
+  if(typeof v === "string" && v.includes("T") && v.endsWith("Z")){
+    const d=new Date(v);
+    if(!isNaN(d)) return d.toLocaleString("tr-TR");
+  }
+  return (v ?? "").toString();
 }
 
 async function loadData(type){
@@ -158,7 +161,6 @@ async function loadData(type){
     renderRows(json.rows || []);
     status.textContent="✅ Yüklendi (" + json.rows.length + ")";
     status.className="status ok";
-
   }catch{
     status.textContent="❌ API bağlantı hatası";
     status.className="status bad";
@@ -172,22 +174,24 @@ function renderRows(rows){
   rows.forEach(r=>{
     const tr=document.createElement("tr");
 
+    const safe = i => fmt(r[i] ?? "");
+
     const cols = [
-      r[0], // kayıt tarihi
-      r[1], // ad soyad
-      r[2], // email
-      r[3], // telefon
-      r[4], // tarih
-      r[5], // seans
-      r[6], // ücret
-      r[7], // not
-      r[8], // dil
-      r[9]  // durum
+      safe(0), // kayıt tarihi
+      safe(1), // ad soyad
+      safe(2), // email
+      safe(3), // telefon
+      safe(4), // tarih
+      safe(5), // seans
+      safe(6), // ücret
+      safe(7), // not
+      safe(8), // dil
+      safe(9)  // durum
     ];
 
-    cols.forEach(c=>{
+    cols.forEach(v=>{
       const td=document.createElement("td");
-      td.textContent = fmt(c);
+      td.textContent=v;
       tr.appendChild(td);
     });
 
@@ -197,7 +201,6 @@ function renderRows(rows){
       <span class="dot yellow" title="Beklemede"></span>
       <span class="dot red" title="İptal"></span>
     `;
-    action.onclick = ()=>alert("Durum güncelleme backend’e bağlanabilir.");
     tr.appendChild(action);
 
     el.appendChild(tr);
