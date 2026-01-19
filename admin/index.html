@@ -41,6 +41,7 @@ table{
 th,td{
   padding:8px;
   border-bottom:1px solid #333;
+  vertical-align:top;
 }
 .hidden{display:none}
 .status{margin-left:10px;font-size:13px}
@@ -63,8 +64,7 @@ th,td{
 <div class="card hidden" id="panelCard">
 
   <div style="margin-bottom:14px">
-    <input id="apiUrl" placeholder="Apps Script Web App URL">
-    <button onclick="saveApi()">Kaydet</button>
+    <span style="opacity:.8">API bağlı</span>
     <button onclick="logout()">Çıkış</button>
     <span id="status" class="status"></span>
   </div>
@@ -95,10 +95,15 @@ th,td{
 </div>
 
 <script>
+/* =====================
+   AYARLAR
+===================== */
 const PASSWORD = "cadimagic2025";
-const LS_API = "admin_api_url";
+const API_URL = "https://script.google.com/macros/s/AKfycbx7AiP3yKgNBUtY-25w7wldp_MUd5Q8JGsbRDJ4W8pxDAm13RIgvUrs53itOYchsRwe_Q/exec";
 
-// Giriş / çıkış
+/* =====================
+   GİRİŞ
+===================== */
 function login(){
   if(password.value === PASSWORD){
     loginCard.classList.add("hidden");
@@ -108,75 +113,62 @@ function login(){
     err.style.display="block";
   }
 }
-function logout(){ location.reload(); }
 
-// API URL kaydet
-function saveApi(){
-  localStorage.setItem(LS_API, apiUrl.value.trim());
-  status.textContent="✅ API kaydedildi";
-  status.className="status ok";
+function logout(){
+  location.reload();
 }
 
-// Metin formatlama
-function fmt(v){
-  if(typeof v === "string" && v.includes("T") && v.endsWith("Z")){
-    const d = new Date(v);
-    if(!isNaN(d)) return d.toLocaleString("tr-TR");
-  }
-  return (v ?? "").toString();
-}
-
-// Veri çekme
+/* =====================
+   VERİ ÇEKME
+===================== */
 async function loadData(type){
-  const url = localStorage.getItem(LS_API);
-  if(!url){
-    status.textContent="❌ API URL girilmedi";
-    status.className="status bad";
-    return;
-  }
+  status.textContent = "⏳ Yükleniyor...";
+  status.className = "status";
 
-  status.textContent="⏳ Yükleniyor...";
   try{
-    const res = await fetch(url + "?type=" + type);
+    const res = await fetch(API_URL + "?type=" + type);
     const json = await res.json();
-    if(!json.ok) throw json.error;
+
+    if(!json.ok){
+      status.textContent = "❌ API hata";
+      status.className = "status bad";
+      return;
+    }
 
     renderRows(json.rows || []);
-    status.textContent="✅ Yüklendi (" + (json.rows ? json.rows.length : 0) + ")";
-    status.className="status ok";
-  }catch(err){
-    status.textContent="❌ Veri alınamadı";
-    status.className="status bad";
+    status.textContent = "✅ Yüklendi (" + json.rows.length + ")";
+    status.className = "status ok";
+
+  }catch(e){
+    status.textContent = "❌ Bağlantı hatası";
+    status.className = "status bad";
   }
 }
 
-// Satır gösterimi
+/* =====================
+   TABLOYA YAZ
+===================== */
 function renderRows(rows){
   const el = document.getElementById("rows");
   el.innerHTML = "";
 
-  rows.forEach(r => {
+  rows.forEach(r=>{
     const tr = document.createElement("tr");
-
     tr.innerHTML = `
-      <td>${fmt(r.kayitTarihi)}</td>
-      <td>${fmt(r.adSoyad)}</td>
-      <td>${fmt(r.email)}</td>
-      <td>${fmt(r.telefon)}</td>
-      <td>${fmt(r.tarih)}</td>
-      <td>${fmt(r.seans)}</td>
-      <td>${fmt(r.ucret)}</td>
-      <td>${fmt(r.not)}</td>
-      <td>${fmt(r.dil)}</td>
-      <td>${fmt(r.durum)}</td>
+      <td>${r.kayitTarihi || ""}</td>
+      <td>${r.adSoyad || ""}</td>
+      <td>${r.email || ""}</td>
+      <td>${r.telefon || ""}</td>
+      <td>${r.tarih || ""}</td>
+      <td>${r.seans || ""}</td>
+      <td>${r.ucret || ""}</td>
+      <td>${r.not || ""}</td>
+      <td>${r.dil || ""}</td>
+      <td>${r.durum || ""}</td>
     `;
-
     el.appendChild(tr);
   });
 }
-
-// Kaydedilmiş API’yi getir
-apiUrl.value = localStorage.getItem(LS_API) || "";
 </script>
 
 </body>
