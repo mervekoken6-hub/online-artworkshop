@@ -81,27 +81,7 @@ textarea{min-height:80px}
   padding:14px;
   text-align:center;
   font-weight:600;
-}
-
-.bankbox{
-  margin-top:16px;
-  background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:14px;
-  padding:14px;
-  line-height:1.45;
-}
-.bankbox .title{
-  font-weight:800;
-  margin-bottom:6px;
-}
-.bankbox .line{
-  font-weight:600;
-  opacity:.95;
-}
-.bankbox .muted{
-  opacity:.85;
-  font-weight:600;
+  line-height:1.35;
 }
 
 .btn{
@@ -119,6 +99,36 @@ textarea{min-height:80px}
 
 .success{display:none;text-align:center}
 .success h2{color:#c4b5fd}
+
+.bankbox{
+  margin-top:14px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:14px;
+  padding:14px;
+  line-height:1.4;
+}
+.bankbox .title{
+  font-weight:800;
+  margin-bottom:6px;
+}
+.bankbox .line{
+  margin:4px 0;
+}
+
+.noticebox{
+  margin-top:16px;
+  background:rgba(139,92,246,.12);
+  border:1px solid rgba(139,92,246,.45);
+  border-radius:14px;
+  padding:14px;
+  text-align:center;
+  line-height:1.45;
+}
+.noticebox .title{
+  font-weight:900;
+  margin-bottom:8px;
+}
 </style>
 </head>
 
@@ -136,29 +146,28 @@ textarea{min-height:80px}
 
   <form id="registerForm">
     <label id="l_name">Ad Soyad</label>
-    <!-- ✅ id=name yerine fullName -->
-    <input id="fullName" name="name" type="text" required>
+    <input id="name" type="text" required autocomplete="name">
 
     <div class="row">
       <div>
         <label id="l_email">E-posta</label>
-        <input id="email" name="email" type="email" required>
+        <input id="email" type="email" required autocomplete="email">
       </div>
       <div>
         <label id="l_phone">Telefon (WhatsApp)</label>
-        <input id="phone" name="phone" type="text" required>
+        <input id="phone" type="text" required autocomplete="tel">
       </div>
     </div>
 
     <div class="row">
       <div>
         <label id="l_date">Tarih</label>
-        <input id="date" name="date" type="date" required>
+        <input id="date" type="date" required>
       </div>
       <div>
         <label id="l_time">Seans Saati</label>
-        <select id="timeSlot" name="seans" required>
-          <option value="">Saat seçiniz</option>
+        <select id="timeSlot" required>
+          <option value="" id="opt_time">Saat seçiniz</option>
           <option>09.30 – 11.00</option>
           <option>11.20 – 12.50</option>
           <option>14.10 – 15.40</option>
@@ -169,19 +178,32 @@ textarea{min-height:80px}
     </div>
 
     <label id="l_price">Ücret</label>
-    <input id="price" name="ucret" type="text" required>
+    <input id="price" type="text" required inputmode="numeric">
 
     <label id="l_note">Not</label>
-    <textarea id="note" name="not"></textarea>
+    <textarea id="note"></textarea>
 
+    <!-- ✅ Banka Havalesi Bilgileri -->
     <div class="bankbox" id="bankBox">
       <div class="title" id="t_bank_title">Banka Havalesi Bilgileri</div>
-      <div class="line" id="t_bank_receiver">Alıcı: Merve Köken</div>
-      <div class="line" id="t_bank_iban">IBAN: TR78 0004 6012 1488 8000 1122 48</div>
-      <div class="muted" id="t_bank_desc">Açıklama: Ad Soyad – Atölye Adı</div>
+      <div class="line"><span id="t_bank_receiver_label">Alıcı:</span> <strong id="t_bank_receiver">Merve Köken</strong></div>
+      <div class="line"><span id="t_bank_iban_label">IBAN:</span> <strong id="t_bank_iban">TR78 0004 6012 1488 8000 1122 48</strong></div>
+      <div class="line"><span id="t_bank_desc_label">Açıklama:</span> <span id="t_bank_desc">Ad Soyad – Atölye Adı</span></div>
     </div>
 
-    <div class="warn" id="t_warn"></div>
+    <!-- ✅ DUYURU (bire bir) -->
+    <div class="noticebox" id="announceBox">
+      <div class="title" id="t_announce_title">📣 Duyuru</div>
+      <div id="t_announce_1">Atölye ücretleri seansa göre değişiklik gösterebilir.</div>
+      <div id="t_announce_2">Kayıt öncesinde fiyat bilgisi için</div>
+      <div id="t_announce_3">WhatsApp’tan <strong>0530 916 44 25</strong> bize yazabilirsiniz 💜</div>
+    </div>
+
+    <!-- ✅ Uyarı -->
+    <div class="warn" id="t_warn">
+      ⚠️ Ödeme dekontunu WhatsApp üzerinden <strong>0530 916 44 25</strong> gönderiniz.<br>
+      Zoom linki ödeme kontrolünden sonra paylaşılır.
+    </div>
 
     <button class="btn" type="submit" id="submitBtn">Kaydı Gönder</button>
   </form>
@@ -189,149 +211,176 @@ textarea{min-height:80px}
 
 <div class="card success" id="successCard">
   <h2 id="t_success">✨ Kayıt Alındı</h2>
-  <p id="t_success_text">Teşekkürler! WhatsApp üzerinden dekontu gönderdiğinizde Zoom linki paylaşılacaktır.</p>
+  <p id="t_success_text">Teşekkürler! WhatsApp üzerinden <strong>0530 916 44 25</strong> dekontu gönderdiğinizde Zoom linki paylaşılacaktır.</p>
 </div>
 
 <script>
-/* ✅ API URL */
+// ✅ SENİN VERDİĞİN YENİ URL
 const API_URL="https://script.google.com/macros/s/AKfycbzTmI7NICLJ9fYiMChA-4jDkh3c9Q75djEU9cE3l3fpldRF3jpPDjWglQHBni7KiRBYjQ/exec";
-
-/* ✅ WhatsApp numarası */
-const WHATSAPP_NO = "0530 916 44 25";
-
-/* ✅ Banka bilgileri */
-const BANK = {
-  receiver: "Merve Köken",
-  iban: "TR78 0004 6012 1488 8000 1122 48",
-  desc_tr: "Ad Soyad – Atölye Adı",
-  desc_en: "Full Name – Workshop Name",
-  desc_fa: "نام و نام خانوادگی – نام کارگاه"
-};
-
-let currentLang="tr";
 
 const dict={
 tr:{
   title:"Online Art Workshop",
   subtitle:"Kayıt Formu • Zoom linki WhatsApp’tan gönderilir",
-  name:"Ad Soyad", email:"E-posta", phone:"Telefon (WhatsApp)", date:"Tarih", time:"Seans Saati",
-  price:"Ücret", note:"Not",
-
+  name:"Ad Soyad",
+  email:"E-posta",
+  phone:"Telefon (WhatsApp)",
+  date:"Tarih",
+  time:"Seans Saati",
+  timeOpt:"Saat seçiniz",
+  price:"Ücret",
+  note:"Not",
   bankTitle:"Banka Havalesi Bilgileri",
-  bankReceiver:`Alıcı: ${BANK.receiver}`,
-  bankIban:`IBAN: ${BANK.iban}`,
-  bankDesc:`Açıklama: ${BANK.desc_tr}`,
-
-  warn:`⚠️ Ödeme dekontunu WhatsApp üzerinden ${WHATSAPP_NO} gönderiniz.<br>Zoom linki ödeme kontrolünden sonra paylaşılır.`,
+  bankReceiverLabel:"Alıcı:",
+  bankIbanLabel:"IBAN:",
+  bankDescLabel:"Açıklama:",
+  bankDesc:"Ad Soyad – Atölye Adı",
+  announceTitle:"📣 Duyuru",
+  announce1:"Atölye ücretleri seansa göre değişiklik gösterebilir.",
+  announce2:"Kayıt öncesinde fiyat bilgisi için",
+  announce3:"WhatsApp’tan 0530 916 44 25 bize yazabilirsiniz 💜",
+  warn:"⚠️ Ödeme dekontunu WhatsApp üzerinden 0530 916 44 25 gönderiniz.<br>Zoom linki ödeme kontrolünden sonra paylaşılır.",
   submit:"Kaydı Gönder",
-  successTitle:"✨ Kayıt Alındı",
-  successText:`Teşekkürler! WhatsApp üzerinden ${WHATSAPP_NO} dekontu gönderdiğinizde Zoom linki paylaşılacaktır.`
+  success:"✨ Kayıt Alındı",
+  successText:"Teşekkürler! WhatsApp üzerinden 0530 916 44 25 dekontu gönderdiğinizde Zoom linki paylaşılacaktır."
 },
 en:{
   title:"Online Art Workshop",
   subtitle:"Registration Form • Zoom link via WhatsApp",
-  name:"Full Name", email:"Email", phone:"Phone (WhatsApp)", date:"Date", time:"Session Time",
-  price:"Fee", note:"Note",
-
+  name:"Full Name",
+  email:"Email",
+  phone:"Phone (WhatsApp)",
+  date:"Date",
+  time:"Session Time",
+  timeOpt:"Select time",
+  price:"Fee",
+  note:"Note",
   bankTitle:"Bank Transfer Details",
-  bankReceiver:`Recipient: ${BANK.receiver}`,
-  bankIban:`IBAN: ${BANK.iban}`,
-  bankDesc:`Description: ${BANK.desc_en}`,
-
-  warn:`⚠️ Please send the payment receipt via WhatsApp to ${WHATSAPP_NO}.<br>The Zoom link will be shared after verification.`,
+  bankReceiverLabel:"Receiver:",
+  bankIbanLabel:"IBAN:",
+  bankDescLabel:"Description:",
+  bankDesc:"Full Name – Workshop Name",
+  announceTitle:"📣 Announcement",
+  announce1:"Workshop fees may vary depending on the session.",
+  announce2:"For price information before registration,",
+  announce3:"you can contact us on WhatsApp at +90 530 916 44 25 💜",
+  warn:"⚠️ Please send the payment receipt via WhatsApp to +90 530 916 44 25.<br>The Zoom link will be shared after payment verification.",
   submit:"Submit Registration",
-  successTitle:"✨ Registration Received",
-  successText:`Thank you! When you send the receipt via WhatsApp to ${WHATSAPP_NO}, the Zoom link will be shared.`
+  success:"✨ Registration Received",
+  successText:"Thank you! Once you send the receipt via WhatsApp to +90 530 916 44 25, the Zoom link will be shared."
 },
 fa:{
   title:"کارگاه آنلاین هنر",
   subtitle:"فرم ثبت‌نام • لینک زوم از واتساپ",
-  name:"نام و نام خانوادگی", email:"ایمیل", phone:"واتساپ", date:"تاریخ", time:"ساعت جلسه",
-  price:"هزینه", note:"یادداشت",
-
+  name:"نام و نام خانوادگی",
+  email:"ایمیل",
+  phone:"واتساپ",
+  date:"تاریخ",
+  time:"ساعت جلسه",
+  timeOpt:"انتخاب ساعت",
+  price:"هزینه",
+  note:"یادداشت",
   bankTitle:"اطلاعات حواله بانکی",
-  bankReceiver:`گیرنده: ${BANK.receiver}`,
-  bankIban:`IBAN: ${BANK.iban}`,
-  bankDesc:`توضیحات: ${BANK.desc_fa}`,
-
-  warn:`⚠️ رسید پرداخت را از واتساپ به شماره ${WHATSAPP_NO} ارسال کنید.<br>لینک زوم بعد از بررسی ارسال می‌شود.`,
+  bankReceiverLabel:"گیرنده:",
+  bankIbanLabel:"شبا/IBAN:",
+  bankDescLabel:"توضیحات:",
+  bankDesc:"نام و نام خانوادگی – نام کارگاه",
+  announceTitle:"📣 اطلاعیه",
+  announce1:"هزینه کارگاه ممکن است بسته به زمان جلسه متفاوت باشد.",
+  announce2:"برای اطلاع از قیمت قبل از ثبت‌نام،",
+  announce3:"می‌توانید از طریق واتساپ به شماره 0530 916 44 25 پیام دهید 💜",
+  warn:"⚠️ لطفاً رسید پرداخت را از طریق واتساپ به شماره 0530 916 44 25 ارسال کنید.<br>لینک زوم بعد از بررسی پرداخت ارسال می‌شود.",
   submit:"ارسال ثبت‌نام",
-  successTitle:"✨ ثبت‌نام انجام شد",
-  successText:`متشکریم! پس از ارسال رسید پرداخت از طریق واتساپ به شماره ${WHATSAPP_NO}، لینک زوم ارسال خواهد شد.`
+  success:"✨ ثبت‌نام انجام شد",
+  successText:"سپاسگزاریم! پس از ارسال رسید از طریق واتساپ به شماره 0530 916 44 25، لینک زوم برای شما ارسال خواهد شد."
 }
 };
 
+let currentLang = "tr";
+
 function setLang(l){
   currentLang = l;
-  document.documentElement.dir=(l==="fa")?"rtl":"ltr";
+  document.documentElement.dir = (l==="fa") ? "rtl" : "ltr";
 
-  document.getElementById("t_title").textContent=dict[l].title;
-  document.getElementById("t_subtitle").textContent=dict[l].subtitle;
+  t_title.textContent = dict[l].title;
+  t_subtitle.textContent = dict[l].subtitle;
 
-  document.getElementById("l_name").textContent=dict[l].name;
-  document.getElementById("l_email").textContent=dict[l].email;
-  document.getElementById("l_phone").textContent=dict[l].phone;
-  document.getElementById("l_date").textContent=dict[l].date;
-  document.getElementById("l_time").textContent=dict[l].time;
-  document.getElementById("l_price").textContent=dict[l].price;
-  document.getElementById("l_note").textContent=dict[l].note;
+  l_name.textContent = dict[l].name;
+  l_email.textContent = dict[l].email;
+  l_phone.textContent = dict[l].phone;
+  l_date.textContent = dict[l].date;
+  l_time.textContent = dict[l].time;
+  l_price.textContent = dict[l].price;
+  l_note.textContent = dict[l].note;
 
+  // select ilk seçenek
+  document.getElementById("opt_time").textContent = dict[l].timeOpt;
+
+  // Banka kutusu
   document.getElementById("t_bank_title").textContent = dict[l].bankTitle;
-  document.getElementById("t_bank_receiver").textContent = dict[l].bankReceiver;
-  document.getElementById("t_bank_iban").textContent = dict[l].bankIban;
+  document.getElementById("t_bank_receiver_label").textContent = dict[l].bankReceiverLabel;
+  document.getElementById("t_bank_iban_label").textContent = dict[l].bankIbanLabel;
+  document.getElementById("t_bank_desc_label").textContent = dict[l].bankDescLabel;
   document.getElementById("t_bank_desc").textContent = dict[l].bankDesc;
 
-  document.getElementById("t_warn").innerHTML=dict[l].warn;
-  document.getElementById("submitBtn").textContent=dict[l].submit;
+  // Duyuru
+  document.getElementById("t_announce_title").textContent = dict[l].announceTitle;
+  document.getElementById("t_announce_1").textContent = dict[l].announce1;
+  document.getElementById("t_announce_2").textContent = dict[l].announce2;
+  document.getElementById("t_announce_3").textContent = dict[l].announce3;
 
-  document.getElementById("t_success").textContent=dict[l].successTitle;
-  document.getElementById("t_success_text").textContent = dict[l].successText;
+  // Uyarı + buton + başarı
+  t_warn.innerHTML = dict[l].warn;
+  submitBtn.textContent = dict[l].submit;
+  t_success.textContent = dict[l].success;
+  document.getElementById("t_success_text").innerHTML = dict[l].successText;
 
-  document.querySelectorAll(".langbtn").forEach(b=>b.classList.toggle("active",b.dataset.lang===l));
+  // aktif buton
+  document.querySelectorAll(".langbtn").forEach(b=>{
+    b.classList.toggle("active", b.dataset.lang===l);
+  });
 }
 
-document.querySelectorAll(".langbtn").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
+document.querySelectorAll(".langbtn").forEach(b=>{
+  b.addEventListener("click", ()=>setLang(b.dataset.lang));
+});
+
 setLang("tr");
 
-document.getElementById("registerForm").addEventListener("submit", async (e)=>{
+registerForm.addEventListener("submit", async (e)=>{
   e.preventDefault();
-  const submitBtn = document.getElementById("submitBtn");
   submitBtn.disabled = true;
 
   try{
-    // ✅ güvenli okuma (undefined bitiyor)
-    const fullName = document.getElementById("fullName").value.trim();
-    const email    = document.getElementById("email").value.trim();
-    const phone    = document.getElementById("phone").value.trim();
-    const date     = document.getElementById("date").value;
-    const seans    = document.getElementById("timeSlot").value;
-    const ucret    = document.getElementById("price").value.trim();
-    const note     = document.getElementById("note").value.trim();
-
+    // ✅ FormData (Apps Script ile uyumlu)
     const fd = new FormData();
-
-    // ✅ burası: canli/cadi sayfana göre değişir
-    fd.append("type", "canli");
-
-    fd.append("name", fullName);
-    fd.append("email", email);
-    fd.append("phone", phone);
-    fd.append("date", date);
-    fd.append("seans", seans);
-    fd.append("ucret", ucret);
-    fd.append("not", note);
-
+    fd.append("type", "cadi"); // Eğer bu sayfa Canlı Ders ise "canli" yap
+    fd.append("name", name.value.trim());
+    fd.append("email", email.value.trim());
+    fd.append("phone", phone.value.trim());
+    fd.append("date", date.value);
+    fd.append("seans", timeSlot.value);
+    fd.append("ucret", price.value.trim());
+    fd.append("not", note.value.trim());
     fd.append("dil", currentLang);
     fd.append("durum", "Beklemede");
 
-    await fetch(API_URL, { method:"POST", body: fd });
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: fd
+    });
 
-    document.getElementById("formCard").style.display="none";
-    document.getElementById("successCard").style.display="block";
+    // Bazı ortamlarda res okunamaz ama post çalışır.
+    // Yine de başarısızsa kullanıcı görsün diye kontrol:
+    if(!res || (res.ok === false)){
+      throw new Error("Kayıt gönderilemedi");
+    }
 
+    formCard.style.display="none";
+    successCard.style.display="block";
   }catch(err){
     alert("Hata oluştu. Lütfen tekrar deneyin.");
-    submitBtn.disabled = false;
+    submitBtn.disabled=false;
   }
 });
 </script>
