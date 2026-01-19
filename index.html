@@ -9,7 +9,7 @@
 *{box-sizing:border-box}
 body{
   margin:0;
-  font-family:system-ui;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
   background:radial-gradient(circle at top,#0b1220,#05060a);
   color:#fff;
   min-height:100vh;
@@ -20,52 +20,42 @@ body{
 .card{
   width:100%;
   max-width:520px;
-  background:#0f172a;
+  background:rgba(12,18,32,.95);
   border-radius:18px;
   padding:26px;
   box-shadow:0 25px 60px rgba(0,0,0,.55);
 }
-label{display:block;margin:12px 0 6px;font-size:13px}
+h1{text-align:center;margin:0 0 6px}
+.subtitle{text-align:center;font-size:14px;opacity:.8;margin-bottom:16px}
+.langbar{
+  display:flex;justify-content:center;gap:10px;margin-bottom:18px;
+}
+.langbtn{
+  padding:8px 14px;border-radius:999px;
+  border:1px solid #374151;background:#1f2937;color:#fff;cursor:pointer;
+}
+.langbtn.active{
+  background:linear-gradient(135deg,#60a5fa,#a78bfa);
+}
+label{font-size:13px;margin:12px 0 6px;display:block}
 input,select,textarea{
-  width:100%;
-  padding:12px;
-  border-radius:12px;
-  border:none;
-  font-size:14px;
+  width:100%;padding:12px;border-radius:12px;
+  border:1px solid rgba(255,255,255,.18);
+  background:#fff;color:#000;font-size:14px;
 }
 textarea{min-height:80px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:520px){.row{grid-template-columns:1fr}}
-.langbar{display:flex;justify-content:center;gap:10px;margin-bottom:16px}
-.langbtn{
-  padding:8px 14px;
-  border-radius:999px;
-  border:1px solid #334155;
-  background:#1e293b;
-  color:#fff;
-  cursor:pointer;
+.warn{
+  margin-top:16px;background:#3a2f12;border:1px solid #facc15;
+  color:#fde68a;border-radius:14px;padding:14px;text-align:center;font-weight:600;
 }
-.langbtn.active{background:linear-gradient(135deg,#60a5fa,#a78bfa)}
 .btn{
-  margin-top:18px;
-  width:100%;
-  padding:15px;
-  border:none;
+  margin-top:18px;width:100%;padding:15px;border:none;
   border-radius:14px;
-  background:linear-gradient(135deg,#8b5cf6,#ec4899);
-  color:#fff;
-  font-size:16px;
-  cursor:pointer;
+  background:linear-gradient(135deg,#60a5fa,#a78bfa);
+  color:#fff;font-size:16px;cursor:pointer;
 }
-.notice,.warn{
-  margin-top:16px;
-  padding:14px;
-  border-radius:14px;
-  text-align:center;
-  font-size:14px;
-}
-.notice{background:#312e81}
-.warn{background:#3a2f12;border:1px solid #facc15;color:#fde68a}
 .success{display:none;text-align:center}
 </style>
 </head>
@@ -73,8 +63,8 @@ textarea{min-height:80px}
 <body>
 
 <div class="card" id="formCard">
-  <h2 id="t_title">Online Art Workshop</h2>
-  <p id="t_subtitle">Kayıt Formu</p>
+  <h1 id="t_title">Online Art Workshop</h1>
+  <p class="subtitle" id="t_subtitle">Kayıt Formu</p>
 
   <div class="langbar">
     <button class="langbtn active" data-lang="tr">🇹🇷</button>
@@ -84,7 +74,7 @@ textarea{min-height:80px}
 
   <form id="registerForm">
     <label id="l_name">Ad Soyad</label>
-    <input id="name" required>
+    <input id="name" name="name" type="text" required>
 
     <div class="row">
       <div>
@@ -93,7 +83,7 @@ textarea{min-height:80px}
       </div>
       <div>
         <label id="l_phone">Telefon (WhatsApp)</label>
-        <input id="phone" required>
+        <input id="phone" type="text" required>
       </div>
     </div>
 
@@ -105,7 +95,7 @@ textarea{min-height:80px}
       <div>
         <label id="l_time">Seans Saati</label>
         <select id="timeSlot" required>
-          <option value="">Seçiniz</option>
+          <option value="">Saat seçiniz</option>
           <option>09.30 – 11.00</option>
           <option>11.20 – 12.50</option>
           <option>14.10 – 15.40</option>
@@ -115,16 +105,15 @@ textarea{min-height:80px}
       </div>
     </div>
 
-    <label id="l_price">Ücret (TL)</label>
-    <input id="price" value="500" required>
+    <label id="l_price">Ücret</label>
+    <input id="price" type="text" value="500">
 
     <label id="l_note">Not</label>
     <textarea id="note"></textarea>
 
-    <div class="notice" id="t_notice"></div>
     <div class="warn" id="t_warn"></div>
 
-    <button class="btn" type="submit" id="submitBtn">Kaydı Gönder</button>
+    <button class="btn">Kaydı Gönder</button>
   </form>
 </div>
 
@@ -145,13 +134,11 @@ email:"E-posta",
 phone:"Telefon (WhatsApp)",
 date:"Tarih",
 time:"Seans Saati",
-price:"Ücret (TL)",
+price:"Ücret",
 note:"Not",
-notice:"📣 Atölye ücretleri seansa göre değişiklik gösterebilir.<br>Fiyat bilgisi için WhatsApp: <b>0530 916 44 25</b>",
-warn:"⚠️ Ödeme dekontunu WhatsApp üzerinden <b>0530 916 44 25</b> gönderiniz.<br>Ödeme kontrolünden sonra kaydınız tamamlanır.",
+warn:"⚠️ Ödeme dekontunu WhatsApp üzerinden <b>0530 916 44 25</b> gönderiniz.<br>Zoom linki ödeme kontrolünden sonra paylaşılır.",
 success:"✨ Kayıt Alındı",
-successText:"Teşekkürler! WhatsApp üzerinden <b>0530 916 44 25</b> dekontu gönderdiğinizde Zoom linki paylaşılacaktır.",
-submit:"Kaydı Gönder"
+successText:"Teşekkürler! WhatsApp üzerinden <b>0530 916 44 25</b> dekontu gönderdiğinizde Zoom linki paylaşılacaktır."
 },
 en:{
 title:"Online Art Workshop",
@@ -161,13 +148,11 @@ email:"Email",
 phone:"Phone (WhatsApp)",
 date:"Date",
 time:"Session Time",
-price:"Fee (TRY)",
+price:"Fee",
 note:"Note",
-notice:"📣 Workshop fees may vary by session.<br>For price info contact WhatsApp: <b>+90 530 916 44 25</b>",
-warn:"⚠️ Please send the payment receipt via WhatsApp to <b>+90 530 916 44 25</b>.<br>Your registration will be completed after verification.",
+warn:"⚠️ Please send the payment receipt via WhatsApp to <b>+90 530 916 44 25</b>.<br>The Zoom link will be shared after verification.",
 success:"✨ Registration Received",
-successText:"Thank you! After sending the receipt via WhatsApp <b>+90 530 916 44 25</b>, the Zoom link will be shared.",
-submit:"Submit Registration"
+successText:"Thank you! Please send the receipt to <b>+90 530 916 44 25</b> via WhatsApp to receive the Zoom link."
 },
 fa:{
 title:"کارگاه آنلاین هنر",
@@ -177,58 +162,50 @@ email:"ایمیل",
 phone:"واتساپ",
 date:"تاریخ",
 time:"ساعت جلسه",
-price:"هزینه (لیر)",
+price:"هزینه",
 note:"یادداشت",
-notice:"📣 هزینه کارگاه بسته به جلسه ممکن است تغییر کند.<br>اطلاعات قیمت در واتساپ: <b>0530 916 44 25</b>",
-warn:"⚠️ رسید پرداخت را از طریق واتساپ به <b>0530 916 44 25</b> ارسال کنید.<br>پس از بررسی ثبت‌نام تکمیل می‌شود.",
+warn:"⚠️ لطفاً رسید پرداخت را از طریق واتساپ به <b>+90 530 916 44 25</b> ارسال کنید.<br>لینک زوم بعد از تأیید پرداخت ارسال می‌شود.",
 success:"✨ ثبت‌نام انجام شد",
-successText:"سپاسگزاریم! پس از ارسال رسید به واتساپ <b>0530 916 44 25</b> لینک زوم ارسال خواهد شد.",
-submit:"ارسال ثبت‌نام"
+successText:"سپاسگزاریم! لطفاً رسید پرداخت را از طریق واتساپ به <b>+90 530 916 44 25</b> ارسال کنید."
 }
 };
 
 function setLang(l){
-  document.documentElement.dir=(l==="fa")?"rtl":"ltr";
-  t_title.innerHTML=dict[l].title;
-  t_subtitle.innerHTML=dict[l].subtitle;
-  l_name.innerHTML=dict[l].name;
-  l_email.innerHTML=dict[l].email;
-  l_phone.innerHTML=dict[l].phone;
-  l_date.innerHTML=dict[l].date;
-  l_time.innerHTML=dict[l].time;
-  l_price.innerHTML=dict[l].price;
-  l_note.innerHTML=dict[l].note;
-  t_notice.innerHTML=dict[l].notice;
+  t_title.textContent=dict[l].title;
+  t_subtitle.textContent=dict[l].subtitle;
+  l_name.textContent=dict[l].name;
+  l_email.textContent=dict[l].email;
+  l_phone.textContent=dict[l].phone;
+  l_date.textContent=dict[l].date;
+  l_time.textContent=dict[l].time;
+  l_price.textContent=dict[l].price;
+  l_note.textContent=dict[l].note;
   t_warn.innerHTML=dict[l].warn;
-  t_success.innerHTML=dict[l].success;
+  t_success.textContent=dict[l].success;
   t_success_text.innerHTML=dict[l].successText;
-  submitBtn.innerHTML=dict[l].submit;
   document.querySelectorAll(".langbtn").forEach(b=>b.classList.toggle("active",b.dataset.lang===l));
 }
 document.querySelectorAll(".langbtn").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
 setLang("tr");
 
-registerForm.addEventListener("submit",async e=>{
+registerForm.onsubmit=async e=>{
   e.preventDefault();
-  submitBtn.disabled=true;
-
   const fd=new FormData();
   fd.append("type","canli");
-  fd.append("name",name.value);
+  fd.append("name",document.getElementById("name").value.trim());
   fd.append("email",email.value);
   fd.append("phone",phone.value);
   fd.append("date",date.value);
   fd.append("seans",timeSlot.value);
   fd.append("ucret",price.value);
   fd.append("not",note.value);
-  fd.append("dil",document.documentElement.lang||"tr");
+  fd.append("dil",document.querySelector(".langbtn.active").dataset.lang);
   fd.append("durum","Beklemede");
-
   await fetch(API_URL,{method:"POST",body:fd});
-
   formCard.style.display="none";
   successCard.style.display="block";
-});
+};
 </script>
+
 </body>
 </html>
