@@ -6,7 +6,10 @@
 <title>Online Art Workshop | Kayıt</title>
 
 <style>
-*{box-sizing:border-box}
+*,
+*::before,
+*::after{box-sizing:border-box}
+
 body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto;
@@ -17,6 +20,7 @@ body{
   justify-content:center;
   padding:40px 12px;
 }
+
 .card{
   width:100%;
   max-width:520px;
@@ -25,38 +29,96 @@ body{
   padding:26px;
   box-shadow:0 25px 60px rgba(0,0,0,.55);
 }
+
 h1{text-align:center;margin:0 0 6px}
 .subtitle{text-align:center;font-size:14px;opacity:.8;margin-bottom:16px}
+
 .langbar{
-  display:flex;justify-content:center;gap:10px;margin-bottom:18px;
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:18px;
 }
 .langbtn{
-  padding:8px 14px;border-radius:999px;
-  border:1px solid #374151;background:#1f2937;color:#fff;cursor:pointer;
+  padding:8px 14px;
+  border-radius:999px;
+  border:1px solid #374151;
+  background:#1f2937;
+  color:#fff;
+  cursor:pointer;
 }
 .langbtn.active{
   background:linear-gradient(135deg,#60a5fa,#a78bfa);
 }
+
 label{font-size:13px;margin:12px 0 6px;display:block}
+
 input,select,textarea{
-  width:100%;padding:12px;border-radius:12px;
+  width:100%;
+  padding:12px;
+  border-radius:12px;
   border:1px solid rgba(255,255,255,.18);
-  background:#fff;color:#000;font-size:14px;
+  background:#fff;
+  color:#000;
+  font-size:14px;
 }
+
 textarea{min-height:80px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:520px){.row{grid-template-columns:1fr}}
-.warn{
-  margin-top:16px;background:#3a2f12;border:1px solid #facc15;
-  color:#fde68a;border-radius:14px;padding:14px;text-align:center;font-weight:600;
+
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
 }
+@media(max-width:520px){.row{grid-template-columns:1fr}}
+
+.box{
+  margin-top:14px;
+  border-radius:14px;
+  padding:14px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.06);
+}
+.box h3{
+  margin:0 0 8px;
+  font-size:14px;
+  opacity:.95;
+}
+.box p{
+  margin:6px 0;
+  font-size:13px;
+  opacity:.95;
+  line-height:1.35;
+}
+
+.warn{
+  margin-top:16px;
+  background:#3a2f12;
+  border:1px solid #facc15;
+  color:#fde68a;
+  border-radius:14px;
+  padding:14px;
+  text-align:center;
+  font-weight:600;
+  line-height:1.35;
+}
+
 .btn{
-  margin-top:18px;width:100%;padding:15px;border:none;
+  margin-top:18px;
+  width:100%;
+  padding:15px;
+  border:none;
   border-radius:14px;
   background:linear-gradient(135deg,#60a5fa,#a78bfa);
-  color:#fff;font-size:16px;cursor:pointer;
+  color:#fff;
+  font-size:16px;
+  cursor:pointer;
 }
+.btn:disabled{opacity:.6;cursor:not-allowed}
+
 .success{display:none;text-align:center}
+.success h2{color:#c4b5fd}
+.success p{opacity:.9; line-height:1.4}
 </style>
 </head>
 
@@ -64,17 +126,18 @@ textarea{min-height:80px}
 
 <div class="card" id="formCard">
   <h1 id="t_title">Online Art Workshop</h1>
-  <p class="subtitle" id="t_subtitle">Kayıt Formu</p>
+  <p class="subtitle" id="t_subtitle">Kayıt Formu • Zoom linki WhatsApp’tan gönderilir</p>
 
   <div class="langbar">
-    <button class="langbtn active" data-lang="tr">🇹🇷</button>
-    <button class="langbtn" data-lang="en">🇬🇧</button>
-    <button class="langbtn" data-lang="fa">🇮🇷</button>
+    <button type="button" class="langbtn active" data-lang="tr">🇹🇷 Türkçe</button>
+    <button type="button" class="langbtn" data-lang="en">🇬🇧 English</button>
+    <button type="button" class="langbtn" data-lang="fa">🇮🇷 فارسی</button>
   </div>
 
   <form id="registerForm">
     <label id="l_name">Ad Soyad</label>
-    <input id="name" name="name" type="text" required>
+    <!-- ⚠️ id="name" kullanmıyoruz (window.name çakışması yüzünden undefined olabiliyor) -->
+    <input id="fullName" type="text" required>
 
     <div class="row">
       <div>
@@ -106,105 +169,222 @@ textarea{min-height:80px}
     </div>
 
     <label id="l_price">Ücret</label>
-    <input id="price" type="text" value="500">
+    <input id="price" type="text" required>
 
     <label id="l_note">Not</label>
     <textarea id="note"></textarea>
 
-    <div class="warn" id="t_warn"></div>
+    <!-- Banka Havalesi Bilgileri -->
+    <div class="box" id="bankBox">
+      <h3 id="t_bank_title">Banka Havalesi Bilgileri</h3>
+      <p id="t_bank_receiver"><b>Alıcı:</b> Merve Köken</p>
+      <p id="t_bank_iban"><b>IBAN:</b> TR78 0004 6012 1488 8000 1122 48</p>
+      <p id="t_bank_desc"><b>Açıklama:</b> Ad Soyad – Atölye Adı</p>
+    </div>
 
-    <button class="btn">Kaydı Gönder</button>
+    <!-- Duyuru -->
+    <div class="box" id="announceBox">
+      <h3 id="t_announce_title">📣 Duyuru</h3>
+      <p id="t_announce_body">
+        Atölye ücretleri seansa göre değişiklik gösterebilir.<br>
+        Kayıt öncesinde fiyat bilgisi için<br>
+        WhatsApp’tan <b>0530 916 44 25</b> bize yazabilirsiniz 💜
+      </p>
+    </div>
+
+    <!-- Uyarı -->
+    <div class="warn" id="t_warn">
+      ⚠️ Ödeme dekontunu WhatsApp üzerinden 0530 916 44 25 gönderiniz.<br>
+      Zoom linki ödeme kontrolünden sonra paylaşılır.
+    </div>
+
+    <button class="btn" type="submit" id="submitBtn">Kaydı Gönder</button>
   </form>
 </div>
 
 <div class="card success" id="successCard">
   <h2 id="t_success">✨ Kayıt Alındı</h2>
-  <p id="t_success_text"></p>
+  <p id="t_success_msg">
+    Teşekkürler! WhatsApp üzerinden 0530 916 44 25 dekontu gönderdiğinizde Zoom linki paylaşılacaktır.
+  </p>
 </div>
 
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbzTmI7NICLJ9fYiMChA-4jDkh3c9Q75djEU9cE3l3fpldRF3jpPDjWglQHBni7KiRBYjQ/exec";
+/* ✅ SENİN YENİ URL’İN */
+const API_URL = "https://script.google.com/macros/s/AKfycbzTmI7NICLJ9fYiMChA-4jDkh3c9Q75djEU9cE3l3fpldRF3jpPDjWglQHBni7KiRBYjQ/exec";
 
-const dict={
-tr:{
-title:"Online Art Workshop",
-subtitle:"Kayıt Formu",
-name:"Ad Soyad",
-email:"E-posta",
-phone:"Telefon (WhatsApp)",
-date:"Tarih",
-time:"Seans Saati",
-price:"Ücret",
-note:"Not",
-warn:"⚠️ Ödeme dekontunu WhatsApp üzerinden <b>0530 916 44 25</b> gönderiniz.<br>Zoom linki ödeme kontrolünden sonra paylaşılır.",
-success:"✨ Kayıt Alındı",
-successText:"Teşekkürler! WhatsApp üzerinden <b>0530 916 44 25</b> dekontu gönderdiğinizde Zoom linki paylaşılacaktır."
-},
-en:{
-title:"Online Art Workshop",
-subtitle:"Registration Form",
-name:"Full Name",
-email:"Email",
-phone:"Phone (WhatsApp)",
-date:"Date",
-time:"Session Time",
-price:"Fee",
-note:"Note",
-warn:"⚠️ Please send the payment receipt via WhatsApp to <b>+90 530 916 44 25</b>.<br>The Zoom link will be shared after verification.",
-success:"✨ Registration Received",
-successText:"Thank you! Please send the receipt to <b>+90 530 916 44 25</b> via WhatsApp to receive the Zoom link."
-},
-fa:{
-title:"کارگاه آنلاین هنر",
-subtitle:"فرم ثبت‌نام",
-name:"نام و نام خانوادگی",
-email:"ایمیل",
-phone:"واتساپ",
-date:"تاریخ",
-time:"ساعت جلسه",
-price:"هزینه",
-note:"یادداشت",
-warn:"⚠️ لطفاً رسید پرداخت را از طریق واتساپ به <b>+90 530 916 44 25</b> ارسال کنید.<br>لینک زوم بعد از تأیید پرداخت ارسال می‌شود.",
-success:"✨ ثبت‌نام انجام شد",
-successText:"سپاسگزاریم! لطفاً رسید پرداخت را از طریق واتساپ به <b>+90 530 916 44 25</b> ارسال کنید."
-}
+let currentLang = "tr";
+
+const dict = {
+  tr: {
+    dir: "ltr",
+    title: "Online Art Workshop",
+    subtitle: "Kayıt Formu • Zoom linki WhatsApp’tan gönderilir",
+    name: "Ad Soyad",
+    email: "E-posta",
+    phone: "Telefon (WhatsApp)",
+    date: "Tarih",
+    time: "Seans Saati",
+    price: "Ücret",
+    note: "Not",
+    bank_title: "Banka Havalesi Bilgileri",
+    bank_receiver: "<b>Alıcı:</b> Merve Köken",
+    bank_iban: "<b>IBAN:</b> TR78 0004 6012 1488 8000 1122 48",
+    bank_desc: "<b>Açıklama:</b> Ad Soyad – Atölye Adı",
+    announce_title: "📣 Duyuru",
+    announce_body:
+      "Atölye ücretleri seansa göre değişiklik gösterebilir.<br>" +
+      "Kayıt öncesinde fiyat bilgisi için<br>" +
+      "WhatsApp’tan <b>0530 916 44 25</b> bize yazabilirsiniz 💜",
+    warn:
+      "⚠️ Ödeme dekontunu WhatsApp üzerinden <b>0530 916 44 25</b> gönderiniz.<br>" +
+      "Zoom linki ödeme kontrolünden sonra paylaşılır.",
+    submit: "Kaydı Gönder",
+    success: "✨ Kayıt Alındı",
+    success_msg:
+      "Teşekkürler! WhatsApp üzerinden <b>0530 916 44 25</b> dekontu gönderdiğinizde Zoom linki paylaşılacaktır."
+  },
+
+  en: {
+    dir: "ltr",
+    title: "Online Art Workshop",
+    subtitle: "Registration Form • Zoom link via WhatsApp",
+    name: "Full Name",
+    email: "Email",
+    phone: "Phone (WhatsApp)",
+    date: "Date",
+    time: "Session Time",
+    price: "Fee",
+    note: "Note",
+    bank_title: "Bank Transfer Details",
+    bank_receiver: "<b>Receiver:</b> Merve Köken",
+    bank_iban: "<b>IBAN:</b> TR78 0004 6012 1488 8000 1122 48",
+    bank_desc: "<b>Description:</b> Full Name – Workshop Name",
+    announce_title: "📣 Announcement",
+    announce_body:
+      "Workshop fees may vary depending on the session.<br>" +
+      "For price information before registration,<br>" +
+      "you can contact us on WhatsApp at <b>+90 530 916 44 25</b> 💜",
+    warn:
+      "⚠️ Please send the payment receipt via WhatsApp to <b>+90 530 916 44 25</b>.<br>" +
+      "The Zoom link will be shared after payment verification.",
+    submit: "Submit Registration",
+    success: "✨ Registration Received",
+    success_msg:
+      "Thank you! When you send the receipt via WhatsApp to <b>+90 530 916 44 25</b>, the Zoom link will be shared."
+  },
+
+  fa: {
+    dir: "rtl",
+    title: "کارگاه آنلاین هنر",
+    subtitle: "فرم ثبت‌نام • لینک زوم از واتساپ",
+    name: "نام و نام خانوادگی",
+    email: "ایمیل",
+    phone: "واتساپ",
+    date: "تاریخ",
+    time: "ساعت جلسه",
+    price: "هزینه",
+    note: "یادداشت",
+    bank_title: "اطلاعات انتقال بانکی",
+    bank_receiver: "<b>گیرنده:</b> Merve Köken",
+    bank_iban: "<b>شماره شبا (IBAN):</b> TR78 0004 6012 1488 8000 1122 48",
+    bank_desc: "<b>توضیحات:</b> نام و نام خانوادگی – نام کارگاه",
+    announce_title: "📣 اطلاعیه",
+    announce_body:
+      "هزینه کارگاه ممکن است بر اساس سانس تغییر کند.<br>" +
+      "برای اطلاع از قیمت قبل از ثبت‌نام،<br>" +
+      "در واتساپ به <b>+90 530 916 44 25</b> پیام دهید 💜",
+    warn:
+      "⚠️ لطفاً رسید پرداخت را از طریق واتساپ به <b>+90 530 916 44 25</b> ارسال کنید.<br>" +
+      "لینک زوم بعد از بررسی پرداخت ارسال می‌شود.",
+    submit: "ارسال ثبت‌نام",
+    success: "✨ ثبت‌نام انجام شد",
+    success_msg:
+      "سپاسگزاریم! وقتی رسید را در واتساپ به <b>+90 530 916 44 25</b> ارسال کنید، لینک زوم ارسال خواهد شد."
+  }
 };
 
 function setLang(l){
-  t_title.textContent=dict[l].title;
-  t_subtitle.textContent=dict[l].subtitle;
-  l_name.textContent=dict[l].name;
-  l_email.textContent=dict[l].email;
-  l_phone.textContent=dict[l].phone;
-  l_date.textContent=dict[l].date;
-  l_time.textContent=dict[l].time;
-  l_price.textContent=dict[l].price;
-  l_note.textContent=dict[l].note;
-  t_warn.innerHTML=dict[l].warn;
-  t_success.textContent=dict[l].success;
-  t_success_text.innerHTML=dict[l].successText;
-  document.querySelectorAll(".langbtn").forEach(b=>b.classList.toggle("active",b.dataset.lang===l));
+  currentLang = l;
+  document.documentElement.dir = dict[l].dir;
+
+  t_title.textContent = dict[l].title;
+  t_subtitle.textContent = dict[l].subtitle;
+
+  l_name.textContent = dict[l].name;
+  l_email.textContent = dict[l].email;
+  l_phone.textContent = dict[l].phone;
+  l_date.textContent = dict[l].date;
+  l_time.textContent = dict[l].time;
+  l_price.textContent = dict[l].price;
+  l_note.textContent = dict[l].note;
+
+  t_bank_title.textContent = dict[l].bank_title;
+  t_bank_receiver.innerHTML = dict[l].bank_receiver;
+  t_bank_iban.innerHTML = dict[l].bank_iban;
+  t_bank_desc.innerHTML = dict[l].bank_desc;
+
+  t_announce_title.textContent = dict[l].announce_title;
+  t_announce_body.innerHTML = dict[l].announce_body;
+
+  t_warn.innerHTML = dict[l].warn;
+
+  submitBtn.textContent = dict[l].submit;
+  t_success.textContent = dict[l].success;
+  t_success_msg.innerHTML = dict[l].success_msg;
+
+  document.querySelectorAll(".langbtn").forEach(b=>{
+    b.classList.toggle("active", b.dataset.lang === l);
+  });
 }
-document.querySelectorAll(".langbtn").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
+
+document.querySelectorAll(".langbtn").forEach(b=>{
+  b.onclick = ()=> setLang(b.dataset.lang);
+});
+
 setLang("tr");
 
-registerForm.onsubmit=async e=>{
+/* ✅ Elementleri güvenli şekilde yakalıyoruz (undefined bitiyor) */
+const fullNameEl = document.getElementById("fullName");
+const emailEl = document.getElementById("email");
+const phoneEl = document.getElementById("phone");
+const dateEl = document.getElementById("date");
+const timeSlotEl = document.getElementById("timeSlot");
+const priceEl = document.getElementById("price");
+const noteEl = document.getElementById("note");
+
+registerForm.addEventListener("submit", async (e)=>{
   e.preventDefault();
-  const fd=new FormData();
-  fd.append("type","canli");
-  fd.append("name",document.getElementById("name").value.trim());
-  fd.append("email",email.value);
-  fd.append("phone",phone.value);
-  fd.append("date",date.value);
-  fd.append("seans",timeSlot.value);
-  fd.append("ucret",price.value);
-  fd.append("not",note.value);
-  fd.append("dil",document.querySelector(".langbtn.active").dataset.lang);
-  fd.append("durum","Beklemede");
-  await fetch(API_URL,{method:"POST",body:fd});
-  formCard.style.display="none";
-  successCard.style.display="block";
-};
+  submitBtn.disabled = true;
+
+  try{
+    const fd = new FormData();
+    fd.append("type", "canli");
+    fd.append("name", (fullNameEl.value || "").trim());
+    fd.append("email", (emailEl.value || "").trim());
+    fd.append("phone", (phoneEl.value || "").trim());
+    fd.append("date", dateEl.value || "");
+    fd.append("seans", timeSlotEl.value || "");
+    fd.append("ucret", (priceEl.value || "").trim());
+    fd.append("not", (noteEl.value || "").trim());
+    fd.append("dil", currentLang);
+    fd.append("durum", "Beklemede");
+
+    /* CORS sıkıntısı yaşamamak için no-cors kullanıyoruz */
+    await fetch(API_URL, {
+      method: "POST",
+      mode: "no-cors",
+      body: fd
+    });
+
+    formCard.style.display = "none";
+    successCard.style.display = "block";
+
+  }catch(err){
+    alert("Hata oluştu. Lütfen tekrar deneyin.");
+    submitBtn.disabled = false;
+  }
+});
 </script>
 
 </body>
