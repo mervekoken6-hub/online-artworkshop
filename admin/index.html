@@ -18,6 +18,12 @@ body{
   border-radius:14px;
   max-width:1200px;
 }
+input{
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  width:420px;
+}
 button{
   padding:10px 16px;
   border-radius:8px;
@@ -27,12 +33,6 @@ button{
   cursor:pointer;
   margin-right:6px;
 }
-input{
-  padding:10px;
-  border-radius:8px;
-  border:none;
-  width:420px;
-}
 table{
   width:100%;
   border-collapse:collapse;
@@ -41,29 +41,17 @@ table{
 th,td{
   padding:8px;
   border-bottom:1px solid #333;
-  vertical-align:top;
 }
 .hidden{display:none}
 .status{margin-left:10px;font-size:13px}
 .bad{color:#fb7185}
 .ok{color:#34d399}
-
-.dot{
-  width:14px;
-  height:14px;
-  border-radius:50%;
-  display:inline-block;
-  margin-right:6px;
-}
-.green{background:#22c55e}
-.yellow{background:#eab308}
-.red{background:#ef4444}
 </style>
 </head>
 
 <body>
 
-<h1>🧙 Admin Panel • Online Art Workshop</h1>
+<h1>🧙 Admin Panel</h1>
 
 <div class="card" id="loginCard">
   <h3>Giriş</h3>
@@ -75,7 +63,7 @@ th,td{
 <div class="card hidden" id="panelCard">
 
   <div style="margin-bottom:14px">
-    <input id="apiUrl" placeholder="Apps Script WEB APP URL (…/exec)">
+    <input id="apiUrl" placeholder="Apps Script Web App URL">
     <button onclick="saveApi()">Kaydet</button>
     <button onclick="logout()">Çıkış</button>
     <span id="status" class="status"></span>
@@ -99,7 +87,6 @@ th,td{
         <th>Not</th>
         <th>Dil</th>
         <th>Durum</th>
-        <th>İşlem</th>
       </tr>
     </thead>
     <tbody id="rows"></tbody>
@@ -111,6 +98,7 @@ th,td{
 const PASSWORD = "cadimagic2025";
 const LS_API = "admin_api_url";
 
+// Giriş / çıkış
 function login(){
   if(password.value === PASSWORD){
     loginCard.classList.add("hidden");
@@ -120,17 +108,16 @@ function login(){
     err.style.display="block";
   }
 }
+function logout(){ location.reload(); }
 
-function logout(){
-  location.reload();
-}
-
+// API URL kaydet
 function saveApi(){
   localStorage.setItem(LS_API, apiUrl.value.trim());
   status.textContent="✅ API kaydedildi";
   status.className="status ok";
 }
 
+// Metin formatlama
 function fmt(v){
   if(typeof v === "string" && v.includes("T") && v.endsWith("Z")){
     const d = new Date(v);
@@ -139,6 +126,7 @@ function fmt(v){
   return (v ?? "").toString();
 }
 
+// Veri çekme
 async function loadData(type){
   const url = localStorage.getItem(LS_API);
   if(!url){
@@ -148,59 +136,46 @@ async function loadData(type){
   }
 
   status.textContent="⏳ Yükleniyor...";
-  status.className="status";
-
   try{
-    const res = await fetch(url + "?type=" + encodeURIComponent(type));
+    const res = await fetch(url + "?type=" + type);
     const json = await res.json();
-
-    if(!json.ok){
-      status.textContent="❌ API hata";
-      status.className="status bad";
-      return;
-    }
+    if(!json.ok) throw json.error;
 
     renderRows(json.rows || []);
-    status.textContent="✅ Yüklendi (" + json.rows.length + ")";
+    status.textContent="✅ Yüklendi (" + (json.rows ? json.rows.length : 0) + ")";
     status.className="status ok";
-  }catch{
-    status.textContent="❌ API bağlantı hatası";
+  }catch(err){
+    status.textContent="❌ Veri alınamadı";
     status.className="status bad";
   }
 }
 
-function normalizeRow(r){
-  const row = Array.isArray(r) ? r.slice() : [];
-  while(row.length < 10) row.push("");
-  return row;
-}
-
+// Satır gösterimi
 function renderRows(rows){
   const el = document.getElementById("rows");
   el.innerHTML = "";
 
-  rows.forEach(raw=>{
-    const r = normalizeRow(raw);
+  rows.forEach(r => {
     const tr = document.createElement("tr");
 
-    for(let i=0;i<10;i++){
-      const td = document.createElement("td");
-      td.textContent = fmt(r[i]);
-      tr.appendChild(td);
-    }
-
-    const action = document.createElement("td");
-    action.innerHTML = `
-      <span class="dot green" title="Onaylandı"></span>
-      <span class="dot yellow" title="Beklemede"></span>
-      <span class="dot red" title="İptal"></span>
+    tr.innerHTML = `
+      <td>${fmt(r.kayitTarihi)}</td>
+      <td>${fmt(r.adSoyad)}</td>
+      <td>${fmt(r.email)}</td>
+      <td>${fmt(r.telefon)}</td>
+      <td>${fmt(r.tarih)}</td>
+      <td>${fmt(r.seans)}</td>
+      <td>${fmt(r.ucret)}</td>
+      <td>${fmt(r.not)}</td>
+      <td>${fmt(r.dil)}</td>
+      <td>${fmt(r.durum)}</td>
     `;
-    tr.appendChild(action);
 
     el.appendChild(tr);
   });
 }
 
+// Kaydedilmiş API’yi getir
 apiUrl.value = localStorage.getItem(LS_API) || "";
 </script>
 
