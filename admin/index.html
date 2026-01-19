@@ -19,19 +19,14 @@ body{
   max-width:1200px;
 }
 button{
-  padding:8px 14px;
+  padding:8px 12px;
   border-radius:8px;
   border:none;
+  background:#6366f1;
+  color:#fff;
   cursor:pointer;
   margin-right:6px;
-  font-weight:600;
 }
-.btn-green{background:#22c55e;color:#000}
-.btn-yellow{background:#facc15;color:#000}
-.btn-red{background:#ef4444;color:#fff}
-.btn-main{background:#6366f1;color:#fff}
-.btn-wa{background:#25d366;color:#000}
-
 input{
   padding:10px;
   border-radius:8px;
@@ -52,7 +47,18 @@ th,td{
 .status{margin-left:10px; font-size:13px}
 .bad{color:#fb7185}
 .ok{color:#34d399}
-.actions button{margin-bottom:4px}
+
+.dot{
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  display:inline-block;
+  cursor:pointer;
+  margin-right:6px;
+}
+.green{background:#22c55e}
+.yellow{background:#eab308}
+.red{background:#ef4444}
 </style>
 </head>
 
@@ -63,7 +69,7 @@ th,td{
 <div class="card" id="loginCard">
   <h3>Giriş</h3>
   <input type="password" id="password" placeholder="Şifre">
-  <button class="btn-main" onclick="login()">Giriş Yap</button>
+  <button onclick="login()">Giriş Yap</button>
   <p id="err" style="color:#fb7185;display:none">Şifre yanlış</p>
 </div>
 
@@ -71,14 +77,14 @@ th,td{
 
   <div style="margin-bottom:14px">
     <input id="apiUrl" placeholder="Apps Script WEB APP URL (…/exec)">
-    <button class="btn-main" onclick="saveApi()">Kaydet</button>
-    <button class="btn-red" onclick="logout()">Çıkış</button>
+    <button onclick="saveApi()">Kaydet</button>
+    <button onclick="logout()">Çıkış</button>
     <span id="status" class="status"></span>
   </div>
 
   <div style="margin-bottom:10px">
-    <button class="btn-main" onclick="loadData('cadi')">🧙 Cadı Atölyesi</button>
-    <button class="btn-main" onclick="loadData('canli')">🎥 Canlı Ders</button>
+    <button onclick="loadData('cadi')">🧙 Cadı Atölyesi</button>
+    <button onclick="loadData('canli')">🎥 Canlı Ders</button>
   </div>
 
   <table>
@@ -94,7 +100,7 @@ th,td{
         <th>Not</th>
         <th>Dil</th>
         <th>Durum</th>
-        <th>İşlemler</th>
+        <th>İşlem</th>
       </tr>
     </thead>
     <tbody id="rows"></tbody>
@@ -103,63 +109,58 @@ th,td{
 </div>
 
 <script>
-const PASSWORD="cadimagic2025";
-const LS_API="admin_api_url";
-
-const COL={
-  tarihKayit:0,
-  adSoyad:1,
-  email:2,
-  telefon:3,
-  tarih:4,
-  seans:5,
-  ucret:6,
-  not:7,
-  dil:8,
-  durum:9
-};
+const PASSWORD = "cadimagic2025";
+const LS_API = "admin_api_url";
 
 function login(){
-  if(password.value===PASSWORD){
+  if(password.value === PASSWORD){
     loginCard.classList.add("hidden");
     panelCard.classList.remove("hidden");
     err.style.display="none";
-  }else err.style.display="block";
+  }else{
+    err.style.display="block";
+  }
 }
 
-function logout(){location.reload();}
+function logout(){ location.reload(); }
+
 function saveApi(){
-  localStorage.setItem(LS_API,apiUrl.value.trim());
+  localStorage.setItem(LS_API, apiUrl.value.trim());
   status.textContent="✅ API kaydedildi";
   status.className="status ok";
 }
 
 function fmt(v){
-  if(!v) return "";
-  if(typeof v==="string" && v.includes("T")){
-    const d=new Date(v);
-    if(!isNaN(d)) return d.toLocaleString("tr-TR");
-  }
-  return String(v);
+  return (v === null || v === undefined) ? "" : String(v);
 }
 
 async function loadData(type){
-  const url=localStorage.getItem(LS_API);
+  const url = localStorage.getItem(LS_API);
   if(!url){
-    status.textContent="❌ API URL yok";
-    status.className="status bad"; return;
+    status.textContent="❌ API URL girilmedi";
+    status.className="status bad";
+    return;
   }
 
   status.textContent="⏳ Yükleniyor...";
+  status.className="status";
+
   try{
-    const r=await fetch(url+"?type="+type);
-    const j=await r.json();
-    if(!j.ok) throw j.error;
-    renderRows(j.rows||[]);
-    status.textContent="✅ "+j.rows.length+" kayıt";
+    const res = await fetch(url + "?type=" + type);
+    const json = await res.json();
+
+    if(!json.ok){
+      status.textContent="❌ API hata";
+      status.className="status bad";
+      return;
+    }
+
+    renderRows(json.rows || []);
+    status.textContent="✅ Yüklendi (" + json.rows.length + ")";
     status.className="status ok";
-  }catch(e){
-    status.textContent="❌ Veri alınamadı";
+
+  }catch{
+    status.textContent="❌ API bağlantı hatası";
     status.className="status bad";
   }
 }
@@ -167,35 +168,43 @@ async function loadData(type){
 function renderRows(rows){
   const el=document.getElementById("rows");
   el.innerHTML="";
+
   rows.forEach(r=>{
     const tr=document.createElement("tr");
-    for(let i=0;i<10;i++){
+
+    const cols = [
+      r[0], // kayıt tarihi
+      r[1], // ad soyad
+      r[2], // email
+      r[3], // telefon
+      r[4], // tarih
+      r[5], // seans
+      r[6], // ücret
+      r[7], // not
+      r[8], // dil
+      r[9]  // durum
+    ];
+
+    cols.forEach(c=>{
       const td=document.createElement("td");
-      td.textContent=fmt(r[i]);
+      td.textContent = fmt(c);
       tr.appendChild(td);
-    }
+    });
 
-    const td=document.createElement("td");
-    td.className="actions";
-
-    td.innerHTML=`
-      <button class="btn-green" onclick="alert('Backend’de bağlanabilir')">●</button>
-      <button class="btn-yellow" onclick="alert('Backend’de bağlanabilir')">●</button>
-      <button class="btn-red" onclick="alert('Backend’de bağlanabilir')">●</button><br>
-      <button class="btn-wa" onclick="wa('${r[COL.telefon]}','${r[COL.adSoyad]}')">WhatsApp</button>
+    const action=document.createElement("td");
+    action.innerHTML = `
+      <span class="dot green" title="Onaylandı"></span>
+      <span class="dot yellow" title="Beklemede"></span>
+      <span class="dot red" title="İptal"></span>
     `;
-    tr.appendChild(td);
+    action.onclick = ()=>alert("Durum güncelleme backend’e bağlanabilir.");
+    tr.appendChild(action);
+
     el.appendChild(tr);
   });
 }
 
-function wa(tel,ad){
-  if(!tel) return alert("Telefon yok");
-  const msg=`Merhaba ${ad||""} 🌙 Cadı Atölyesi kaydınız alınmıştır. Ödeme kontrolünden sonra bilgilendirileceksiniz.`;
-  window.open("https://wa.me/9"+tel.replace(/\D/g,"")+"?text="+encodeURIComponent(msg));
-}
-
-apiUrl.value=localStorage.getItem(LS_API)||"";
+apiUrl.value = localStorage.getItem(LS_API) || "";
 </script>
 
 </body>
