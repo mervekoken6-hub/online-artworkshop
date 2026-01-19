@@ -16,16 +16,17 @@ body{
   background:#111827;
   padding:20px;
   border-radius:14px;
-  max-width:1100px;
+  max-width:1200px;
 }
 button{
-  padding:10px 16px;
+  padding:8px 12px;
   border-radius:8px;
   border:none;
   background:#6366f1;
   color:#fff;
   cursor:pointer;
-  margin-right:6px;
+  margin-right:4px;
+  font-size:12px;
 }
 input{
   padding:10px;
@@ -37,16 +38,27 @@ table{
   width:100%;
   border-collapse:collapse;
   margin-top:18px;
+  font-size:13px;
 }
 th,td{
   padding:8px;
   border-bottom:1px solid #333;
-  vertical-align:top;
 }
 .hidden{display:none}
-.status{margin-left:10px; font-size:13px}
+.status{margin-left:10px;font-size:13px}
 .bad{color:#fb7185}
 .ok{color:#34d399}
+
+tr.beklemede{background:rgba(250,204,21,.08)}
+tr.onaylandi{background:rgba(34,197,94,.10)}
+tr.iptal{background:rgba(244,63,94,.12)}
+
+.action-btns button{
+  margin-bottom:4px;
+}
+.whatsapp{
+  background:#22c55e;
+}
 </style>
 </head>
 
@@ -71,23 +83,22 @@ th,td{
   </div>
 
   <div style="margin-bottom:10px">
-    <button onclick="loadData('cadi')">🧙 Cadı Atölyesi Kayıtları</button>
-    <button onclick="loadData('canli')">🎥 Canlı Ders Kayıtları</button>
+    <button onclick="loadData('cadi')">🧙 Cadı Atölyesi</button>
+    <button onclick="loadData('canli')">🎥 Canlı Ders</button>
   </div>
 
   <table>
     <thead>
       <tr>
-        <th>Kayıt Tarihi</th>
+        <th>Kayıt</th>
         <th>Ad Soyad</th>
         <th>E-posta</th>
         <th>Telefon</th>
         <th>Tarih</th>
         <th>Seans</th>
         <th>Ücret</th>
-        <th>Not</th>
-        <th>Dil</th>
         <th>Durum</th>
+        <th>İşlemler</th>
       </tr>
     </thead>
     <tbody id="rows"></tbody>
@@ -96,91 +107,76 @@ th,td{
 </div>
 
 <script>
-const PASSWORD = "cadimagic2025";
-const LS_API = "admin_api_url";
+const PASSWORD="cadimagic2025";
+const LS_API="admin_api_url";
 
 function login(){
-  if(password.value === PASSWORD){
+  if(password.value===PASSWORD){
     loginCard.classList.add("hidden");
     panelCard.classList.remove("hidden");
     err.style.display="none";
-  }else{
-    err.style.display="block";
-  }
+  }else err.style.display="block";
 }
-
-function logout(){
-  location.reload();
-}
-
+function logout(){location.reload();}
 function saveApi(){
-  localStorage.setItem(LS_API, apiUrl.value.trim());
+  localStorage.setItem(LS_API,apiUrl.value.trim());
   status.textContent="✅ API kaydedildi";
   status.className="status ok";
 }
-
 function fmt(v){
-  // ISO tarihleri biraz güzelleştir
-  if(typeof v === "string" && v.includes("T") && v.endsWith("Z")){
-    try{
-      const d = new Date(v);
-      if(!isNaN(d.getTime())) return d.toLocaleString("tr-TR");
-    }catch{}
+  if(typeof v==="string"&&v.includes("T")){
+    const d=new Date(v);
+    if(!isNaN(d)) return d.toLocaleString("tr-TR");
   }
-  return (v === null || v === undefined) ? "" : String(v);
+  return v||"";
 }
 
 async function loadData(type){
-  const url = localStorage.getItem(LS_API);
-  if(!url){
-    status.textContent="❌ API URL girilmedi";
-    status.className="status bad";
-    return;
-  }
-
+  const url=localStorage.getItem(LS_API);
+  if(!url) return;
   status.textContent="⏳ Yükleniyor...";
-  status.className="status";
-
-  try{
-    const res = await fetch(url + "?type=" + encodeURIComponent(type));
-    const json = await res.json();
-
-    if(!json.ok){
-      status.textContent="❌ API hata: " + (json.error || "Bilinmeyen");
-      status.className="status bad";
-      renderRows([]);
-      return;
-    }
-
-    renderRows(json.rows || []);
-    status.textContent="✅ Yüklendi (" + (json.rows ? json.rows.length : 0) + ")";
-    status.className="status ok";
-  }catch(e){
-    status.textContent="❌ API ulaşılamıyor / JSON okunamıyor";
-    status.className="status bad";
-  }
+  const res=await fetch(url+"?type="+type);
+  const json=await res.json();
+  renderRows(json.rows||[]);
+  status.textContent="✅ Yüklendi";
 }
 
 function renderRows(rows){
-  const el=document.getElementById("rows");
-  el.innerHTML="";
-
+  rowsEl.innerHTML="";
   rows.forEach(r=>{
     const tr=document.createElement("tr");
+    const durum=(r[9]||"Beklemede").toLowerCase();
+    tr.className=durum==="onaylandı"?"onaylandi":durum==="iptal"?"iptal":"beklemede";
 
-    // A-J (10 sütun) garanti
-    for(let i=0;i<10;i++){
-      const td=document.createElement("td");
-      td.textContent = fmt(r[i]);
-      tr.appendChild(td);
-    }
-
-    el.appendChild(tr);
+    tr.innerHTML=`
+<td>${fmt(r[0])}</td>
+<td>${r[1]||""}</td>
+<td>${r[2]||""}</td>
+<td>${r[3]||""}</td>
+<td>${fmt(r[4])}</td>
+<td>${r[5]||""}</td>
+<td>${r[6]||""}</td>
+<td>${r[9]||"Beklemede"}</td>
+<td class="action-btns">
+  <button onclick="setStatus('${r[0]}','Onaylandı')">🟢</button>
+  <button onclick="setStatus('${r[0]}','Beklemede')">🟡</button>
+  <button onclick="setStatus('${r[0]}','İptal')">🔴</button><br>
+  <button class="whatsapp" onclick="wa('${r[3]}','${r[1]}')">WhatsApp</button>
+</td>`;
+    rowsEl.appendChild(tr);
   });
 }
 
-// load saved url
-apiUrl.value = localStorage.getItem(LS_API) || "";
+function wa(phone,name){
+  const msg=`Merhaba ${name} 🌙 Cadı Atölyesi için kaydınızı aldık. Ödeme kontrolünden sonra bilgilendireceğiz 💜`;
+  window.open(`https://wa.me/9${phone}?text=${encodeURIComponent(msg)}`);
+}
+
+// Durum değiştirme (basit – yeniden yükleme yeterli)
+function setStatus(){ alert("Durum güncelleme backend'e eklenebilir. Şu an görsel.") }
+
+apiUrl.value=localStorage.getItem(LS_API)||"";
+const rowsEl=document.getElementById("rows");
 </script>
 
 </body>
