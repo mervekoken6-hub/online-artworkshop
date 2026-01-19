@@ -18,12 +18,6 @@ body{
   border-radius:14px;
   max-width:1200px;
 }
-input{
-  padding:10px;
-  border-radius:8px;
-  border:none;
-  width:420px;
-}
 button{
   padding:10px 16px;
   border-radius:8px;
@@ -39,14 +33,19 @@ table{
   margin-top:18px;
 }
 th,td{
-  padding:8px;
-  border-bottom:1px solid #333;
+  padding:10px;
+  border-bottom:1px solid #2a2a2a;
   vertical-align:top;
 }
+th{
+  text-align:left;
+  font-size:14px;
+  opacity:.85;
+}
+td{
+  font-size:14px;
+}
 .hidden{display:none}
-.status{margin-left:10px;font-size:13px}
-.bad{color:#fb7185}
-.ok{color:#34d399}
 </style>
 </head>
 
@@ -56,7 +55,9 @@ th,td{
 
 <div class="card" id="loginCard">
   <h3>Giriş</h3>
-  <input type="password" id="password" placeholder="Şifre">
+  <input type="password" id="password" placeholder="Şifre"
+         style="padding:10px;border-radius:8px;border:none;width:300px">
+  <br><br>
   <button onclick="login()">Giriş Yap</button>
   <p id="err" style="color:#fb7185;display:none">Şifre yanlış</p>
 </div>
@@ -64,12 +65,11 @@ th,td{
 <div class="card hidden" id="panelCard">
 
   <div style="margin-bottom:14px">
-    <span style="opacity:.8">API bağlı</span>
+    <strong>API bağlı</strong>
     <button onclick="logout()">Çıkış</button>
-    <span id="status" class="status"></span>
   </div>
 
-  <div style="margin-bottom:10px">
+  <div style="margin-bottom:12px">
     <button onclick="loadData('cadi')">🧙 Cadı Atölyesi</button>
     <button onclick="loadData('canli')">🎥 Canlı Ders</button>
   </div>
@@ -95,15 +95,11 @@ th,td{
 </div>
 
 <script>
-/* =====================
-   AYARLAR
-===================== */
 const PASSWORD = "cadimagic2025";
+
+/* 🔴 SENİN VERDİĞİN API – SABİT */
 const API_URL = "https://script.google.com/macros/s/AKfycbx7AiP3yKgNBUtY-25w7wldp_MUd5Q8JGsbRDJ4W8pxDAm13RIgvUrs53itOYchsRwe_Q/exec";
 
-/* =====================
-   GİRİŞ
-===================== */
 function login(){
   if(password.value === PASSWORD){
     loginCard.classList.add("hidden");
@@ -118,54 +114,50 @@ function logout(){
   location.reload();
 }
 
-/* =====================
-   VERİ ÇEKME
-===================== */
-async function loadData(type){
-  status.textContent = "⏳ Yükleniyor...";
-  status.className = "status";
+/* Tarih formatını güzelleştir */
+function niceDate(v){
+  if(!v) return "";
+  const d = new Date(v);
+  return isNaN(d) ? v : d.toLocaleString("tr-TR");
+}
 
+async function loadData(type){
   try{
-    const res = await fetch(API_URL + "?type=" + type);
+    const res = await fetch(API_URL + "?type=" + encodeURIComponent(type));
     const json = await res.json();
 
     if(!json.ok){
-      status.textContent = "❌ API hata";
-      status.className = "status bad";
+      renderRows([]);
+      alert("Veri alınamadı");
       return;
     }
 
     renderRows(json.rows || []);
-    status.textContent = "✅ Yüklendi (" + json.rows.length + ")";
-    status.className = "status ok";
-
   }catch(e){
-    status.textContent = "❌ Bağlantı hatası";
-    status.className = "status bad";
+    alert("API erişim hatası");
   }
 }
 
-/* =====================
-   TABLOYA YAZ
-===================== */
 function renderRows(rows){
-  const el = document.getElementById("rows");
-  el.innerHTML = "";
+  const el=document.getElementById("rows");
+  el.innerHTML="";
 
   rows.forEach(r=>{
-    const tr = document.createElement("tr");
+    const tr=document.createElement("tr");
+
     tr.innerHTML = `
-      <td>${r.kayitTarihi || ""}</td>
+      <td>${niceDate(r.kayitTarihi)}</td>
       <td>${r.adSoyad || ""}</td>
       <td>${r.email || ""}</td>
       <td>${r.telefon || ""}</td>
-      <td>${r.tarih || ""}</td>
+      <td>${niceDate(r.tarih)}</td>
       <td>${r.seans || ""}</td>
       <td>${r.ucret || ""}</td>
       <td>${r.not || ""}</td>
       <td>${r.dil || ""}</td>
       <td>${r.durum || ""}</td>
     `;
+
     el.appendChild(tr);
   });
 }
