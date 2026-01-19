@@ -44,7 +44,7 @@ th,td{
   vertical-align:top;
 }
 .hidden{display:none}
-.status{margin-left:10px; font-size:13px}
+.status{margin-left:10px;font-size:13px}
 .bad{color:#fb7185}
 .ok{color:#34d399}
 
@@ -121,7 +121,9 @@ function login(){
   }
 }
 
-function logout(){ location.reload(); }
+function logout(){
+  location.reload();
+}
 
 function saveApi(){
   localStorage.setItem(LS_API, apiUrl.value.trim());
@@ -131,7 +133,7 @@ function saveApi(){
 
 function fmt(v){
   if(typeof v === "string" && v.includes("T") && v.endsWith("Z")){
-    const d=new Date(v);
+    const d = new Date(v);
     if(!isNaN(d)) return d.toLocaleString("tr-TR");
   }
   return (v ?? "").toString();
@@ -149,7 +151,7 @@ async function loadData(type){
   status.className="status";
 
   try{
-    const res = await fetch(url + "?type=" + type);
+    const res = await fetch(url + "?type=" + encodeURIComponent(type));
     const json = await res.json();
 
     if(!json.ok){
@@ -167,35 +169,27 @@ async function loadData(type){
   }
 }
 
+function normalizeRow(r){
+  const row = Array.isArray(r) ? r.slice() : [];
+  while(row.length < 10) row.push("");
+  return row;
+}
+
 function renderRows(rows){
-  const el=document.getElementById("rows");
-  el.innerHTML="";
+  const el = document.getElementById("rows");
+  el.innerHTML = "";
 
-  rows.forEach(r=>{
-    const tr=document.createElement("tr");
+  rows.forEach(raw=>{
+    const r = normalizeRow(raw);
+    const tr = document.createElement("tr");
 
-    const safe = i => fmt(r[i] ?? "");
-
-    const cols = [
-      safe(0), // kayıt tarihi
-      safe(1), // ad soyad
-      safe(2), // email
-      safe(3), // telefon
-      safe(4), // tarih
-      safe(5), // seans
-      safe(6), // ücret
-      safe(7), // not
-      safe(8), // dil
-      safe(9)  // durum
-    ];
-
-    cols.forEach(v=>{
-      const td=document.createElement("td");
-      td.textContent=v;
+    for(let i=0;i<10;i++){
+      const td = document.createElement("td");
+      td.textContent = fmt(r[i]);
       tr.appendChild(td);
-    });
+    }
 
-    const action=document.createElement("td");
+    const action = document.createElement("td");
     action.innerHTML = `
       <span class="dot green" title="Onaylandı"></span>
       <span class="dot yellow" title="Beklemede"></span>
