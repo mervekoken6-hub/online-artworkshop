@@ -16,7 +16,7 @@ body{
   background:#111827;
   padding:20px;
   border-radius:14px;
-  max-width:1200px;
+  max-width:1100px;
 }
 button{
   padding:10px 16px;
@@ -27,44 +27,36 @@ button{
   cursor:pointer;
   margin-right:6px;
 }
+input{
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  width:420px;
+}
 table{
   width:100%;
   border-collapse:collapse;
   margin-top:18px;
 }
 th,td{
-  padding:10px;
-  border-bottom:1px solid #2a2a2a;
-  vertical-align:middle;
-}
-th{
-  font-size:14px;
-  opacity:.85;
+  padding:8px;
+  border-bottom:1px solid #333;
+  vertical-align:top;
 }
 .hidden{display:none}
-
-.dot{
-  width:14px;
-  height:14px;
-  border-radius:50%;
-  display:inline-block;
-}
-.green{background:#22c55e}
-.yellow{background:#facc15}
-.red{background:#ef4444}
+.status{margin-left:10px; font-size:13px}
+.bad{color:#fb7185}
+.ok{color:#34d399}
 </style>
 </head>
 
 <body>
 
-<h1>🧙 Admin Panel</h1>
+<h1>🧙 Admin Panel • Online Art Workshop</h1>
 
 <div class="card" id="loginCard">
   <h3>Giriş</h3>
-  <input type="password" id="password"
-         placeholder="Şifre"
-         style="padding:10px;border-radius:8px;border:none;width:300px">
-  <br><br>
+  <input type="password" id="password" placeholder="Şifre">
   <button onclick="login()">Giriş Yap</button>
   <p id="err" style="color:#fb7185;display:none">Şifre yanlış</p>
 </div>
@@ -72,14 +64,20 @@ th{
 <div class="card hidden" id="panelCard">
 
   <div style="margin-bottom:14px">
-    <strong>API bağlı</strong>
+    <input id="apiUrl" placeholder="Apps Script WEB APP URL (…/exec)">
+    <button onclick="saveApi()">Kaydet</button>
     <button onclick="logout()">Çıkış</button>
+    <span id="status" class="status"></span>
+  </div>
+
+  <div style="margin-bottom:10px">
+    <button onclick="loadData('cadi')">🧙 Cadı Atölyesi Kayıtları</button>
+    <button onclick="loadData('canli')">🎥 Canlı Ders Kayıtları</button>
   </div>
 
   <table>
     <thead>
       <tr>
-        <th>Durum</th>
         <th>Kayıt Tarihi</th>
         <th>Ad Soyad</th>
         <th>E-posta</th>
@@ -89,6 +87,7 @@ th{
         <th>Ücret</th>
         <th>Not</th>
         <th>Dil</th>
+        <th>Durum</th>
       </tr>
     </thead>
     <tbody id="rows"></tbody>
@@ -98,14 +97,13 @@ th{
 
 <script>
 const PASSWORD = "cadimagic2025";
-const API_URL = "https://script.google.com/macros/s/AKfycbx7AiP3yKgNBUtY-25w7wldp_MUd5Q8JGsbRDJ4W8pxDAm13RIgvUrs53itOYchsRwe_Q/exec";
+const LS_API = "admin_api_url";
 
 function login(){
   if(password.value === PASSWORD){
     loginCard.classList.add("hidden");
     panelCard.classList.remove("hidden");
     err.style.display="none";
-    loadData(); // otomatik yükle
   }else{
     err.style.display="block";
   }
@@ -115,25 +113,51 @@ function logout(){
   location.reload();
 }
 
-function niceDate(v){
-  if(!v) return "";
-  const d = new Date(v);
-  return isNaN(d) ? v : d.toLocaleString("tr-TR");
+function saveApi(){
+  localStorage.setItem(LS_API, apiUrl.value.trim());
+  status.textContent="✅ API kaydedildi";
+  status.className="status ok";
 }
 
-async function loadData(){
+function fmt(v){
+  // ISO tarihleri biraz güzelleştir
+  if(typeof v === "string" && v.includes("T") && v.endsWith("Z")){
+    try{
+      const d = new Date(v);
+      if(!isNaN(d.getTime())) return d.toLocaleString("tr-TR");
+    }catch{}
+  }
+  return (v === null || v === undefined) ? "" : String(v);
+}
+
+async function loadData(type){
+  const url = localStorage.getItem(LS_API);
+  if(!url){
+    status.textContent="❌ API URL girilmedi";
+    status.className="status bad";
+    return;
+  }
+
+  status.textContent="⏳ Yükleniyor...";
+  status.className="status";
+
   try{
-    const res = await fetch(API_URL);
+    const res = await fetch(url + "?type=" + encodeURIComponent(type));
     const json = await res.json();
 
     if(!json.ok){
-      alert("Veri alınamadı");
+      status.textContent="❌ API hata: " + (json.error || "Bilinmeyen");
+      status.className="status bad";
+      renderRows([]);
       return;
     }
 
     renderRows(json.rows || []);
+    status.textContent="✅ Yüklendi (" + (json.rows ? json.rows.length : 0) + ")";
+    status.className="status ok";
   }catch(e){
-    alert("API erişim hatası");
+    status.textContent="❌ API ulaşılamıyor / JSON okunamıyor";
+    status.className="status bad";
   }
 }
 
@@ -144,26 +168,19 @@ function renderRows(rows){
   rows.forEach(r=>{
     const tr=document.createElement("tr");
 
-    // durum r[9]
-    let dotClass = "yellow";
-    if(r[9]==="Onaylandı") dotClass="green";
-    if(r[9]==="İptal") dotClass="red";
+    // A-J (10 sütun) garanti
+    for(let i=0;i<10;i++){
+      const td=document.createElement("td");
+      td.textContent = fmt(r[i]);
+      tr.appendChild(td);
+    }
 
-    tr.innerHTML = `
-      <td><span class="dot ${dotClass}"></span></td>
-      <td>${niceDate(r[0])}</td>
-      <td>${r[1]||""}</td>
-      <td>${r[2]||""}</td>
-      <td>${r[3]||""}</td>
-      <td>${niceDate(r[4])}</td>
-      <td>${r[5]||""}</td>
-      <td>${r[6]||""}</td>
-      <td>${r[7]||""}</td>
-      <td>${r[8]||""}</td>
-    `;
     el.appendChild(tr);
   });
 }
+
+// load saved url
+apiUrl.value = localStorage.getItem(LS_API) || "";
 </script>
 
 </body>
