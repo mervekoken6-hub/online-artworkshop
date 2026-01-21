@@ -55,7 +55,8 @@ td{
 
 <div class="card" id="loginCard">
   <h3>Giriş</h3>
-  <input type="password" id="password" placeholder="Şifre"
+  <input type="password" id="password"
+         placeholder="Şifre"
          style="padding:10px;border-radius:8px;border:none;width:300px">
   <br><br>
   <button onclick="login()">Giriş Yap</button>
@@ -97,7 +98,7 @@ td{
 <script>
 const PASSWORD = "cadimagic2025";
 
-/* 🔴 SENİN VERDİĞİN API – SABİT */
+/* 🔴 SABİT API */
 const API_URL = "https://script.google.com/macros/s/AKfycbx7AiP3yKgNBUtY-25w7wldp_MUd5Q8JGsbRDJ4W8pxDAm13RIgvUrs53itOYchsRwe_Q/exec";
 
 function login(){
@@ -114,7 +115,6 @@ function logout(){
   location.reload();
 }
 
-/* Tarih formatını güzelleştir */
 function niceDate(v){
   if(!v) return "";
   const d = new Date(v);
@@ -127,8 +127,8 @@ async function loadData(type){
     const json = await res.json();
 
     if(!json.ok){
-      renderRows([]);
       alert("Veri alınamadı");
+      renderRows([]);
       return;
     }
 
@@ -139,23 +139,23 @@ async function loadData(type){
 }
 
 function renderRows(rows){
-  const el=document.getElementById("rows");
-  el.innerHTML="";
+  const el = document.getElementById("rows");
+  el.innerHTML = "";
 
   rows.forEach(r=>{
-    const tr=document.createElement("tr");
+    const tr = document.createElement("tr");
 
     tr.innerHTML = `
-      <td>${niceDate(r.kayitTarihi)}</td>
-      <td>${r.adSoyad || ""}</td>
-      <td>${r.email || ""}</td>
-      <td>${r.telefon || ""}</td>
-      <td>${niceDate(r.tarih)}</td>
-      <td>${r.seans || ""}</td>
-      <td>${r.ucret || ""}</td>
-      <td>${r.not || ""}</td>
-      <td>${r.dil || ""}</td>
-      <td>${r.durum || ""}</td>
+      <td>${niceDate(r[0])}</td>
+      <td>${r[1] || ""}</td>
+      <td>${r[2] || ""}</td>
+      <td>${r[3] || ""}</td>
+      <td>${niceDate(r[4])}</td>
+      <td>${r[5] || ""}</td>
+      <td>${r[6] || ""}</td>
+      <td>${r[7] || ""}</td>
+      <td>${r[8] || ""}</td>
+      <td>${r[9] || ""}</td>
     `;
 
     el.appendChild(tr);
