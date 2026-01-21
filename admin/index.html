@@ -35,17 +35,23 @@ table{
 th,td{
   padding:10px;
   border-bottom:1px solid #2a2a2a;
-  vertical-align:top;
+  vertical-align:middle;
 }
 th{
-  text-align:left;
   font-size:14px;
   opacity:.85;
 }
-td{
-  font-size:14px;
-}
 .hidden{display:none}
+
+.dot{
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  display:inline-block;
+}
+.green{background:#22c55e}
+.yellow{background:#facc15}
+.red{background:#ef4444}
 </style>
 </head>
 
@@ -70,14 +76,10 @@ td{
     <button onclick="logout()">Çıkış</button>
   </div>
 
-  <div style="margin-bottom:12px">
-    <button onclick="loadData('cadi')">🧙 Cadı Atölyesi</button>
-    <button onclick="loadData('canli')">🎥 Canlı Ders</button>
-  </div>
-
   <table>
     <thead>
       <tr>
+        <th>Durum</th>
         <th>Kayıt Tarihi</th>
         <th>Ad Soyad</th>
         <th>E-posta</th>
@@ -87,7 +89,6 @@ td{
         <th>Ücret</th>
         <th>Not</th>
         <th>Dil</th>
-        <th>Durum</th>
       </tr>
     </thead>
     <tbody id="rows"></tbody>
@@ -97,8 +98,6 @@ td{
 
 <script>
 const PASSWORD = "cadimagic2025";
-
-/* 🔴 SABİT API */
 const API_URL = "https://script.google.com/macros/s/AKfycbx7AiP3yKgNBUtY-25w7wldp_MUd5Q8JGsbRDJ4W8pxDAm13RIgvUrs53itOYchsRwe_Q/exec";
 
 function login(){
@@ -106,6 +105,7 @@ function login(){
     loginCard.classList.add("hidden");
     panelCard.classList.remove("hidden");
     err.style.display="none";
+    loadData(); // otomatik yükle
   }else{
     err.style.display="block";
   }
@@ -121,14 +121,13 @@ function niceDate(v){
   return isNaN(d) ? v : d.toLocaleString("tr-TR");
 }
 
-async function loadData(type){
+async function loadData(){
   try{
-    const res = await fetch(API_URL + "?type=" + encodeURIComponent(type));
+    const res = await fetch(API_URL);
     const json = await res.json();
 
     if(!json.ok){
       alert("Veri alınamadı");
-      renderRows([]);
       return;
     }
 
@@ -139,25 +138,29 @@ async function loadData(type){
 }
 
 function renderRows(rows){
-  const el = document.getElementById("rows");
-  el.innerHTML = "";
+  const el=document.getElementById("rows");
+  el.innerHTML="";
 
   rows.forEach(r=>{
-    const tr = document.createElement("tr");
+    const tr=document.createElement("tr");
+
+    // durum r[9]
+    let dotClass = "yellow";
+    if(r[9]==="Onaylandı") dotClass="green";
+    if(r[9]==="İptal") dotClass="red";
 
     tr.innerHTML = `
+      <td><span class="dot ${dotClass}"></span></td>
       <td>${niceDate(r[0])}</td>
-      <td>${r[1] || ""}</td>
-      <td>${r[2] || ""}</td>
-      <td>${r[3] || ""}</td>
+      <td>${r[1]||""}</td>
+      <td>${r[2]||""}</td>
+      <td>${r[3]||""}</td>
       <td>${niceDate(r[4])}</td>
-      <td>${r[5] || ""}</td>
-      <td>${r[6] || ""}</td>
-      <td>${r[7] || ""}</td>
-      <td>${r[8] || ""}</td>
-      <td>${r[9] || ""}</td>
+      <td>${r[5]||""}</td>
+      <td>${r[6]||""}</td>
+      <td>${r[7]||""}</td>
+      <td>${r[8]||""}</td>
     `;
-
     el.appendChild(tr);
   });
 }
