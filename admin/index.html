@@ -48,13 +48,8 @@ th,td{
 .bad{color:#fb7185}
 .ok{color:#34d399}
 </style>
-
-<!-- 🔥 DEBUG: BU SATIR GÖRÜNMELİ -->
-<script>
-  console.log("🔥 ADMIN PANEL YENİ KOD AKTİF");
-</script>
-
 </head>
+
 <body>
 
 <h1>🧙 Admin Panel • Online Art Workshop</h1>
@@ -92,7 +87,6 @@ th,td{
 <script>
 const PASSWORD = "cadimagic2025";
 const LS_API = "admin_api_url";
-let currentType = "cadi";
 
 /* ---------- AUTH ---------- */
 function login(){
@@ -120,13 +114,8 @@ function fmt(v){
   return isNaN(d) ? v : d.toLocaleString("tr-TR");
 }
 
-/* ---------- LOAD DATA ---------- */
+/* ---------- LOAD DATA (TEK VE NET) ---------- */
 async function loadData(type){
-  console.log("➡️ loadData çağrıldı:", type);
-  alert("loadData çalıştı: " + type); // DEBUG
-
-  currentType = type;
-
   const url = localStorage.getItem(LS_API);
   if(!url){
     status.textContent="❌ API URL girilmedi";
@@ -149,7 +138,6 @@ async function loadData(type){
 
     status.textContent="✅ Yüklendi";
     status.className="status ok";
-
   }catch(e){
     console.error(e);
     status.textContent="❌ API okunamadı";
@@ -157,7 +145,7 @@ async function loadData(type){
   }
 }
 
-/* ---------- RENDER CADI ---------- */
+/* ---------- RENDER CADI ATÖLYESİ ---------- */
 function renderCadi(rows){
   const thead=document.getElementById("thead");
   const tbody=document.getElementById("rows");
@@ -196,7 +184,7 @@ function renderCadi(rows){
   });
 }
 
-/* ---------- RENDER CANLI ---------- */
+/* ---------- RENDER CANLI DERS ---------- */
 function renderCanli(rows){
   const thead=document.getElementById("thead");
   const tbody=document.getElementById("rows");
