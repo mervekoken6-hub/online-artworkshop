@@ -54,7 +54,6 @@ th,td{
 
 <h1>🧙 Admin Panel • Online Art Workshop</h1>
 
-<!-- LOGIN -->
 <div class="card" id="loginCard">
   <h3>Giriş</h3>
   <input type="password" id="password" placeholder="Şifre">
@@ -62,7 +61,6 @@ th,td{
   <p id="err" style="color:#fb7185;display:none">Şifre yanlış</p>
 </div>
 
-<!-- PANEL -->
 <div class="card hidden" id="panelCard">
 
   <div style="margin-bottom:14px">
@@ -88,7 +86,6 @@ th,td{
 const PASSWORD = "cadimagic2025";
 const LS_API = "admin_api_url";
 
-/* ---------- AUTH ---------- */
 function login(){
   if(password.value === PASSWORD){
     loginCard.classList.add("hidden");
@@ -100,22 +97,19 @@ function login(){
 }
 function logout(){ location.reload(); }
 
-/* ---------- API URL ---------- */
 function saveApi(){
   localStorage.setItem(LS_API, apiUrl.value.trim());
   status.textContent="✅ API kaydedildi";
   status.className="status ok";
 }
 
-/* ---------- HELPERS ---------- */
 function fmt(v){
   if(!v) return "";
   const d = new Date(v);
   return isNaN(d) ? v : d.toLocaleString("tr-TR");
 }
 
-/* ---------- LOAD DATA (TEK VE NET) ---------- */
-async function loadData(type){
+async function loadData(){
   const url = localStorage.getItem(LS_API);
   if(!url){
     status.textContent="❌ API URL girilmedi";
@@ -127,15 +121,9 @@ async function loadData(type){
   status.className="status";
 
   try{
-    const res = await fetch(url + "?type=" + type);
+    const res = await fetch(url);
     const data = await res.json();
-
-    if(type === "cadi"){
-      renderCadi(data.rows || []);
-    }else{
-      renderCanli(data.rows || []);
-    }
-
+    renderSmart(data.rows || []);
     status.textContent="✅ Yüklendi";
     status.className="status ok";
   }catch(e){
@@ -145,75 +133,70 @@ async function loadData(type){
   }
 }
 
-/* ---------- RENDER CADI ATÖLYESİ ---------- */
-function renderCadi(rows){
-  const thead=document.getElementById("thead");
-  const tbody=document.getElementById("rows");
-
-  thead.innerHTML=`
-    <tr>
-      <th>Kayıt Tarihi</th>
-      <th>Ad Soyad</th>
-      <th>E-posta</th>
-      <th>Telefon</th>
-      <th>Tarih</th>
-      <th>Seans</th>
-      <th>Ücret</th>
-      <th>Not</th>
-      <th>Dil</th>
-      <th>Durum</th>
-    </tr>
-  `;
+/* 🔥 AKILLI RENDER */
+function renderSmart(rows){
+  const thead = document.getElementById("thead");
+  const tbody = document.getElementById("rows");
   tbody.innerHTML="";
 
-  rows.slice(1).forEach(r=>{
-    tbody.innerHTML+=`
+  if(!rows.length) return;
+
+  const sample = rows[1] || [];
+  const isCadi = sample.length >= 9;
+
+  if(isCadi){
+    thead.innerHTML=`
       <tr>
-        <td>${fmt(r[0])}</td>
-        <td>${r[1]||""}</td>
-        <td>${r[2]||""}</td>
-        <td>${r[3]||""}</td>
-        <td>${fmt(r[4])}</td>
-        <td>${r[5]||""}</td>
-        <td>${r[6]||""}</td>
-        <td>${r[7]||""}</td>
-        <td>${r[8]||""}</td>
-        <td>${r[9]||""}</td>
+        <th>Kayıt Tarihi</th>
+        <th>Ad Soyad</th>
+        <th>E-posta</th>
+        <th>Telefon</th>
+        <th>Tarih</th>
+        <th>Seans</th>
+        <th>Ücret</th>
+        <th>Not</th>
+        <th>Dil</th>
+        <th>Durum</th>
       </tr>
     `;
-  });
-}
-
-/* ---------- RENDER CANLI DERS ---------- */
-function renderCanli(rows){
-  const thead=document.getElementById("thead");
-  const tbody=document.getElementById("rows");
-
-  thead.innerHTML=`
-    <tr>
-      <th>Kayıt Tarihi</th>
-      <th>E-posta</th>
-      <th>Seans</th>
-      <th>Dil</th>
-      <th>Durum</th>
-    </tr>
-  `;
-  tbody.innerHTML="";
-
-  rows.slice(1).forEach(r=>{
-    tbody.innerHTML+=`
+    rows.slice(1).forEach(r=>{
+      tbody.innerHTML+=`
+        <tr>
+          <td>${fmt(r[0])}</td>
+          <td>${r[1]||""}</td>
+          <td>${r[2]||""}</td>
+          <td>${r[3]||""}</td>
+          <td>${fmt(r[4])}</td>
+          <td>${r[5]||""}</td>
+          <td>${r[6]||""}</td>
+          <td>${r[7]||""}</td>
+          <td>${r[8]||""}</td>
+          <td>${r[9]||""}</td>
+        </tr>`;
+    });
+  }else{
+    thead.innerHTML=`
       <tr>
-        <td>${fmt(r[0])}</td>
-        <td>${r[1]||""}</td>
-        <td>${r[2]||""}</td>
-        <td>${r[3]||""}</td>
-        <td>${r[4]||""}</td>
+        <th>Kayıt Tarihi</th>
+        <th>E-posta</th>
+        <th>Seans</th>
+        <th>Dil</th>
+        <th>Durum</th>
       </tr>
     `;
-  });
+    rows.slice(1).forEach(r=>{
+      tbody.innerHTML+=`
+        <tr>
+          <td>${fmt(r[0])}</td>
+          <td>${r[1]||""}</td>
+          <td>${r[2]||""}</td>
+          <td>${r[3]||""}</td>
+          <td>${r[4]||""}</td>
+        </tr>`;
+    });
+  }
 }
 
-/* ---------- INIT ---------- */
 apiUrl.value = localStorage.getItem(LS_API) || "";
 </script>
 
