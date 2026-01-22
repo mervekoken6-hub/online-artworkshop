@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Admin Panel • Cadı Sanat Atölyesi</title>
+<title>Admin Panel • Online Art Workshop</title>
 
 <style>
 body{
@@ -16,7 +16,7 @@ body{
   background:#111827;
   padding:20px;
   border-radius:14px;
-  max-width:1200px;
+  max-width:1100px;
 }
 button{
   padding:10px 16px;
@@ -25,6 +25,13 @@ button{
   background:#6366f1;
   color:#fff;
   cursor:pointer;
+  margin-right:6px;
+}
+input{
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  width:420px;
 }
 table{
   width:100%;
@@ -32,64 +39,70 @@ table{
   margin-top:18px;
 }
 th,td{
-  padding:10px;
-  border-bottom:1px solid #2a2a2a;
+  padding:8px;
+  border-bottom:1px solid #333;
 }
 .hidden{display:none}
-.dot{
-  width:14px;height:14px;border-radius:50%;display:inline-block;
-}
-.green{background:#22c55e}
-.yellow{background:#facc15}
-.red{background:#ef4444}
+.status{margin-left:10px;font-size:13px}
+.bad{color:#fb7185}
+.ok{color:#34d399}
 </style>
 </head>
 
 <body>
 
-<h1>🧙 Admin Panel</h1>
+<h1>🧙 Admin Panel • Online Art Workshop</h1>
 
 <div class="card" id="loginCard">
   <h3>Giriş</h3>
-  <input type="password" id="password" placeholder="Şifre"
-    style="padding:10px;border-radius:8px;border:none;width:260px">
-  <br><br>
+  <input type="password" id="password" placeholder="Şifre">
   <button onclick="login()">Giriş Yap</button>
   <p id="err" style="color:#fb7185;display:none">Şifre yanlış</p>
 </div>
 
 <div class="card hidden" id="panelCard">
-  <strong>API bağlı</strong>
-  <button onclick="logout()">Çıkış</button>
+
+  <div style="margin-bottom:14px">
+    <input id="apiUrl" placeholder="Apps Script WEB APP URL (…/exec)">
+    <button onclick="saveApi()">Kaydet</button>
+    <button onclick="logout()">Çıkış</button>
+    <span id="status" class="status"></span>
+  </div>
+
+  <div style="margin-bottom:10px">
+    <button onclick="loadData('cadi')">🧙 Cadı Atölyesi</button>
+    <button onclick="loadData('canli')">🎥 Canlı Ders</button>
+  </div>
 
   <table>
     <thead>
       <tr>
-        <th>Durum</th>
         <th>Kayıt</th>
         <th>Ad Soyad</th>
-        <th>Email</th>
+        <th>E-posta</th>
         <th>Telefon</th>
         <th>Tarih</th>
         <th>Seans</th>
         <th>Ücret</th>
         <th>Not</th>
         <th>Dil</th>
+        <th>Durum</th>
       </tr>
     </thead>
     <tbody id="rows"></tbody>
   </table>
+
 </div>
 
 <script>
 const PASSWORD="cadimagic2025";
-const API_URL="https://script.google.com/macros/s/AKfycbx7AiP3yKgNBUtY-25w7wldp_MUd5Q8JGsbRDJ4W8pxDAm13RIgvUrs53itOYchsRwe_Q/exec";
+const LS_API="admin_api_url";
 
 function login(){
   if(password.value===PASSWORD){
     loginCard.classList.add("hidden");
     panelCard.classList.remove("hidden");
-    loadData();
+    err.style.display="none";
   }else{
     err.style.display="block";
   }
@@ -97,45 +110,70 @@ function login(){
 
 function logout(){ location.reload(); }
 
-function nice(v){
-  if(!v) return "";
-  const d=new Date(v);
-  return isNaN(d)?v:d.toLocaleString("tr-TR");
+function saveApi(){
+  localStorage.setItem(LS_API, apiUrl.value.trim());
+  status.textContent="✅ API kaydedildi";
+  status.className="status ok";
 }
 
-async function loadData(){
+function fmt(v){
+  if(v instanceof Date){
+    return v.toLocaleString("tr-TR");
+  }
+  if(typeof v==="string"){
+    const d=new Date(v);
+    if(!isNaN(d)) return d.toLocaleString("tr-TR");
+  }
+  return v ?? "";
+}
+
+async function loadData(type){
+  const url=localStorage.getItem(LS_API);
+  if(!url){
+    status.textContent="❌ API URL girilmedi";
+    status.className="status bad";
+    return;
+  }
+
+  status.textContent="⏳ Yükleniyor...";
+  status.className="status";
+
   try{
-    const r=await fetch(API_URL);
+    const r=await fetch(url+"?type="+encodeURIComponent(type));
     const data=await r.json();
-    render(data);
+
+    const rows = Array.isArray(data)
+      ? data
+      : (data.rows || []);
+
+    renderRows(rows);
+    status.textContent="✅ Yüklendi ("+rows.length+")";
+    status.className="status ok";
   }catch{
-    alert("API okunamadı");
+    status.textContent="❌ API okunamadı";
+    status.className="status bad";
   }
 }
 
-function render(rows){
+function renderRows(rows){
   const el=document.getElementById("rows");
   el.innerHTML="";
-  rows.slice(1).forEach(r=>{
-    let c="yellow";
-    if(r[9]==="Onaylandı") c="green";
-    if(r[9]==="İptal") c="red";
 
-    el.innerHTML+=`
-      <tr>
-        <td><span class="dot ${c}"></span></td>
-        <td>${nice(r[0])}</td>
-        <td>${r[1]||""}</td>
-        <td>${r[2]||""}</td>
-        <td>${r[3]||""}</td>
-        <td>${nice(r[4])}</td>
-        <td>${r[5]||""}</td>
-        <td>${r[6]||""}</td>
-        <td>${r[7]||""}</td>
-        <td>${r[8]||""}</td>
-      </tr>`;
+  rows.forEach(r=>{
+    if(!Array.isArray(r)) return;
+
+    const tr=document.createElement("tr");
+    for(let i=0;i<10;i++){
+      const td=document.createElement("td");
+      td.textContent=fmt(r[i]);
+      tr.appendChild(td);
+    }
+    el.appendChild(tr);
   });
 }
+
+// localStorage'dan URL yükle
+apiUrl.value = localStorage.getItem(LS_API) || "";
 </script>
 
 </body>
