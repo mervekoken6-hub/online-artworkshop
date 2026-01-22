@@ -41,6 +41,7 @@ table{
 th,td{
   padding:8px;
   border-bottom:1px solid #333;
+  vertical-align:top;
 }
 .hidden{display:none}
 .status{margin-left:10px;font-size:13px}
@@ -53,6 +54,7 @@ th,td{
 
 <h1>🧙 Admin Panel • Online Art Workshop</h1>
 
+<!-- GİRİŞ -->
 <div class="card" id="loginCard">
   <h3>Giriş</h3>
   <input type="password" id="password" placeholder="Şifre">
@@ -60,6 +62,7 @@ th,td{
   <p id="err" style="color:#fb7185;display:none">Şifre yanlış</p>
 </div>
 
+<!-- PANEL -->
 <div class="card hidden" id="panelCard">
 
   <div style="margin-bottom:14px">
@@ -77,7 +80,7 @@ th,td{
   <table>
     <thead>
       <tr>
-        <th>Kayıt</th>
+        <th>Kayıt Tarihi</th>
         <th>Ad Soyad</th>
         <th>E-posta</th>
         <th>Telefon</th>
@@ -95,11 +98,11 @@ th,td{
 </div>
 
 <script>
-const PASSWORD="cadimagic2025";
-const LS_API="admin_api_url";
+const PASSWORD = "cadimagic2025";
+const LS_API = "admin_api_url";
 
 function login(){
-  if(password.value===PASSWORD){
+  if(password.value === PASSWORD){
     loginCard.classList.add("hidden");
     panelCard.classList.remove("hidden");
     err.style.display="none";
@@ -108,7 +111,9 @@ function login(){
   }
 }
 
-function logout(){ location.reload(); }
+function logout(){
+  location.reload();
+}
 
 function saveApi(){
   localStorage.setItem(LS_API, apiUrl.value.trim());
@@ -117,18 +122,13 @@ function saveApi(){
 }
 
 function fmt(v){
-  if(v instanceof Date){
-    return v.toLocaleString("tr-TR");
-  }
-  if(typeof v==="string"){
-    const d=new Date(v);
-    if(!isNaN(d)) return d.toLocaleString("tr-TR");
-  }
-  return v ?? "";
+  if(!v) return "";
+  const d = new Date(v);
+  return isNaN(d) ? v : d.toLocaleString("tr-TR");
 }
 
 async function loadData(type){
-  const url=localStorage.getItem(LS_API);
+  const url = localStorage.getItem(LS_API);
   if(!url){
     status.textContent="❌ API URL girilmedi";
     status.className="status bad";
@@ -139,40 +139,52 @@ async function loadData(type){
   status.className="status";
 
   try{
-    const r=await fetch(url+"?type="+encodeURIComponent(type));
-    const data=await r.json();
+    const res = await fetch(url + "?type=" + encodeURIComponent(type));
+    const data = await res.json();
 
-    const rows = Array.isArray(data)
-      ? data
-      : (data.rows || []);
+    if(!data.ok){
+      status.textContent="❌ API hata";
+      status.className="status bad";
+      return;
+    }
 
-    renderRows(rows);
-    status.textContent="✅ Yüklendi ("+rows.length+")";
+    renderRows(data.rows || []);
+    status.textContent="✅ Yüklendi ("+(data.rows.length-1)+")";
     status.className="status ok";
-  }catch{
+
+  }catch(e){
     status.textContent="❌ API okunamadı";
     status.className="status bad";
   }
 }
 
+/* 🔴 ASIL DÜZELTİLEN YER BURASI */
 function renderRows(rows){
-  const el=document.getElementById("rows");
-  el.innerHTML="";
+  const el = document.getElementById("rows");
+  el.innerHTML = "";
 
-  rows.forEach(r=>{
-    if(!Array.isArray(r)) return;
+  // başlık satırını atla
+  rows.slice(1).forEach(r=>{
+    const tr = document.createElement("tr");
 
-    const tr=document.createElement("tr");
-    for(let i=0;i<10;i++){
-      const td=document.createElement("td");
-      td.textContent=fmt(r[i]);
-      tr.appendChild(td);
-    }
+    tr.innerHTML = `
+      <td>${fmt(r[0])}</td>
+      <td>${r[1] || ""}</td>
+      <td>${r[2] || ""}</td>
+      <td>${r[3] || ""}</td>
+      <td>${fmt(r[4])}</td>
+      <td>${r[5] || ""}</td>
+      <td>${r[6] || ""}</td>
+      <td>${r[7] || ""}</td>
+      <td>${r[8] || ""}</td>
+      <td>${r[9] || ""}</td>
+    `;
+
     el.appendChild(tr);
   });
 }
 
-// localStorage'dan URL yükle
+// kayıtlı API URL varsa yükle
 apiUrl.value = localStorage.getItem(LS_API) || "";
 </script>
 
