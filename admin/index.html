@@ -88,6 +88,7 @@ th,td{
 <script>
 const PASSWORD = "cadimagic2025";
 const LS_API = "admin_api_url";
+const rowsEl = document.getElementById("rows");
 
 function login(){
   if(password.value === PASSWORD){
@@ -96,38 +97,53 @@ function login(){
   }
 }
 
-function logout(){ location.reload(); }
+function logout(){
+  location.reload();
+}
 
 function saveApi(){
   localStorage.setItem(LS_API, apiUrl.value.trim());
   alert("API kaydedildi");
 }
 
-function fmt(v){ return v ?? ""; }
-
 async function loadData(type){
   const url = localStorage.getItem(LS_API);
-  if(!url) return alert("API yok");
+  if(!url){
+    alert("API URL girilmedi");
+    return;
+  }
 
   const res = await fetch(url + "?type=" + type);
   const json = await res.json();
-  render(json.rows || []);
-}
 
-function render(rows){
   rowsEl.innerHTML = "";
-  rows.forEach(r=>{
+
+  json.rows.forEach(r=>{
     const tr = document.createElement("tr");
-    for(let i=0;i<10;i++){
+
+    const cols = [
+      r[0], // Kayıt Tarihi
+      r[1], // Ad Soyad
+      r[2], // E-posta
+      r[3], // Telefon
+      r[4], // Tarih
+      r[5], // Seans
+      r[6], // Ücret
+      r[7], // Not
+      r[8], // Dil
+      r[9]  // Durum
+    ];
+
+    cols.forEach(c=>{
       const td = document.createElement("td");
-      td.textContent = fmt(r[i]);
+      td.textContent = c ?? "";
       tr.appendChild(td);
-    }
+    });
+
     rowsEl.appendChild(tr);
   });
 }
 
-const rowsEl = document.getElementById("rows");
 apiUrl.value = localStorage.getItem(LS_API) || "";
 </script>
 
