@@ -88,46 +88,42 @@ th,td{
 </div>
 
 <script>
-/* ================= CONFIG ================= */
 const PASSWORD = "cadimagic2025";
 const LS_API = "admin_api_url";
 const rowsEl = document.getElementById("rows");
 
-/* ================= HELPERS ================= */
+/* -------- helpers -------- */
+function pick(row, indexes){
+  for(const i of indexes){
+    if(row[i] !== undefined && row[i] !== null && row[i] !== "")
+      return row[i];
+  }
+  return "—";
+}
+
 function fmtDate(v){
   if(!v) return "—";
   const d = new Date(v);
   return isNaN(d) ? v : d.toLocaleString("tr-TR");
 }
 
-function safe(v){
-  return (v === undefined || v === null || v === "") ? "—" : v;
-}
-
-/* ================= AUTH ================= */
+/* -------- auth -------- */
 function login(){
   if(password.value === PASSWORD){
     loginCard.classList.add("hidden");
     panelCard.classList.remove("hidden");
   }
 }
-
-function logout(){
-  location.reload();
-}
-
+function logout(){ location.reload(); }
 function saveApi(){
   localStorage.setItem(LS_API, apiUrl.value.trim());
   alert("API kaydedildi");
 }
 
-/* ================= DATA ================= */
+/* -------- data -------- */
 async function loadData(type){
   const url = localStorage.getItem(LS_API);
-  if(!url){
-    alert("API URL girilmedi");
-    return;
-  }
+  if(!url) return alert("API URL girilmedi");
 
   const res = await fetch(url + "?type=" + type);
   const json = await res.json();
@@ -137,22 +133,17 @@ async function loadData(type){
   (json.rows || []).forEach(r=>{
     const tr = document.createElement("tr");
 
-    // 🔥 CADI ATÖLYESİ DAYANIKLI OKUMA
-    const name  = r[1] || (r[2] ? r[2].split("@")[0] : "—");
-    const phone = r[3] || "—";
-    const date  = r[4] || "—";
-
     const cols = [
-      fmtDate(r[0]),        // Kayıt Tarihi
-      name,                // Ad Soyad
-      safe(r[2]),           // E-posta
-      phone,               // Telefon
-      date,                // Tarih
-      safe(r[5]),           // Seans
-      safe(r[6]),           // Ücret
-      safe(r[7]),           // Not
-      safe(r[8] || "tr"),   // Dil
-      safe(r[9] || "Beklemede") // Durum
+      fmtDate(r[0]),                 // kayıt tarihi
+      pick(r,[1]),                   // ad soyad
+      pick(r,[2]),                   // email
+      pick(r,[3,4]),                 // telefon
+      pick(r,[4,0]),                 // tarih
+      pick(r,[5,4]),                 // seans
+      pick(r,[6,5]),                 // ücret
+      pick(r,[7]),                   // not
+      pick(r,[8]),                   // dil
+      pick(r,[9])                    // durum
     ];
 
     cols.forEach(c=>{
@@ -165,7 +156,7 @@ async function loadData(type){
   });
 }
 
-/* ================= INIT ================= */
+/* -------- init -------- */
 apiUrl.value = localStorage.getItem(LS_API) || "";
 </script>
 
