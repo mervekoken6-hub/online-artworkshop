@@ -88,18 +88,23 @@ th,td{
 </div>
 
 <script>
+/* ================= CONFIG ================= */
 const PASSWORD = "cadimagic2025";
 const LS_API = "admin_api_url";
 const rowsEl = document.getElementById("rows");
 
-/* ---------- helpers ---------- */
-function fmt(v){
-  if(!v) return "";
+/* ================= HELPERS ================= */
+function fmtDate(v){
+  if(!v) return "—";
   const d = new Date(v);
   return isNaN(d) ? v : d.toLocaleString("tr-TR");
 }
 
-/* ---------- auth ---------- */
+function safe(v){
+  return (v === undefined || v === null || v === "") ? "—" : v;
+}
+
+/* ================= AUTH ================= */
 function login(){
   if(password.value === PASSWORD){
     loginCard.classList.add("hidden");
@@ -116,7 +121,7 @@ function saveApi(){
   alert("API kaydedildi");
 }
 
-/* ---------- data ---------- */
+/* ================= DATA ================= */
 async function loadData(type){
   const url = localStorage.getItem(LS_API);
   if(!url){
@@ -132,17 +137,22 @@ async function loadData(type){
   (json.rows || []).forEach(r=>{
     const tr = document.createElement("tr");
 
+    // 🔥 CADI ATÖLYESİ DAYANIKLI OKUMA
+    const name  = r[1] || (r[2] ? r[2].split("@")[0] : "—");
+    const phone = r[3] || "—";
+    const date  = r[4] || "—";
+
     const cols = [
-      fmt(r[0]),   // Kayıt Tarihi
-      r[1] || "",  // Ad Soyad
-      r[2] || "",  // E-posta
-      r[3] || "",  // Telefon
-      r[4] || "",  // Tarih
-      r[5] || "",  // Seans
-      r[6] || "",  // Ücret
-      r[7] || "",  // Not
-      r[8] || "",  // Dil
-      r[9] || ""   // Durum
+      fmtDate(r[0]),        // Kayıt Tarihi
+      name,                // Ad Soyad
+      safe(r[2]),           // E-posta
+      phone,               // Telefon
+      date,                // Tarih
+      safe(r[5]),           // Seans
+      safe(r[6]),           // Ücret
+      safe(r[7]),           // Not
+      safe(r[8] || "tr"),   // Dil
+      safe(r[9] || "Beklemede") // Durum
     ];
 
     cols.forEach(c=>{
@@ -155,7 +165,7 @@ async function loadData(type){
   });
 }
 
-/* ---------- init ---------- */
+/* ================= INIT ================= */
 apiUrl.value = localStorage.getItem(LS_API) || "";
 </script>
 
