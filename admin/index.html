@@ -41,6 +41,7 @@ table{
 th,td{
   padding:8px;
   border-bottom:1px solid #333;
+  vertical-align:top;
 }
 .hidden{display:none}
 </style>
@@ -83,6 +84,7 @@ th,td{
     </thead>
     <tbody id="rows"></tbody>
   </table>
+
 </div>
 
 <script>
@@ -90,6 +92,14 @@ const PASSWORD = "cadimagic2025";
 const LS_API = "admin_api_url";
 const rowsEl = document.getElementById("rows");
 
+/* ---------- helpers ---------- */
+function fmt(v){
+  if(!v) return "";
+  const d = new Date(v);
+  return isNaN(d) ? v : d.toLocaleString("tr-TR");
+}
+
+/* ---------- auth ---------- */
 function login(){
   if(password.value === PASSWORD){
     loginCard.classList.add("hidden");
@@ -106,6 +116,7 @@ function saveApi(){
   alert("API kaydedildi");
 }
 
+/* ---------- data ---------- */
 async function loadData(type){
   const url = localStorage.getItem(LS_API);
   if(!url){
@@ -118,25 +129,25 @@ async function loadData(type){
 
   rowsEl.innerHTML = "";
 
-  json.rows.forEach(r=>{
+  (json.rows || []).forEach(r=>{
     const tr = document.createElement("tr");
 
     const cols = [
-      r[0], // Kayıt Tarihi
-      r[1], // Ad Soyad
-      r[2], // E-posta
-      r[3], // Telefon
-      r[4], // Tarih
-      r[5], // Seans
-      r[6], // Ücret
-      r[7], // Not
-      r[8], // Dil
-      r[9]  // Durum
+      fmt(r[0]),   // Kayıt Tarihi
+      r[1] || "",  // Ad Soyad
+      r[2] || "",  // E-posta
+      r[3] || "",  // Telefon
+      r[4] || "",  // Tarih
+      r[5] || "",  // Seans
+      r[6] || "",  // Ücret
+      r[7] || "",  // Not
+      r[8] || "",  // Dil
+      r[9] || ""   // Durum
     ];
 
     cols.forEach(c=>{
       const td = document.createElement("td");
-      td.textContent = c ?? "";
+      td.textContent = c;
       tr.appendChild(td);
     });
 
@@ -144,6 +155,7 @@ async function loadData(type){
   });
 }
 
+/* ---------- init ---------- */
 apiUrl.value = localStorage.getItem(LS_API) || "";
 </script>
 
