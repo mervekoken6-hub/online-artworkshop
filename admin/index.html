@@ -93,10 +93,10 @@ const LS_API = "admin_api_url";
 const rowsEl = document.getElementById("rows");
 
 /* -------- helpers -------- */
-function pick(row, indexes){
-  for(const i of indexes){
-    if(row[i] !== undefined && row[i] !== null && row[i] !== "")
-      return row[i];
+function pick(row, keysOrIndexes){
+  for(const k of keysOrIndexes){
+    const v = row?.[k];
+    if(v !== undefined && v !== null && v !== "") return v;
   }
   return "—";
 }
@@ -107,44 +107,75 @@ function fmtDate(v){
   return isNaN(d) ? v : d.toLocaleString("tr-TR");
 }
 
+function normalizeExecUrl(u){
+  const url = String(u || "").trim();
+  if(!url) return "";
+  // yanlışlıkla /exec dışında bir şey yapıştırılırsa bile kırmayalım
+  return url.replace(/\s+/g,"");
+}
+
 /* -------- auth -------- */
 function login(){
   if(password.value === PASSWORD){
     loginCard.classList.add("hidden");
     panelCard.classList.remove("hidden");
+  } else {
+    alert("Şifre yanlış");
   }
 }
 function logout(){ location.reload(); }
 function saveApi(){
-  localStorage.setItem(LS_API, apiUrl.value.trim());
+  const v = normalizeExecUrl(apiUrl.value);
+  localStorage.setItem(LS_API, v);
+  apiUrl.value = v;
   alert("API kaydedildi");
 }
 
-/* -------- data -------- */
-async function loadData(type){
-  const url = localStorage.getItem(LS_API);
-  if(!url) return alert("API URL girilmedi");
-
-  const res = await fetch(url + "?type=" + type);
-  const json = await res.json();
-
+/* -------- render -------- */
+function renderRows(json){
   rowsEl.innerHTML = "";
 
-  (json.rows || []).forEach(r=>{
+  const list = json?.rows || json?.data || json?.items || json?.records || [];
+  if(!Array.isArray(list) || list.length === 0){
+    // boşsa tabloyu boş bırak (istersen uyarı ekleyebilirsin)
+    return;
+  }
+
+  list.forEach(r=>{
     const tr = document.createElement("tr");
 
-    const cols = [
-      fmtDate(r[0]),                 // kayıt tarihi
-      pick(r,[1]),                   // ad soyad
-      pick(r,[2]),                   // email
-      pick(r,[3,4]),                 // telefon
-      pick(r,[4,0]),                 // tarih
-      pick(r,[5,4]),                 // seans
-      pick(r,[6,5]),                 // ücret
-      pick(r,[7]),                   // not
-      pick(r,[8]),                   // dil
-      pick(r,[9])                    // durum
-    ];
+    // ✅ 2 formatı da destekle:
+    // 1) r bir obje ise: r.createdAt, r.name...
+    // 2) r bir dizi ise: r[0], r[1]...
+    let cols;
+
+    if(Array.isArray(r)){
+      cols = [
+        fmtDate(r[0]),                 // kayıt tarihi
+        pick(r,[1]),                   // ad soyad
+        pick(r,[2]),                   // email
+        pick(r,[3]),                   // telefon
+        pick(r,[4]),                   // tarih
+        pick(r,[5]),                   // seans
+        pick(r,[6]),                   // ücret
+        pick(r,[7]),                   // not
+        pick(r,[8]),                   // dil
+        pick(r,[9])                    // durum
+      ];
+    } else {
+      cols = [
+        fmtDate(pick(r,["createdAt","created_at","created"])),
+        pick(r,["name","ad","fullname"]),
+        pick(r,["email","mail"]),
+        pick(r,["phone","telefon","whatsapp"]),
+        pick(r,["date","tarih"]),
+        pick(r,["session","seans"]),
+        pick(r,["price","ucret","fee"]),
+        pick(r,["note","not"]),
+        pick(r,["lang","dil"]),
+        pick(r,["status","durum"])
+      ];
+    }
 
     cols.forEach(c=>{
       const td = document.createElement("td");
@@ -154,6 +185,61 @@ async function loadData(type){
 
     rowsEl.appendChild(tr);
   });
+}
+
+/* -------- data -------- */
+/*
+  ✅ CORS derdi çıkmasın diye JSONP kullanıyoruz:
+  Apps Script GET şu şekilde yanıt vermeli:
+  callbackName({...json...});
+*/
+function loadJSONP(baseUrl, params){
+  return new Promise((resolve, reject) => {
+    const cb = "cb_" + Date.now() + "_" + Math.floor(Math.random()*9999);
+    const urlObj = new URL(baseUrl);
+
+    Object.keys(params || {}).forEach(k => urlObj.searchParams.set(k, params[k]));
+    urlObj.searchParams.set("callback", cb);
+
+    const script = document.createElement("script");
+    script.src = urlObj.toString();
+
+    window[cb] = (data) => {
+      try { delete window[cb]; } catch {}
+      script.remove();
+      resolve(data);
+    };
+
+    script.onerror = () => {
+      try { delete window[cb]; } catch {}
+      script.remove();
+      reject(new Error("JSONP yüklenemedi"));
+    };
+
+    document.body.appendChild(script);
+  });
+}
+
+async function loadData(type){
+  const url = normalizeExecUrl(localStorage.getItem(LS_API));
+  if(!url) return alert("API URL girilmedi");
+  apiUrl.value = url;
+
+  try {
+    // ✅ Önce JSONP (en sağlam)
+    const json = await loadJSONP(url, { type });
+    renderRows(json);
+  } catch (e) {
+    // JSONP olmazsa fallback: fetch (bazı ortamlarda çalışabiliyor)
+    try {
+      const res = await fetch(url + "?type=" + encodeURIComponent(type));
+      const json = await res.json();
+      renderRows(json);
+    } catch (err) {
+      console.log(err);
+      alert("Veri alınamadı. API URL veya izin/CORS sorunu olabilir.");
+    }
+  }
 }
 
 /* -------- init -------- */
