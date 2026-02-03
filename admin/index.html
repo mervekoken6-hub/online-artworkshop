@@ -2,52 +2,59 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Yönetim Paneli</title>
+    <title>Yönetim Paneli • Workshop</title>
     <style>
-        body { background: #0f172a; color: white; font-family: sans-serif; padding: 20px; }
-        .card { background: #1e293b; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; }
+        body { background: #0f172a; color: white; font-family: system-ui, sans-serif; padding: 20px; margin: 0; }
+        .card { background: #1e293b; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background: #334155; padding: 12px; text-align: left; font-size: 12px; }
-        td { padding: 12px; border-bottom: 1px solid #334155; font-size: 13px; }
-        button { cursor: pointer; border: none; border-radius: 6px; padding: 8px 12px; font-weight: bold; margin: 2px; }
-        .btn-check { background: #22c55e; color: white; }
-        .btn-x { background: #ef4444; color: white; }
-        .btn-nav { background: #6366f1; color: white; padding: 12px 20px; }
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
-        .status-onay { color: #4ade80; }
-        .status-ret { color: #f87171; }
+        th { background: #334155; padding: 15px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #9ca3af; }
+        td { padding: 15px; border-bottom: 1px solid #334155; font-size: 13px; }
+        
+        .btn-action { cursor: pointer; border: none; border-radius: 6px; padding: 6px 10px; font-weight: bold; font-size: 11px; transition: 0.2s; }
+        .btn-approve { background: #22c55e; color: white; margin-right: 5px; }
+        .btn-reject { background: #ef4444; color: white; }
+        .btn-nav { background: #6366f1; color: white; padding: 12px 24px; font-weight: 600; cursor: pointer; border-radius: 8px; border: none; }
+        .btn-nav:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; background: #334155; }
+        .status-onay { color: #4ade80; font-weight: bold; }
+        .status-ret { color: #f87171; font-weight: bold; }
+        .status-bekle { color: #fbbf24; font-weight: bold; }
+        
+        input { padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="login" class="card" style="max-width:400px; margin:auto; text-align:center;">
+    <div id="login" class="card" style="max-width:400px; margin: 100px auto; text-align:center;">
         <h2>Giriş Yap</h2>
-        <input type="password" id="pass" style="padding:10px; width:80%; margin-bottom:10px;">
-        <button onclick="checkPass()" class="btn-nav">Giriş</button>
+        <input type="password" id="pass" placeholder="Şifre" style="width:80%; margin-bottom:15px;">
+        <button onclick="checkPass()" class="btn-nav" style="width:85%;">Giriş</button>
     </div>
 
     <div id="panel" class="hidden">
         <div class="card">
-            <input id="url" placeholder="Apps Script URL" style="width:70%; padding:10px;">
-            <button onclick="saveURL()" class="btn-nav" style="padding:10px;">API Kaydet</button>
+            <input id="url" placeholder="Apps Script URL" style="width:60%;">
+            <button onclick="saveURL()" class="btn-nav">API Kaydet</button>
+            <button onclick="location.reload()" class="btn-nav" style="background:#475569">Çıkış</button>
         </div>
 
-        <div style="text-align:center; margin-bottom:20px;">
-            <button onclick="fetchData('cadi')" class="btn-nav">🧙 Cadı Atölyesi</button>
-            <button onclick="fetchData('canli')" class="btn-nav" style="background:#ec4899;">🎥 Canlı Ders</button>
+        <div style="text-align:center; margin-bottom:20px; display:flex; justify-content:center; gap:10px;">
+            <button onclick="fetchData('cadi')" class="btn-nav" style="background:#7c3aed;">🧙 Cadı Atölyesi</button>
+            <button onclick="fetchData('canli')" class="btn-nav" style="background:#db2777;">🎥 Canlı Ders</button>
         </div>
 
         <div class="card">
             <table>
                 <thead>
                     <tr>
-                        <th>AD SOYAD</th>
-                        <th>TELEFON</th>
-                        <th>TARİH / SEANS</th>
-                        <th>KONTENJAN</th>
-                        <th>DURUM</th>
-                        <th>İŞLEMLER</th>
+                        <th>Ad Soyad</th>
+                        <th>Telefon</th>
+                        <th>Seans Detayı</th>
+                        <th>Kontenjan</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
                     </tr>
                 </thead>
                 <tbody id="list"></tbody>
@@ -57,55 +64,75 @@
 
     <script>
         let curType = "";
+        
         function checkPass() {
             if(document.getElementById('pass').value === "cadimagic2025") {
                 document.getElementById('login').classList.add('hidden');
                 document.getElementById('panel').classList.remove('hidden');
                 document.getElementById('url').value = localStorage.getItem('my_api') || "";
-            }
-        }
-        function saveURL() {
-            localStorage.setItem('my_api', document.getElementById('url').value);
-            alert("Kaydedildi!");
+            } else { alert("Hatalı Şifre!"); }
         }
 
-        async function update(id, status) {
+        function saveURL() {
+            localStorage.setItem('my_api', document.getElementById('url').value.trim());
+            alert("API Başarıyla Kaydedildi!");
+        }
+
+        async function update(rowIndex, newStatus) {
             const api = localStorage.getItem('my_api');
-            await callAPI(api, { action: "update", type: curType, id: id, status: status });
-            fetchData(curType);
+            if(!api) return;
+            
+            // Satırı anlık olarak "Güncelleniyor..." yap
+            document.getElementById('row-'+rowIndex).innerText = "🔄";
+            
+            try {
+                const res = await callAPI(api, { action: "update", type: curType, rowIndex: rowIndex, status: newStatus });
+                if(res.ok) fetchData(curType);
+            } catch(e) { alert("Güncelleme başarısız!"); fetchData(curType); }
         }
 
         async function fetchData(type) {
             curType = type;
             const api = localStorage.getItem('my_api');
+            if(!api) return alert("Lütfen önce API URL kaydedin!");
+            
             const list = document.getElementById('list');
-            list.innerHTML = "Yükleniyor...";
+            list.innerHTML = "<tr><td colspan='6' style='text-align:center;'>Yükleniyor...</td></tr>";
             
             const res = await callAPI(api, { type: type });
             list.innerHTML = "";
 
-            // Kontenjan hesabı
+            // Kontenjanları hesapla (Sadece onaylıları say)
             const counts = {};
             res.rows.forEach(r => {
                 if(r[9] === "Onaylandı") {
-                    const k = r[4] + r[5];
+                    const k = String(r[4]) + String(r[5]);
                     counts[k] = (counts[k] || 0) + 1;
                 }
             });
 
-            res.rows.reverse().forEach((r, i) => {
-                const idx = res.rows.length - 1 - i;
-                const c = counts[r[4] + r[5]] || 0;
+            // Veriyi tersten göster (En yeni en üstte)
+            const rowsData = [...res.rows];
+            rowsData.reverse().forEach((r, reversedIdx) => {
+                const originalIdx = rowsData.length - 1 - reversedIdx;
+                const c = counts[String(r[4]) + String(r[5])] || 0;
+                const status = r[9] || "Beklemede";
+                
+                let statusClass = "status-bekle";
+                if(status === "Onaylandı") statusClass = "status-onay";
+                if(status === "Reddedildi") statusClass = "status-ret";
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><b>${r[1]}</b></td>
-                    <td>${r[3]}</td>
-                    <td>${r[4]}<br><small>${r[5]}</small></td>
-                    <td><span class="badge" style="background:#334155">${c} / 5</span></td>
-                    <td class="${r[9]=='Onaylandı'?'status-onay':(r[9]=='Reddedildi'?'status-ret':'')}">${r[9]||'Beklemede'}</td>
+                    <td><b>${r[1] || '—'}</b></td>
+                    <td>${r[3] || '—'}</td>
+                    <td>${r[4] ? r[4].split('T')[0] : '—'}<br><small>${r[5] || '—'}</small></td>
+                    <td><span class="badge" style="border: 1px solid ${c >= 5 ? '#ef4444' : '#22c55e'}">${c} / 5</span></td>
+                    <td class="${statusClass}" id="row-${originalIdx}">${status}</td>
                     <td>
-                        <button class="btn-check" onclick="update(${idx}, 'Onaylandı')">✓ Onay</button>
-                        <button class="btn-x" onclick="update(${idx}, 'Reddedildi')">✕ Red</button>
+                        <button class="btn-action btn-approve" onclick="update(${originalIdx}, 'Onaylandı')">Onayla</button>
+                        <button class="btn-action btn-reject" onclick="update(${originalIdx}, 'Reddedildi')">Reddet</button>
+                        <a href="https://wa.me/${String(r[3]).replace(/\D/g,'')}" target="_blank" style="text-decoration:none; margin-left:5px;">💬</a>
                     </td>
                 `;
                 list.appendChild(tr);
@@ -114,7 +141,7 @@
 
         function callAPI(url, params) {
             return new Promise(resolve => {
-                const cb = "cb" + Date.now();
+                const cb = "cb" + Date.now() + Math.floor(Math.random()*1000);
                 const s = document.createElement('script');
                 const q = new URLSearchParams(params).toString();
                 window[cb] = d => { s.remove(); resolve(d); };
