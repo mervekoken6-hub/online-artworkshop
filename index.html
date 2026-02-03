@@ -7,7 +7,6 @@
 
 <style>
 *,*::before,*::after{box-sizing:border-box}
-
 body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto;
@@ -18,7 +17,6 @@ body{
   justify-content:center;
   padding:40px 12px;
 }
-
 .card{
   width:100%;
   max-width:520px;
@@ -27,16 +25,9 @@ body{
   padding:26px;
   box-shadow:0 25px 60px rgba(0,0,0,.55);
 }
-
 h1{text-align:center;margin:0 0 6px}
 .subtitle{text-align:center;font-size:14px;opacity:.8;margin-bottom:16px}
-
-.langbar{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  margin-bottom:18px;
-}
+.langbar{display:flex;justify-content:center;gap:10px;margin-bottom:18px;}
 .langbtn{
   padding:8px 14px;
   border-radius:999px;
@@ -45,12 +36,8 @@ h1{text-align:center;margin:0 0 6px}
   color:#fff;
   cursor:pointer;
 }
-.langbtn.active{
-  background:linear-gradient(135deg,#60a5fa,#a78bfa);
-}
-
+.langbtn.active{background:linear-gradient(135deg,#60a5fa,#a78bfa);}
 label{font-size:13px;margin:12px 0 6px;display:block}
-
 input,select,textarea{
   width:100%;
   padding:12px;
@@ -60,16 +47,9 @@ input,select,textarea{
   color:#000;
   font-size:14px;
 }
-
 textarea{min-height:80px}
-
-.row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 @media(max-width:520px){.row{grid-template-columns:1fr}}
-
 .box{
   margin-top:14px;
   border-radius:14px;
@@ -77,27 +57,10 @@ textarea{min-height:80px}
   border:1px solid rgba(255,255,255,.14);
   background:rgba(255,255,255,.06);
 }
-.box h3{
-  margin:0 0 8px;
-  font-size:14px;
-  opacity:.95;
-}
-.box p{
-  margin:6px 0;
-  font-size:13px;
-  opacity:.95;
-  line-height:1.35;
-}
-
-.age-check{
-  display:flex;
-  gap:10px;
-  font-size:13px;
-  margin-top:16px;
-  align-items: flex-start;
-}
+.box h3{margin:0 0 8px;font-size:14px;opacity:.95;}
+.box p{margin:6px 0;font-size:13px;opacity:.95;line-height:1.35;}
+.age-check{display:flex;gap:10px;font-size:13px;margin:16px 0;align-items:flex-start;}
 .age-check input{width:auto;margin-top:3px;}
-
 .warn{
   margin-top:16px;
   background:#3a2f12;
@@ -109,7 +72,6 @@ textarea{min-height:80px}
   font-weight:600;
   line-height:1.35;
 }
-
 .btn{
   margin-top:18px;
   width:100%;
@@ -120,21 +82,17 @@ textarea{min-height:80px}
   color:#fff;
   font-size:16px;
   cursor:pointer;
+  transition: opacity 0.3s;
 }
 .btn:disabled{opacity:.6;cursor:not-allowed}
-
 .message-screen{text-align:center;padding:20px 0; animation: fadeIn 0.5s ease-in-out;}
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-.success{display:none;}
-.success h2{color:#c4b5fd}
-.success p{opacity:.9; line-height:1.4}
 </style>
 </head>
 
 <body>
 
-<div class="card" id="formCard">
+<div class="card" id="formArea">
   <h1 id="t_title">Online Art Workshop</h1>
   <p class="subtitle" id="t_subtitle">Kayıt Formu • Zoom linki WhatsApp’tan gönderilir</p>
 
@@ -144,7 +102,7 @@ textarea{min-height:80px}
     <button type="button" class="langbtn" data-lang="fa">🇮🇷 فارسی</button>
   </div>
 
-  <div id="dynamicContent">
+  <div id="contentWrapper">
     <form id="registerForm">
       <label id="l_name">Ad Soyad</label>
       <input id="fullName" type="text" required>
@@ -189,25 +147,20 @@ textarea{min-height:80px}
         <span id="t_age_label">12 yaş ve üzerindeyim, eğitime katılım şartlarını onaylıyorum.</span>
       </div>
 
-      <div class="box" id="bankBox">
+      <div class="box">
         <h3 id="t_bank_title">Banka Havalesi Bilgileri</h3>
         <p id="t_bank_receiver"><b>Alıcı:</b> Merve Köken</p>
         <p id="t_bank_iban"><b>IBAN:</b> TR78 0004 6012 1488 8000 1122 48</p>
         <p id="t_bank_desc"><b>Açıklama:</b> Ad Soyad – Atölye Adı</p>
       </div>
 
-      <div class="box" id="announceBox">
+      <div class="box">
         <h3 id="t_announce_title">📣 Duyuru</h3>
-        <p id="t_announce_body">
-          Atölye ücretleri seansa göre değişiklik gösterebilir.<br>
-          Kayıt öncesinde fiyat bilgisi için<br>
-          WhatsApp’tan <b>0530 916 44 25</b> bize yazabilirsiniz 💜
-        </p>
+        <p id="t_announce_body">Atölye ücretleri seansa göre değişiklik gösterebilir.<br>Kayıt öncesinde fiyat bilgisi için WhatsApp’tan <b>0530 916 44 25</b> bize yazabilirsiniz 💜</p>
       </div>
 
       <div class="warn" id="t_warn">
-        ⚠️ Ödeme dekontunu WhatsApp üzerinden 0530 916 44 25 gönderiniz.<br>
-        Zoom linki ödeme kontrolünden sonra paylaşılır.
+        ⚠️ Ödeme dekontunu WhatsApp üzerinden 0530 916 44 25 gönderiniz.<br>Zoom linki ödeme kontrolünden sonra paylaşılır.
       </div>
 
       <button class="btn" type="submit" id="submitBtn">Kaydı Gönder</button>
@@ -215,111 +168,61 @@ textarea{min-height:80px}
   </div>
 </div>
 
-<div class="card success" id="successCard">
-  <div class="message-screen">
-    <h2 id="t_success">✨ Kayıt Alındı</h2>
-    <p id="t_success_msg">
-      Teşekkürler! WhatsApp üzerinden 0530 916 44 25 dekontu gönderdiğinizde Zoom linki paylaşılacaktır.
-    </p>
-    <button class="btn" onclick="location.reload()" style="width: auto; padding: 10px 30px; margin-top:20px;">Geri Dön</button>
-  </div>
-</div>
-
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbzTmI7NICLJ9fYiMChA-4jDkh3c9Q75djEU9cE3l3fpldRF3jpPDjWglQHBni7KiRBYjQ/exec";
-
 let currentLang = "tr";
 
 const dict = {
   tr: {
-    dir: "ltr",
     title: "Online Art Workshop",
     subtitle: "Kayıt Formu • Zoom linki WhatsApp’tan gönderilir",
-    name: "Ad Soyad",
-    email: "E-posta",
-    phone: "Telefon (WhatsApp)",
-    date: "Tarih",
-    time: "Seans Saati",
-    select_time: "Saat seçiniz",
-    price: "Ücret",
-    note: "Not",
+    name: "Ad Soyad", email: "E-posta", phone: "Telefon (WhatsApp)", date: "Tarih", time: "Seans Saati",
+    select_time: "Saat seçiniz", price: "Ücret", note: "Not",
     age_label: "12 yaş ve üzerindeyim, eğitime katılım şartlarını onaylıyorum.",
-    bank_title: "Banka Havalesi Bilgileri",
-    bank_receiver: "<b>Alıcı:</b> Merve Köken",
-    bank_iban: "<b>IBAN:</b> TR78 0004 6012 1488 8000 1122 48",
-    bank_desc: "<b>Açıklama:</b> Ad Soyad – Atölye Adı",
-    announce_title: "📣 Duyuru",
-    announce_body: "Atölye ücretleri seansa göre değişiklik gösterebilir.<br>Kayıt öncesinde fiyat bilgisi için<br>WhatsApp’tan <b>0530 916 44 25</b> bize yazabilirsiniz 💜",
-    warn: "⚠️ Ödeme dekontunu WhatsApp üzerinden <b>0530 916 44 25</b> gönderiniz.<br>Zoom linki ödeme kontrolünden sonra paylaşılır.",
-    submit: "Kaydı Gönder",
-    checking: "Kontrol ediliyor...",
-    full_title: "⚠️ Seans Dolu",
-    full_body: "Maalesef seçtiğiniz seans 5 kişilik kontenjan sınırına ulaşmıştır. Lütfen başka bir seans seçiniz.",
-    back: "Geri Dön",
-    success: "✨ Kayıt Alındı",
-    success_msg: "Teşekkürler! WhatsApp üzerinden <b>0530 916 44 25</b> dekontu gönderdiğinizde Zoom linki paylaşılacaktır."
+    bank_title: "Banka Havalesi Bilgileri", bank_receiver: "<b>Alıcı:</b> Merve Köken",
+    bank_iban: "<b>IBAN:</b> TR78 0004 6012 1488 8000 1122 48", bank_desc: "<b>Açıklama:</b> Ad Soyad – Atölye Adı",
+    announce_title: "📣 Duyuru", announce_body: "Atölye ücretleri seansa göre değişiklik gösterebilir.<br>WhatsApp’tan <b>0530 916 44 25</b> yazabilirsiniz 💜",
+    warn: "⚠️ Ödeme dekontunu WhatsApp’tan gönderiniz. Zoom linki ödeme sonrası paylaşılır.",
+    submit: "Kaydı Gönder", checking: "Kontrol ediliyor...",
+    full_title: "⚠️ Seans Dolu", full_body: "Maalesef bu seans 5 kişilik kontenjan sınırına ulaşmıştır.",
+    back: "Geri Dön", success_title: "✨ Kayıt Alındı",
+    success_msg: "Teşekkürler! Dekontu WhatsApp’tan gönderdiğinizde Zoom linki paylaşılacaktır."
   },
   en: {
-    dir: "ltr",
     title: "Online Art Workshop",
     subtitle: "Registration Form • Zoom link via WhatsApp",
-    name: "Full Name",
-    email: "Email",
-    phone: "Phone (WhatsApp)",
-    date: "Date",
-    time: "Session Time",
-    select_time: "Select time",
-    price: "Fee",
-    note: "Note",
+    name: "Full Name", email: "Email", phone: "Phone (WhatsApp)", date: "Date", time: "Session Time",
+    select_time: "Select time", price: "Fee", note: "Note",
     age_label: "I am 12 years or older, I confirm the participation terms.",
-    bank_title: "Bank Transfer Details",
-    bank_receiver: "<b>Receiver:</b> Merve Köken",
-    bank_iban: "<b>IBAN:</b> TR78 0004 6012 1488 8000 1122 48",
-    bank_desc: "<b>Description:</b> Full Name – Workshop Name",
-    announce_title: "📣 Announcement",
-    announce_body: "Workshop fees may vary. For price information,<br>contact us on WhatsApp at <b>+90 530 916 44 25</b> 💜",
-    warn: "⚠️ Please send the receipt via WhatsApp to <b>+90 530 916 44 25</b>.<br>Zoom link shared after verification.",
-    submit: "Submit Registration",
-    checking: "Checking...",
-    full_title: "⚠️ Session Full",
-    full_body: "Unfortunately, the selected session has reached the 5-person limit. Please choose another session.",
-    back: "Go Back",
-    success: "✨ Registration Received",
-    success_msg: "Thank you! Once you send the receipt to <b>+90 530 916 44 25</b>, the Zoom link will be shared."
+    bank_title: "Bank Transfer Details", bank_receiver: "<b>Receiver:</b> Merve Köken",
+    bank_iban: "<b>IBAN:</b> TR78 0004 6012 1488 8000 1122 48", bank_desc: "<b>Description:</b> Full Name – Workshop Name",
+    announce_title: "📣 Announcement", announce_body: "Fees may vary. Contact us on WhatsApp at <b>+90 530 916 44 25</b> 💜",
+    warn: "⚠️ Please send the receipt via WhatsApp. Zoom link shared after verification.",
+    submit: "Submit Registration", checking: "Checking...",
+    full_title: "⚠️ Session Full", full_body: "Unfortunately, this session is full (Max 5 people).",
+    back: "Go Back", success_title: "✨ Registered",
+    success_msg: "Thank you! Zoom link will be shared after you send the receipt to WhatsApp."
   },
   fa: {
-    dir: "rtl",
     title: "کارگاه آنلاین هنر",
     subtitle: "فرم ثبت‌نام • لینک زوم از واتساپ",
-    name: "نام و نام خانوادگی",
-    email: "ایمیل",
-    phone: "واتساپ",
-    date: "تاریخ",
-    time: "ساعت جلسه",
-    select_time: "ساعت را انتخاب کنید",
-    price: "هزینه",
-    note: "یادداشت",
-    age_label: "من ۱۲ سال یا بیشتر دارم و شرایط شرکت در کارگاه را تأیید می‌کنم.",
-    bank_title: "اطلاعات انتقال بانکی",
-    bank_receiver: "<b>گیرنده:</b> Merve Köken",
-    bank_iban: "<b>IBAN:</b> TR78 0004 6012 1488 8000 1122 48",
-    bank_desc: "<b>توضیحات:</b> نام و نام خانوادگی – نام کارگاه",
-    announce_title: "📣 اطلاعیه",
-    announce_body: "هزینه کارگاه ممکن است تغییر کند.<br>برای اطلاع از قیمت در واتساپ به <b>+90 530 916 44 25</b> پیام دهید 💜",
-    warn: "⚠️ لطفاً رسید را به واتساپ <b>+90 530 916 44 25</b> ارسال کنید.<br>لینک زوم بعد از تأیید ارسال می‌شود.",
-    submit: "ارسال ثبت‌نام",
-    checking: "در حال بررسی...",
-    full_title: "⚠️ سانس تکمیل شد",
-    full_body: "متأسفانه ظرفیت ۵ نفره این سانس تکمیل شده است. لطفاً سانس دیگری انتخاب کنید.",
-    back: "بازگشت",
-    success: "✨ ثبت‌نام انجام شد",
-    success_msg: "سپاسگزاریم! بعد از ارسال رسید به <b>+90 530 916 44 25</b>، لینک زوم ارسال خواهد شد."
+    name: "نام و نام خانوادگی", email: "ایمیل", phone: "واتساپ", date: "تاریخ", time: "ساعت جلسه",
+    select_time: "ساعت را انتخاب کنید", price: "هزینه", note: "یادداشت",
+    age_label: "من ۱۲ سال یا بیشتر دارم و شرایط را تأیید می‌کنم.",
+    bank_title: "اطلاعات بانکی", bank_receiver: "<b>گیرنده:</b> Merve Köken",
+    bank_iban: "<b>IBAN:</b> TR78 0004 6012 1488 8000 1122 48", bank_desc: "<b>توضیحات:</b> نام – نام کارگاه",
+    announce_title: "📣 اطلاعیه", announce_body: "هزینه تغییر می‌کند. در واتساپ به <b>+90 530 916 44 25</b> پیام دهید 💜",
+    warn: "⚠️ رسید را به واتساپ ارسال کنید. لینک زوم بعد از بررسی ارسال می‌شود.",
+    submit: "ارسال ثبت‌نام", checking: "در حال بررسی...",
+    full_title: "⚠️ سانس تکمیل شد", full_body: "ظرفیت ۵ نفره این سانس تکمیل شده است.",
+    back: "بازگشت", success_title: "✨ ثبت‌نام انجام شد",
+    success_msg: "سپاسگزاریم! بعد از ارسال رسید به واتساپ، لینک زوم ارسال خواهد شد."
   }
 };
 
 function setLang(l){
   currentLang = l;
-  document.documentElement.dir = dict[l].dir;
+  document.documentElement.dir = (l === "fa" ? "rtl" : "ltr");
   t_title.textContent = dict[l].title;
   t_subtitle.textContent = dict[l].subtitle;
   l_name.textContent = dict[l].name;
@@ -339,20 +242,13 @@ function setLang(l){
   t_announce_body.innerHTML = dict[l].announce_body;
   t_warn.innerHTML = dict[l].warn;
   submitBtn.textContent = dict[l].submit;
-  t_success.textContent = dict[l].success;
-  t_success_msg.innerHTML = dict[l].success_msg;
-  document.querySelectorAll(".langbtn").forEach(b=>{
-    b.classList.toggle("active", b.dataset.lang === l);
-  });
+  document.querySelectorAll(".langbtn").forEach(b=> b.classList.toggle("active", b.dataset.lang === l));
 }
 
-document.querySelectorAll(".langbtn").forEach(b=>{
-  b.onclick = ()=> setLang(b.dataset.lang);
-});
-
+document.querySelectorAll(".langbtn").forEach(b=> b.onclick = ()=> setLang(b.dataset.lang));
 setLang("tr");
 
-registerForm.addEventListener("submit", function(e){
+document.getElementById("registerForm").addEventListener("submit", function(e){
   e.preventDefault();
   const btn = document.getElementById("submitBtn");
   btn.disabled = true;
@@ -362,13 +258,13 @@ registerForm.addEventListener("submit", function(e){
   const params = new URLSearchParams({
     callback: callbackName,
     type: "canli",
-    name: document.getElementById("fullName").value.trim(),
-    email: document.getElementById("email").value.trim(),
-    phone: document.getElementById("phone").value.trim(),
+    name: document.getElementById("fullName").value,
+    email: document.getElementById("email").value,
+    phone: document.getElementById("phone").value,
     date: document.getElementById("date").value,
     session: document.getElementById("timeSlot").value,
-    price: document.getElementById("price").value.trim(),
-    note: document.getElementById("note").value.trim(),
+    price: document.getElementById("price").value,
+    note: document.getElementById("note").value,
     lang: currentLang
   });
 
@@ -377,15 +273,18 @@ registerForm.addEventListener("submit", function(e){
 
   window[callbackName] = function(data) {
     if (data.ok) {
-      document.getElementById("formCard").style.display = "none";
-      document.getElementById("successCard").style.display = "block";
+      document.getElementById("contentWrapper").innerHTML = `
+        <div class="message-screen">
+          <h2 style="color: #c4b5fd;">${dict[currentLang].success_title}</h2>
+          <p>${dict[currentLang].success_msg}</p>
+          <button class="btn" onclick="location.reload()" style="width:auto; padding:10px 30px;">${dict[currentLang].back}</button>
+        </div>`;
     } else {
-      // ❌ KONTENJAN DOLU EKRANI (DİLE GÖRE)
-      document.getElementById("dynamicContent").innerHTML = `
+      document.getElementById("contentWrapper").innerHTML = `
         <div class="message-screen">
           <h2 style="color: #fbbf24;">${dict[currentLang].full_title}</h2>
-          <p style="line-height: 1.8; margin-bottom: 20px;">${dict[currentLang].full_body}</p>
-          <button class="btn" onclick="location.reload()" style="background: linear-gradient(135deg,#60a5fa,#a78bfa);">${dict[currentLang].back}</button>
+          <p>${dict[currentLang].full_body}</p>
+          <button class="btn" onclick="location.reload()" style="width:auto; padding:10px 30px;">${dict[currentLang].back}</button>
         </div>`;
     }
     delete window[callbackName];
@@ -393,11 +292,10 @@ registerForm.addEventListener("submit", function(e){
   };
 
   script.onerror = function() {
-    alert("Error! Please try again.");
+    alert("Connection Error! Please check your internet.");
     btn.disabled = false;
     btn.innerText = dict[currentLang].submit;
   };
-  
   document.body.appendChild(script);
 });
 </script>
