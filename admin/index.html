@@ -2,59 +2,64 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Yönetim Paneli • Online Art Workshop</title>
+    <title>Yönetim Paneli • Workshop</title>
     <style>
-        body { background: #0b0f1a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
-        .card { background: #161e2d; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #2d3748; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { background: #1f2937; padding: 12px; text-align: left; font-size: 11px; text-transform: uppercase; color: #a0aec0; border-bottom: 2px solid #2d3748; }
-        td { padding: 12px; border-bottom: 1px solid #2d3748; font-size: 13px; vertical-align: middle; }
+        body { background: #0f172a; color: #e2e8f0; font-family: system-ui, sans-serif; padding: 20px; margin: 0; }
+        .card { background: #1e293b; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        th { background: #334155; padding: 12px; text-align: left; font-size: 11px; text-transform: uppercase; color: #9ca3af; }
+        td { padding: 12px; border-bottom: 1px solid #334155; font-size: 13px; white-space: nowrap; }
         
-        .btn-action { cursor: pointer; border: none; border-radius: 6px; padding: 6px 12px; font-weight: bold; font-size: 11px; transition: 0.2s; color: white; }
-        .btn-approve { background: #10b981; margin-right: 5px; }
+        .btn-action { cursor: pointer; border: none; border-radius: 6px; padding: 6px 10px; font-weight: bold; font-size: 11px; color: white; transition: 0.2s; }
+        .btn-approve { background: #22c55e; margin-right: 4px; }
         .btn-reject { background: #ef4444; }
         .btn-nav { background: #6366f1; color: white; padding: 10px 20px; font-weight: 600; cursor: pointer; border-radius: 8px; border: none; }
         
-        .badge-count { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; display: inline-block; border: 1px solid #4a5568; }
-        .status-onay { color: #34d399; font-weight: bold; }
-        .status-ret { color: #f87171; font-weight: bold; }
-        .status-bekle { color: #fbbf24; font-weight: bold; }
+        .badge-cnt { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; border: 1px solid #475569; }
+        .st-Onaylandı { color: #4ade80; font-weight: bold; }
+        .st-Reddedildi { color: #f87171; font-weight: bold; }
+        .st-Beklemede { color: #fbbf24; }
         
-        input { padding: 10px; border-radius: 8px; border: 1px solid #2d3748; background: #0b0f1a; color: white; outline: none; }
+        .wa-link { color: #22c55e; text-decoration: none; font-weight: bold; font-size: 18px; }
+        input { padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
     <div id="login" class="card" style="max-width:350px; margin: 80px auto; text-align:center;">
-        <h2 style="color:#a78bfa">Yönetici Girişi</h2>
-        <input type="password" id="pass" placeholder="Şifre" style="width:85%; margin-bottom:15px;">
-        <button onclick="checkPass()" class="btn-nav" style="width:92%;">Giriş Yap</button>
+        <h2>Admin Girişi</h2>
+        <input type="password" id="pass" placeholder="Şifre" style="width:80%; margin-bottom:15px;">
+        <button onclick="checkPass()" class="btn-nav" style="width:85%;">Giriş</button>
     </div>
 
     <div id="panel" class="hidden">
         <div class="card">
-            <input id="url" placeholder="Google Apps Script URL" style="width:65%;">
+            <input id="url" placeholder="Apps Script URL" style="width:60%;">
             <button onclick="saveURL()" class="btn-nav">API Kaydet</button>
-            <button onclick="location.reload()" class="btn-nav" style="background:#4a5568; float:right;">Çıkış</button>
+            <button onclick="location.reload()" class="btn-nav" style="background:#475569; float:right;">Çıkış</button>
         </div>
 
-        <div style="text-align:center; margin-bottom:20px; display:flex; justify-content:center; gap:15px;">
-            <button onclick="fetchData('cadi')" class="btn-nav" style="background:#7c3aed; min-width:180px;">🧙 Cadı Atölyesi</button>
-            <button onclick="fetchData('canli')" class="btn-nav" style="background:#db2777; min-width:180px;">🎥 Canlı Ders</button>
+        <div style="text-align:center; margin-bottom:20px; display:flex; gap:10px; justify-content:center;">
+            <button onclick="fetchData('cadi')" class="btn-nav" style="background:#7c3aed;">🧙 Cadı Atölyesi</button>
+            <button onclick="fetchData('canli')" class="btn-nav" style="background:#db2777;">🎥 Canlı Ders</button>
         </div>
 
-        <div class="card" style="overflow-x: auto;">
+        <div class="card">
             <table>
                 <thead>
                     <tr>
                         <th>Ad Soyad</th>
-                        <th>E-posta</th>
                         <th>Telefon</th>
-                        <th>Tarih / Seans</th>
-                        <th style="color:#a78bfa">Kontenjan</th>
+                        <th>Seans Tarihi</th>
+                        <th>Kayıt Tarihi</th>
+                        <th>E-Posta</th>
+                        <th>Ücret</th>
+                        <th>Not</th>
+                        <th>Dil</th>
+                        <th>Kontenjan</th>
                         <th>Durum</th>
-                        <th>İşlemler</th>
+                        <th>İşlem</th>
                     </tr>
                 </thead>
                 <tbody id="list"></tbody>
@@ -64,86 +69,68 @@
 
     <script>
         let curType = "";
-        
         function checkPass() {
             if(document.getElementById('pass').value === "cadimagic2025") {
                 document.getElementById('login').classList.add('hidden');
                 document.getElementById('panel').classList.remove('hidden');
                 document.getElementById('url').value = localStorage.getItem('my_api') || "";
-            } else { alert("Şifre Yanlış!"); }
+            }
         }
-
         function saveURL() {
             localStorage.setItem('my_api', document.getElementById('url').value.trim());
-            alert("API Bağlantısı Kuruldu!");
+            alert("API Kaydedildi!");
         }
 
-        async function update(rowIndex, newStatus) {
+        async function update(rowIdx, status) {
             const api = localStorage.getItem('my_api');
-            if(!api) return;
-            
-            document.getElementById('st-'+rowIndex).innerText = "⌛...";
-            
-            try {
-                const res = await callAPI(api, { action: "update", type: curType, rowIndex: rowIndex, status: newStatus });
-                if(res.ok) fetchData(curType);
-                else { alert("Hata!"); fetchData(curType); }
-            } catch(e) { alert("Sistem hatası!"); fetchData(curType); }
+            document.getElementById('status-'+rowIdx).innerText = "⏳...";
+            const res = await callAPI(api, { action: "update", type: curType, rowIndex: rowIdx, status: status });
+            if(res.ok) fetchData(curType);
         }
 
         async function fetchData(type) {
             curType = type;
             const api = localStorage.getItem('my_api');
-            if(!api) return alert("API URL Girmelisiniz!");
-            
             const list = document.getElementById('list');
-            list.innerHTML = "<tr><td colspan='7' style='text-align:center; padding:30px;'>Kayıtlar getiriliyor...</td></tr>";
+            list.innerHTML = "<tr><td colspan='11' style='text-align:center;'>Yükleniyor...</td></tr>";
             
             const res = await callAPI(api, { type: type });
             list.innerHTML = "";
 
-            // Kontenjan Analizi (Tarih + Seans anahtarıyla sayım)
+            // Kontenjan Analizi
             const counts = {};
             res.rows.forEach(r => {
                 if(r[9] === "Onaylandı") {
-                    // Tarihi ve seansı stringe çevirerek eşleştiriyoruz
-                    const dateKey = String(r[4]).split('T')[0];
-                    const sessionKey = String(r[5]);
-                    const key = dateKey + "_" + sessionKey;
+                    const key = String(r[4]).split('T')[0] + "_" + String(r[5]);
                     counts[key] = (counts[key] || 0) + 1;
                 }
             });
 
-            // En yeni kayıt en üstte (Reverse)
-            const raw = [...res.rows];
-            raw.reverse().forEach((r, revIdx) => {
-                const realIdx = raw.length - 1 - revIdx;
-                const dateVal = String(r[4]).split('T')[0];
-                const sessVal = String(r[5]);
-                const countKey = dateVal + "_" + sessVal;
-                const c = counts[countKey] || 0;
-                
+            const rowsData = [...res.rows];
+            rowsData.reverse().forEach((r, revIdx) => {
+                const realIdx = rowsData.length - 1 - revIdx;
+                const dKey = String(r[4]).split('T')[0] + "_" + String(r[5]);
+                const c = counts[dKey] || 0;
                 const status = r[9] || "Beklemede";
-                let sClass = "status-bekle";
-                if(status === "Onaylandı") sClass = "status-onay";
-                if(status === "Reddedildi") sClass = "status-ret";
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td style="font-weight:bold">${r[1] || '—'}</td>
-                    <td style="color:#cbd5e0">${r[2] || '—'}</td>
-                    <td style="color:#60a5fa">${r[3] || '—'}</td>
-                    <td>${dateVal}<br><small style="color:#a0aec0">${sessVal}</small></td>
+                    <td>${r[3] || '—'}</td>
+                    <td>${String(r[4]).split('T')[0]}<br><small>${r[5]}</small></td>
+                    <td style="color:#9ca3af; font-size:11px">${r[0] ? new Date(r[0]).toLocaleString('tr-TR') : '—'}</td>
+                    <td>${r[2] || '—'}</td>
+                    <td>${r[6] || '0'} TL</td>
+                    <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis;" title="${r[7]}">${r[7] || '—'}</td>
+                    <td><span class="badge-cnt">${r[8] || 'tr'}</span></td>
                     <td>
-                        <span class="badge-count" style="border-color: ${c >= 5 ? '#ef4444' : '#10b981'}">
-                            ${c} / 5 Kişi
-                        </span>
+                        <span class="badge-cnt" style="border-color:${c >= 5 ? '#ef4444' : '#22c55e'}">${c} / 5</span>
                     </td>
-                    <td class="${sClass}" id="st-${realIdx}">${status}</td>
+                    <td id="status-${realIdx}" class="st-${status}">${status}</td>
                     <td>
                         <button class="btn-action btn-approve" onclick="update(${realIdx}, 'Onaylandı')">Onayla</button>
                         <button class="btn-action btn-reject" onclick="update(${realIdx}, 'Reddedildi')">Reddet</button>
-                        <a href="https://wa.me/${String(r[3]).replace(/\D/g,'')}" target="_blank" style="margin-left:8px; text-decoration:none;">📲</a>
+                        <a href="https://wa.me/${String(r[3]).replace(/\D/g,'')}" target="_blank" class="wa-link"> 📲</a>
                     </td>
                 `;
                 list.appendChild(tr);
