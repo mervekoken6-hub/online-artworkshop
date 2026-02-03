@@ -1,176 +1,127 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel • Online Art Workshop</title>
-<style>
-  body{ margin:0; font-family:system-ui, -apple-system, sans-serif; background:#0b1220; color:#fff; padding:20px; }
-  .card{ background:#111827; padding:20px; border-radius:14px; max-width:1400px; margin: 0 auto 20px auto; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); }
-  h1{ margin: 0 0 20px 0; font-size: 24px; text-align: center; color: #a78bfa; }
-  .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; align-items: center; }
-  button{ padding:10px 15px; border-radius:8px; border:none; background:#6366f1; color:#fff; cursor:pointer; font-weight: 600; transition: all 0.2s; font-size: 12px; }
-  button:hover{ opacity: 0.9; transform: translateY(-1px); }
-  button.secondary { background: #374151; }
-  input{ padding:12px; border-radius:10px; border: 1px solid #374151; background: #1f2937; color: #fff; flex-grow: 1; }
-  .table-container { overflow-x: auto; background: rgba(0,0,0,0.2); border-radius: 12px; }
-  table{ width:100%; border-collapse:collapse; font-size: 12px; }
-  th{ text-align: left; background: #1f2937; color: #9ca3af; padding: 12px; text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 2px solid #374151; }
-  td{ padding:12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-  
-  .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; }
-  .bg-safe { background: #065f46; color: #d1fae5; }
-  .bg-full { background: #991b1b; color: #fee2e2; }
-  
-  /* Onay/Ret Butonları */
-  .btn-approve { background: #15803d !important; margin-right: 5px; }
-  .btn-reject { background: #b91c1c !important; }
-  .status-onayli { color: #4ade80; font-weight: bold; }
-  .status-red { color: #f87171; font-weight: bold; }
-  
-  .wa-btn { background: #25d366; color: white; text-decoration: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; display: inline-block; margin-bottom: 5px; }
-  .hidden{display:none}
-</style>
+    <meta charset="UTF-8">
+    <title>Yönetim Paneli</title>
+    <style>
+        body { background: #0f172a; color: white; font-family: sans-serif; padding: 20px; }
+        .card { background: #1e293b; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #334155; padding: 12px; text-align: left; font-size: 12px; }
+        td { padding: 12px; border-bottom: 1px solid #334155; font-size: 13px; }
+        button { cursor: pointer; border: none; border-radius: 6px; padding: 8px 12px; font-weight: bold; margin: 2px; }
+        .btn-check { background: #22c55e; color: white; }
+        .btn-x { background: #ef4444; color: white; }
+        .btn-nav { background: #6366f1; color: white; padding: 12px 20px; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .status-onay { color: #4ade80; }
+        .status-ret { color: #f87171; }
+        .hidden { display: none; }
+    </style>
 </head>
 <body>
 
-<h1>🧙 Admin Panel • Online Art Workshop</h1>
+    <div id="login" class="card" style="max-width:400px; margin:auto; text-align:center;">
+        <h2>Giriş Yap</h2>
+        <input type="password" id="pass" style="padding:10px; width:80%; margin-bottom:10px;">
+        <button onclick="checkPass()" class="btn-nav">Giriş</button>
+    </div>
 
-<div class="card" id="loginCard">
-  <div style="max-width: 400px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px;">
-    <input type="password" id="password" placeholder="Yönetici Şifresi">
-    <button onclick="login()">Giriş Yap</button>
-  </div>
-</div>
+    <div id="panel" class="hidden">
+        <div class="card">
+            <input id="url" placeholder="Apps Script URL" style="width:70%; padding:10px;">
+            <button onclick="saveURL()" class="btn-nav" style="padding:10px;">API Kaydet</button>
+        </div>
 
-<div class="card hidden" id="panelCard">
-  <div class="controls">
-    <input id="apiUrl" placeholder="Google Apps Script URL">
-    <button onclick="saveApi()">API Kaydet</button>
-    <button class="secondary" onclick="logout()">Çıkış</button>
-  </div>
+        <div style="text-align:center; margin-bottom:20px;">
+            <button onclick="fetchData('cadi')" class="btn-nav">🧙 Cadı Atölyesi</button>
+            <button onclick="fetchData('canli')" class="btn-nav" style="background:#ec4899;">🎥 Canlı Ders</button>
+        </div>
 
-  <div class="controls">
-    <button onclick="loadData('cadi')" style="background: #7c3aed;">🧙 Cadı Atölyesi</button>
-    <button onclick="loadData('canli')" style="background: #ec4899;">🎥 Canlı Ders</button>
-  </div>
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>AD SOYAD</th>
+                        <th>TELEFON</th>
+                        <th>TARİH / SEANS</th>
+                        <th>KONTENJAN</th>
+                        <th>DURUM</th>
+                        <th>İŞLEMLER</th>
+                    </tr>
+                </thead>
+                <tbody id="list"></tbody>
+            </table>
+        </div>
+    </div>
 
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Tarih</th>
-          <th>Ad Soyad</th>
-          <th>Telefon</th>
-          <th>Atölye</th>
-          <th>Seans</th>
-          <th>Kontenjan</th>
-          <th>Dil</th>
-          <th>Durum</th>
-          <th>İşlemler</th>
-        </tr>
-      </thead>
-      <tbody id="rows">
-        <tr><td colspan="9" style="text-align:center; padding: 40px;">Veri seçin...</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+    <script>
+        let curType = "";
+        function checkPass() {
+            if(document.getElementById('pass').value === "cadimagic2025") {
+                document.getElementById('login').classList.add('hidden');
+                document.getElementById('panel').classList.remove('hidden');
+                document.getElementById('url').value = localStorage.getItem('my_api') || "";
+            }
+        }
+        function saveURL() {
+            localStorage.setItem('my_api', document.getElementById('url').value);
+            alert("Kaydedildi!");
+        }
 
-<script>
-const PASSWORD = "cadimagic2025";
-const LS_API = "admin_api_url";
-let currentType = "";
+        async function update(id, status) {
+            const api = localStorage.getItem('my_api');
+            await callAPI(api, { action: "update", type: curType, id: id, status: status });
+            fetchData(curType);
+        }
 
-function login(){
-  if(document.getElementById("password").value === PASSWORD){
-    document.getElementById("loginCard").classList.add("hidden");
-    document.getElementById("panelCard").classList.remove("hidden");
-    document.getElementById("apiUrl").value = localStorage.getItem(LS_API) || "";
-  } else { alert("Şifre yanlış!"); }
-}
+        async function fetchData(type) {
+            curType = type;
+            const api = localStorage.getItem('my_api');
+            const list = document.getElementById('list');
+            list.innerHTML = "Yükleniyor...";
+            
+            const res = await callAPI(api, { type: type });
+            list.innerHTML = "";
 
-function logout(){ location.reload(); }
-function saveApi(){ localStorage.setItem(LS_API, document.getElementById("apiUrl").value.trim()); alert("API kaydedildi."); }
+            // Kontenjan hesabı
+            const counts = {};
+            res.rows.forEach(r => {
+                if(r[9] === "Onaylandı") {
+                    const k = r[4] + r[5];
+                    counts[k] = (counts[k] || 0) + 1;
+                }
+            });
 
-async function updateStatus(index, newStatus) {
-  const url = localStorage.getItem(LS_API);
-  try {
-    const res = await loadJSONP(url, { 
-      action: "updateStatus", 
-      type: currentType, 
-      rowIndex: index, 
-      newStatus: newStatus 
-    });
-    if(res.ok) loadData(currentType); 
-    else alert("Hata oluştu!");
-  } catch(e) { alert("Bağlantı hatası!"); }
-}
+            res.rows.reverse().forEach((r, i) => {
+                const idx = res.rows.length - 1 - i;
+                const c = counts[r[4] + r[5]] || 0;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><b>${r[1]}</b></td>
+                    <td>${r[3]}</td>
+                    <td>${r[4]}<br><small>${r[5]}</small></td>
+                    <td><span class="badge" style="background:#334155">${c} / 5</span></td>
+                    <td class="${r[9]=='Onaylandı'?'status-onay':(r[9]=='Reddedildi'?'status-ret':'')}">${r[9]||'Beklemede'}</td>
+                    <td>
+                        <button class="btn-check" onclick="update(${idx}, 'Onaylandı')">✓ Onay</button>
+                        <button class="btn-x" onclick="update(${idx}, 'Reddedildi')">✕ Red</button>
+                    </td>
+                `;
+                list.appendChild(tr);
+            });
+        }
 
-function renderRows(json) {
-  const rowsEl = document.getElementById("rows");
-  rowsEl.innerHTML = "";
-  const rawData = json.rows || [];
-  
-  const sessionCounts = {};
-  rawData.forEach(r => {
-    if(r[9] === "Onaylandı") {
-      const key = String(r[4]) + "|" + String(r[5]);
-      sessionCounts[key] = (sessionCounts[key] || 0) + 1;
-    }
-  });
-
-  // Gelen veriyi orijinal sırasıyla işleyip ters gösteriyoruz
-  const total = rawData.length;
-  rawData.forEach((r, i) => {
-    const key = String(r[4]) + "|" + String(r[5]);
-    const currentCount = sessionCounts[key] || 0;
-    const currentStatus = r[9] || "Beklemede";
-
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td style="color:#9ca3af">${r[0] ? new Date(r[0]).toLocaleDateString('tr-TR') : '—'}</td>
-      <td style="font-weight:700">${r[1] || '—'}</td>
-      <td>${r[3] || '—'}</td>
-      <td>${r[4] ? new Date(r[4]).toLocaleDateString('tr-TR') : '—'}</td>
-      <td>${r[5] || '—'}</td>
-      <td><span class="badge ${currentCount >= 5 ? 'bg-full' : 'bg-safe'}">${currentCount}/5</span></td>
-      <td>${r[8] || 'tr'}</td>
-      <td class="status-${currentStatus === 'Onaylandı' ? 'onayli' : (currentStatus === 'Reddedildi' ? 'red' : '')}">${currentStatus}</td>
-      <td>
-        <a href="https://wa.me/${String(r[3]).replace(/\D/g,'')}" target="_blank" class="wa-btn">WA</a><br>
-        <button class="btn-approve" onclick="updateStatus(${i}, 'Onaylandı')">✓</button>
-        <button class="btn-reject" onclick="updateStatus(${i}, 'Reddedildi')">✕</button>
-      </td>
-    `;
-    rowsEl.prepend(tr); // En yeni en üstte
-  });
-}
-
-function loadJSONP(baseUrl, params){
-  return new Promise((resolve, reject) => {
-    const cb = "cb_" + Math.round(Math.random()*1000000);
-    const url = new URL(baseUrl);
-    Object.keys(params).forEach(k => url.searchParams.set(k, params[k]));
-    url.searchParams.set("callback", cb);
-    const script = document.createElement("script");
-    script.src = url.toString();
-    window[cb] = (data) => { script.remove(); delete window[cb]; resolve(data); };
-    script.onerror = () => { script.remove(); reject(); };
-    document.body.appendChild(script);
-  });
-}
-
-async function loadData(type){
-  currentType = type;
-  const url = localStorage.getItem(LS_API);
-  if(!url) return alert("API URL girin!");
-  document.getElementById("rows").innerHTML = '<tr><td colspan="9" style="text-align:center;">Yükleniyor...</td></tr>';
-  try {
-    const json = await loadJSONP(url, { type: type });
-    if(json.ok) renderRows(json);
-  } catch (e) { alert("Hata!"); }
-}
-</script>
+        function callAPI(url, params) {
+            return new Promise(resolve => {
+                const cb = "cb" + Date.now();
+                const s = document.createElement('script');
+                const q = new URLSearchParams(params).toString();
+                window[cb] = d => { s.remove(); resolve(d); };
+                s.src = `${url}?${q}&callback=${cb}`;
+                document.body.appendChild(s);
+            });
+        }
+    </script>
 </body>
 </html>
