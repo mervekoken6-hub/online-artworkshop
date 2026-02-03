@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Yönetim Paneli • Art Workshop</title>
+<title>Yönetim Paneli • Online Art Workshop</title>
+
 <style>
   body{ margin:0; font-family:system-ui, -apple-system, sans-serif; background:#0b1220; color:#fff; padding:20px; }
   .card{ background:#111827; padding:20px; border-radius:14px; max-width:1300px; margin: 0 auto 20px auto; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); }
@@ -19,8 +20,6 @@
   td{ padding:12px; border-bottom:1px solid #1f2937; }
   tr:hover { background: rgba(255,255,255,0.03); }
   .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; }
-  .bg-wait { background: #92400e; color: #fef3c7; }
-  .bg-full { background: #991b1b; color: #fee2e2; }
   .bg-count { background: #1e40af; color: #dbeafe; }
   .wa-btn { background: #16a34a; color: white; text-decoration: none; padding: 5px 10px; border-radius: 6px; font-size: 12px; display: inline-block; }
   .hidden{display:none}
@@ -45,8 +44,8 @@
   </div>
 
   <div class="controls" style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 10px;">
-    <button onclick="loadData('cadi')" style="background: #7c3aed;">🧙 Cadı Atölyesi</button>
-    <button onclick="loadData('canli')" style="background: #ec4899;">🎥 Canlı Ders</button>
+    <button onclick="loadData('cadi')" style="background: #7c3aed;">🧙 Cadı Atölyesi Listesi</button>
+    <button onclick="loadData('canli')" style="background: #ec4899;">🎥 Canlı Ders Listesi</button>
   </div>
 
   <div class="table-container">
@@ -59,15 +58,14 @@
           <th>Telefon</th>
           <th>Atölye Tarihi</th>
           <th>Seans</th>
-          <th>Kontenjan</th>
           <th>Ücret</th>
-          <th>Not</th>
           <th>Dil</th>
-          <th>İşlem</th>
+          <th>Not</th>
+          <th>WhatsApp</th>
         </tr>
       </thead>
       <tbody id="rows">
-        <tr><td colspan="11" style="text-align:center; color:#6b7280; padding: 40px;">Lütfen bir atölye seçin.</td></tr>
+        <tr><td colspan="10" style="text-align:center; color:#6b7280; padding: 40px;">Lütfen bir atölye seçin.</td></tr>
       </tbody>
     </table>
   </div>
@@ -92,34 +90,39 @@ function saveApi(){ localStorage.setItem(LS_API, document.getElementById("apiUrl
 function renderRows(json) {
   rowsEl.innerHTML = "";
   const rawData = json.rows || [];
-  if(rawData.length === 0){ rowsEl.innerHTML = '<tr><td colspan="11" style="text-align:center;">Kayıt yok.</td></tr>'; return; }
+  
+  if(rawData.length === 0){
+    rowsEl.innerHTML = '<tr><td colspan="10" style="text-align:center;">Kayıt bulunamadı.</td></tr>';
+    return;
+  }
 
-  const stats = {};
-  rawData.forEach(r => {
-    const key = (r[4] ? String(r[4]).split('T')[0] : '') + "|" + r[5];
-    stats[key] = (stats[key] || 0) + 1;
-  });
-
+  // Verileri tabloya dök (Yeni kayıt en üstte)
   rawData.reverse().forEach(r => {
-    const tr = document.createElement("tr");
-    const dateKey = (r[4] ? String(r[4]).split('T')[0] : '') + "|" + r[5];
-    const count = stats[dateKey] || 0;
-    
-    // Telefon temizleme
-    const phone = r[3] ? String(r[3]).replace(/\D/g,'') : '';
+    // Ekran görüntüsündeki veri sırasına göre eşleştirme yapıyoruz:
+    const kayitTarihi = r[0] ? new Date(r[0]).toLocaleString('tr-TR') : '—';
+    const adSoyad = r[1] || r[2] || '—'; 
+    const eposta = r[2] || r[3] || '—';
+    const telefon = r[3] || r[4] || '—';
+    const atolyeTarihi = r[4] ? (typeof r[4] === 'string' && r[4].includes('T') ? new Date(r[4]).toLocaleDateString('tr-TR') : r[4]) : '—';
+    const seans = r[5] || '—';
+    const ucret = r[6] || '—';
+    const not = r[7] || '—';
+    const dil = r[8] || 'tr';
 
+    const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${r[0] ? new Date(r[0]).toLocaleString('tr-TR') : '—'}</td>
-      <td style="font-weight:600">${r[1] || '—'}</td>
-      <td>${r[2] || '—'}</td>
-      <td>${r[3] || '—'}</td>
-      <td>${r[4] ? new Date(r[4]).toLocaleDateString('tr-TR') : '—'}</td>
-      <td>${r[5] || '—'}</td>
-      <td><span class="badge ${count >= 5 ? 'bg-full' : 'bg-count'}">${count} / 5</span></td>
-      <td>${r[6] || '0'} TL</td>
-      <td title="${r[7]}">${r[7] || '—'}</td>
-      <td><span class="badge secondary">${r[8] || 'tr'}</span></td>
-      <td><a href="https://wa.me/${phone}" target="_blank" class="wa-btn">WhatsApp</a></td>
+      <td>${kayitTarihi}</td>
+      <td style="font-weight:600">${adSoyad}</td>
+      <td>${eposta}</td>
+      <td>${telefon}</td>
+      <td>${atolyeTarihi}</td>
+      <td>${seans}</td>
+      <td>${ucret} TL</td>
+      <td><span class="badge secondary">${dil}</span></td>
+      <td title="${not}">${not}</td>
+      <td>
+        <a href="https://wa.me/${String(telefon).replace(/\D/g,'')}" target="_blank" class="wa-btn">WhatsApp</a>
+      </td>
     `;
     rowsEl.appendChild(tr);
   });
@@ -142,11 +145,11 @@ function loadJSONP(baseUrl, params){
 async function loadData(type){
   const url = localStorage.getItem(LS_API);
   if(!url) return alert("API URL eksik!");
-  rowsEl.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:40px;">Yükleniyor...</td></tr>';
+  rowsEl.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:40px;">Veriler yükleniyor...</td></tr>';
   try {
     const json = await loadJSONP(url, { type: type });
     if(json.ok) renderRows(json); else alert("Hata: " + json.error);
-  } catch (e) { alert("Bağlantı Hatası!"); }
+  } catch (e) { alert("Bağlantı Hatası! URL'yi kontrol edin."); }
 }
 </script>
 </body>
