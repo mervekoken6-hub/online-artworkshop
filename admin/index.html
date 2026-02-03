@@ -3,25 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Yönetim Paneli • Online Art Workshop</title>
-
+<title>Admin Panel • Online Art Workshop</title>
 <style>
   body{ margin:0; font-family:system-ui, -apple-system, sans-serif; background:#0b1220; color:#fff; padding:20px; }
   .card{ background:#111827; padding:20px; border-radius:14px; max-width:1300px; margin: 0 auto 20px auto; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); }
   h1{ margin: 0 0 20px 0; font-size: 24px; text-align: center; color: #a78bfa; }
   .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; align-items: center; }
-  button{ padding:10px 18px; border-radius:8px; border:none; background:#6366f1; color:#fff; cursor:pointer; font-weight: 600; transition: all 0.2s; }
-  button:hover{ opacity: 0.9; transform: translateY(-1px); }
+  button{ padding:12px 20px; border-radius:10px; border:none; background:#6366f1; color:#fff; cursor:pointer; font-weight: 600; transition: all 0.2s; }
+  button:hover{ opacity: 0.9; transform: translateY(-2px); }
   button.secondary { background: #374151; }
-  input{ padding:10px; border-radius:8px; border: 1px solid #374151; background: #1f2937; color: #fff; flex-grow: 1; }
-  .table-container { overflow-x: auto; }
-  table{ width:100%; border-collapse:collapse; margin-top:10px; font-size: 13px; }
-  th{ text-align: left; background: #1f2937; color: #9ca3af; padding: 12px; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
-  td{ padding:12px; border-bottom:1px solid #1f2937; }
-  tr:hover { background: rgba(255,255,255,0.03); }
-  .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; }
-  .bg-count { background: #1e40af; color: #dbeafe; }
-  .wa-btn { background: #16a34a; color: white; text-decoration: none; padding: 5px 10px; border-radius: 6px; font-size: 12px; display: inline-block; }
+  input{ padding:12px; border-radius:10px; border: 1px solid #374151; background: #1f2937; color: #fff; flex-grow: 1; }
+  .table-container { overflow-x: auto; background: rgba(0,0,0,0.2); border-radius: 12px; }
+  table{ width:100%; border-collapse:collapse; font-size: 13px; }
+  th{ text-align: left; background: #1f2937; color: #9ca3af; padding: 15px; text-transform: uppercase; font-size: 11px; letter-spacing: 0.1em; border-bottom: 2px solid #374151; }
+  td{ padding:15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  tr:hover { background: rgba(255,255,255,0.04); }
+  .badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; }
+  .bg-status { background: #1e3a8a; color: #dbeafe; }
+  .wa-btn { background: #16a34a; color: white; text-decoration: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; display: inline-block; }
   .hidden{display:none}
 </style>
 </head>
@@ -30,7 +29,7 @@
 <h1>🧙 Admin Panel • Online Art Workshop</h1>
 
 <div class="card" id="loginCard">
-  <div style="max-width: 400px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px;">
+  <div style="max-width: 400px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px;">
     <input type="password" id="password" placeholder="Yönetici Şifresi">
     <button onclick="login()">Giriş Yap</button>
   </div>
@@ -40,10 +39,10 @@
   <div class="controls">
     <input id="apiUrl" placeholder="Google Apps Script URL'nizi buraya yapıştırın">
     <button onclick="saveApi()">API Kaydet</button>
-    <button class="secondary" onclick="logout()">Güvenli Çıkış</button>
+    <button class="secondary" onclick="logout()">Çıkış</button>
   </div>
 
-  <div class="controls" style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 10px;">
+  <div class="controls" style="background: rgba(167, 139, 250, 0.05); padding: 15px; border-radius: 12px;">
     <button onclick="loadData('cadi')" style="background: #7c3aed;">🧙 Cadı Atölyesi Listesi</button>
     <button onclick="loadData('canli')" style="background: #ec4899;">🎥 Canlı Ders Listesi</button>
   </div>
@@ -59,13 +58,14 @@
           <th>Atölye Tarihi</th>
           <th>Seans</th>
           <th>Ücret</th>
-          <th>Dil</th>
           <th>Not</th>
-          <th>WhatsApp</th>
+          <th>Dil</th>
+          <th>Durum</th>
+          <th>İşlem</th>
         </tr>
       </thead>
       <tbody id="rows">
-        <tr><td colspan="10" style="text-align:center; color:#6b7280; padding: 40px;">Lütfen bir atölye seçin.</td></tr>
+        <tr><td colspan="11" style="text-align:center; color:#6b7280; padding: 50px;">Lütfen bir liste seçin.</td></tr>
       </tbody>
     </table>
   </div>
@@ -85,41 +85,43 @@ function login(){
 }
 
 function logout(){ location.reload(); }
-function saveApi(){ localStorage.setItem(LS_API, document.getElementById("apiUrl").value.trim()); alert("API URL kaydedildi."); }
+function saveApi(){ localStorage.setItem(LS_API, document.getElementById("apiUrl").value.trim()); alert("API kaydedildi."); }
 
 function renderRows(json) {
   rowsEl.innerHTML = "";
   const rawData = json.rows || [];
   
   if(rawData.length === 0){
-    rowsEl.innerHTML = '<tr><td colspan="10" style="text-align:center;">Kayıt bulunamadı.</td></tr>';
+    rowsEl.innerHTML = '<tr><td colspan="11" style="text-align:center;">Kayıt bulunamadı.</td></tr>';
     return;
   }
 
-  // Verileri tabloya dök (Yeni kayıt en üstte)
   rawData.reverse().forEach(r => {
-    // Ekran görüntüsündeki veri sırasına göre eşleştirme yapıyoruz:
+    // Paylaştığın Excel sütun sırasına göre tam eşleştirme:
+    // A:0, B:1, C:2, D:3, E:4, F:5, G:6, H:7, I:8, J:9
     const kayitTarihi = r[0] ? new Date(r[0]).toLocaleString('tr-TR') : '—';
-    const adSoyad = r[1] || r[2] || '—'; 
-    const eposta = r[2] || r[3] || '—';
-    const telefon = r[3] || r[4] || '—';
+    const adSoyad = r[1] || '—';
+    const eposta = r[2] || '—';
+    const telefon = r[3] || '—';
     const atolyeTarihi = r[4] ? (typeof r[4] === 'string' && r[4].includes('T') ? new Date(r[4]).toLocaleDateString('tr-TR') : r[4]) : '—';
     const seans = r[5] || '—';
-    const ucret = r[6] || '—';
+    const ucret = r[6] || '0';
     const not = r[7] || '—';
     const dil = r[8] || 'tr';
+    const durum = r[9] || 'Beklemede';
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${kayitTarihi}</td>
-      <td style="font-weight:600">${adSoyad}</td>
+      <td style="color: #9ca3af">${kayitTarihi}</td>
+      <td style="font-weight:700; color: #e9d5ff;">${adSoyad}</td>
       <td>${eposta}</td>
-      <td>${telefon}</td>
+      <td style="color: #60a5fa">${telefon}</td>
       <td>${atolyeTarihi}</td>
       <td>${seans}</td>
-      <td>${ucret} TL</td>
+      <td>${ucret}</td>
+      <td>${not}</td>
       <td><span class="badge secondary">${dil}</span></td>
-      <td title="${not}">${not}</td>
+      <td><span class="badge bg-status">${durum}</span></td>
       <td>
         <a href="https://wa.me/${String(telefon).replace(/\D/g,'')}" target="_blank" class="wa-btn">WhatsApp</a>
       </td>
@@ -144,12 +146,12 @@ function loadJSONP(baseUrl, params){
 
 async function loadData(type){
   const url = localStorage.getItem(LS_API);
-  if(!url) return alert("API URL eksik!");
-  rowsEl.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:40px;">Veriler yükleniyor...</td></tr>';
+  if(!url) return alert("API URL girin!");
+  rowsEl.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:50px;">Yükleniyor...</td></tr>';
   try {
     const json = await loadJSONP(url, { type: type });
     if(json.ok) renderRows(json); else alert("Hata: " + json.error);
-  } catch (e) { alert("Bağlantı Hatası! URL'yi kontrol edin."); }
+  } catch (e) { alert("Bağlantı Hatası!"); }
 }
 </script>
 </body>
