@@ -3,96 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel • Online Art Workshop</title>
-
+<title>Yönetim Paneli • Art Workshop</title>
 <style>
-  body{
-    margin:0;
-    font-family:system-ui, -apple-system, sans-serif;
-    background:#0b1220;
-    color:#fff;
-    padding:20px;
-  }
-  .card{
-    background:#111827;
-    padding:20px;
-    border-radius:14px;
-    max-width:1300px;
-    margin: 0 auto 20px auto;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,255,255,0.05);
-  }
+  body{ margin:0; font-family:system-ui, -apple-system, sans-serif; background:#0b1220; color:#fff; padding:20px; }
+  .card{ background:#111827; padding:20px; border-radius:14px; max-width:1300px; margin: 0 auto 20px auto; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); }
   h1{ margin: 0 0 20px 0; font-size: 24px; text-align: center; color: #a78bfa; }
-  
   .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; align-items: center; }
-  
-  button{
-    padding:10px 18px;
-    border-radius:8px;
-    border:none;
-    background:#6366f1;
-    color:#fff;
-    cursor:pointer;
-    font-weight: 600;
-    transition: all 0.2s;
-  }
+  button{ padding:10px 18px; border-radius:8px; border:none; background:#6366f1; color:#fff; cursor:pointer; font-weight: 600; transition: all 0.2s; }
   button:hover{ opacity: 0.9; transform: translateY(-1px); }
   button.secondary { background: #374151; }
-  
-  input{
-    padding:10px;
-    border-radius:8px;
-    border: 1px solid #374151;
-    background: #1f2937;
-    color: #fff;
-    flex-grow: 1;
-  }
-
+  input{ padding:10px; border-radius:8px; border: 1px solid #374151; background: #1f2937; color: #fff; flex-grow: 1; }
   .table-container { overflow-x: auto; }
-  table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:10px;
-    font-size: 14px;
-  }
-  th{
-    text-align: left;
-    background: #1f2937;
-    color: #9ca3af;
-    padding: 12px;
-    text-transform: uppercase;
-    font-size: 11px;
-    letter-spacing: 0.05em;
-  }
-  td{
-    padding:12px;
-    border-bottom:1px solid #1f2937;
-  }
+  table{ width:100%; border-collapse:collapse; margin-top:10px; font-size: 13px; }
+  th{ text-align: left; background: #1f2937; color: #9ca3af; padding: 12px; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
+  td{ padding:12px; border-bottom:1px solid #1f2937; }
   tr:hover { background: rgba(255,255,255,0.03); }
-
-  .badge {
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: bold;
-  }
-  .bg-wait { background: #92400e; color: #fef3c7; } /* Beklemede */
-  .bg-full { background: #991b1b; color: #fee2e2; } /* Dolu */
-  .bg-count { background: #1e40af; color: #dbeafe; } /* Kontenjan */
-
-  .wa-btn {
-    background: #16a34a;
-    color: white;
-    text-decoration: none;
-    padding: 5px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-  }
-
+  .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; }
+  .bg-wait { background: #92400e; color: #fef3c7; }
+  .bg-full { background: #991b1b; color: #fee2e2; }
+  .bg-count { background: #1e40af; color: #dbeafe; }
+  .wa-btn { background: #16a34a; color: white; text-decoration: none; padding: 5px 10px; border-radius: 6px; font-size: 12px; display: inline-block; }
   .hidden{display:none}
 </style>
 </head>
-
 <body>
 
 <h1>🧙 Admin Panel • Online Art Workshop</h1>
@@ -105,7 +38,6 @@
 </div>
 
 <div class="card hidden" id="panelCard">
-  
   <div class="controls">
     <input id="apiUrl" placeholder="Google Apps Script URL'nizi buraya yapıştırın">
     <button onclick="saveApi()">API Kaydet</button>
@@ -113,9 +45,8 @@
   </div>
 
   <div class="controls" style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 10px;">
-    <strong style="color: #9ca3af;">Verileri Getir:</strong>
-    <button onclick="loadData('cadi')" style="background: #7c3aed;">🧙 Cadı Atölyesi Listesi</button>
-    <button onclick="loadData('canli')" style="background: #ec4899;">🎥 Canlı Ders Listesi</button>
+    <button onclick="loadData('cadi')" style="background: #7c3aed;">🧙 Cadı Atölyesi</button>
+    <button onclick="loadData('canli')" style="background: #ec4899;">🎥 Canlı Ders</button>
   </div>
 
   <div class="table-container">
@@ -124,17 +55,19 @@
         <tr>
           <th>Kayıt Tarihi</th>
           <th>Ad Soyad</th>
-          <th>İletişim</th>
+          <th>E-posta</th>
+          <th>Telefon</th>
           <th>Atölye Tarihi</th>
           <th>Seans</th>
-          <th>KONTENJAN</th>
+          <th>Kontenjan</th>
+          <th>Ücret</th>
           <th>Not</th>
-          <th>Durum</th>
+          <th>Dil</th>
           <th>İşlem</th>
         </tr>
       </thead>
       <tbody id="rows">
-        <tr><td colspan="9" style="text-align:center; color:#6b7280; padding: 40px;">Lütfen yukarıdan bir atölye seçerek verileri yükleyin.</td></tr>
+        <tr><td colspan="11" style="text-align:center; color:#6b7280; padding: 40px;">Lütfen bir atölye seçin.</td></tr>
       </tbody>
     </table>
   </div>
@@ -154,53 +87,39 @@ function login(){
 }
 
 function logout(){ location.reload(); }
-
-function saveApi(){
-  localStorage.setItem(LS_API, document.getElementById("apiUrl").value.trim());
-  alert("API URL kaydedildi.");
-}
+function saveApi(){ localStorage.setItem(LS_API, document.getElementById("apiUrl").value.trim()); alert("API URL kaydedildi."); }
 
 function renderRows(json) {
   rowsEl.innerHTML = "";
   const rawData = json.rows || [];
-  
-  if(rawData.length === 0){
-    rowsEl.innerHTML = '<tr><td colspan="9" style="text-align:center;">Henüz kayıt yok.</td></tr>';
-    return;
-  }
+  if(rawData.length === 0){ rowsEl.innerHTML = '<tr><td colspan="11" style="text-align:center;">Kayıt yok.</td></tr>'; return; }
 
-  // Kontenjan sayacı (Tarih + Seans kombinasyonuna göre say)
   const stats = {};
   rawData.forEach(r => {
-    const key = (r[4] ? r[4].split('T')[0] : '') + "|" + r[5];
+    const key = (r[4] ? String(r[4]).split('T')[0] : '') + "|" + r[5];
     stats[key] = (stats[key] || 0) + 1;
   });
 
-  // Verileri tabloya dök (En yeni en üstte)
   rawData.reverse().forEach(r => {
     const tr = document.createElement("tr");
-    const dateKey = (r[4] ? r[4].split('T')[0] : '') + "|" + r[5];
+    const dateKey = (r[4] ? String(r[4]).split('T')[0] : '') + "|" + r[5];
     const count = stats[dateKey] || 0;
+    
+    // Telefon temizleme
+    const phone = r[3] ? String(r[3]).replace(/\D/g,'') : '';
 
     tr.innerHTML = `
       <td>${r[0] ? new Date(r[0]).toLocaleString('tr-TR') : '—'}</td>
       <td style="font-weight:600">${r[1] || '—'}</td>
-      <td>
-        <div style="font-size:12px">${r[2] || ''}</div>
-        <div style="color:#a78bfa">${r[3] || ''}</div>
-      </td>
+      <td>${r[2] || '—'}</td>
+      <td>${r[3] || '—'}</td>
       <td>${r[4] ? new Date(r[4]).toLocaleDateString('tr-TR') : '—'}</td>
       <td>${r[5] || '—'}</td>
-      <td>
-        <span class="badge ${count >= 5 ? 'bg-full' : 'bg-count'}">
-          ${count} / 5 Kişi
-        </span>
-      </td>
-      <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${r[7]}">${r[7] || '—'}</td>
-      <td><span class="badge bg-wait">${r[9] || 'Beklemede'}</span></td>
-      <td>
-        <a href="https://wa.me/${r[3] ? r[3].replace(/\D/g,'') : ''}" target="_blank" class="wa-btn">WhatsApp</a>
-      </td>
+      <td><span class="badge ${count >= 5 ? 'bg-full' : 'bg-count'}">${count} / 5</span></td>
+      <td>${r[6] || '0'} TL</td>
+      <td title="${r[7]}">${r[7] || '—'}</td>
+      <td><span class="badge secondary">${r[8] || 'tr'}</span></td>
+      <td><a href="https://wa.me/${phone}" target="_blank" class="wa-btn">WhatsApp</a></td>
     `;
     rowsEl.appendChild(tr);
   });
@@ -212,7 +131,6 @@ function loadJSONP(baseUrl, params){
     const url = new URL(baseUrl);
     Object.keys(params).forEach(k => url.searchParams.set(k, params[k]));
     url.searchParams.set("callback", cb);
-    
     const script = document.createElement("script");
     script.src = url.toString();
     window[cb] = (data) => { script.remove(); delete window[cb]; resolve(data); };
@@ -223,20 +141,13 @@ function loadJSONP(baseUrl, params){
 
 async function loadData(type){
   const url = localStorage.getItem(LS_API);
-  if(!url) return alert("Lütfen önce API URL'sini yapıştırıp kaydedin!");
-
-  rowsEl.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:40px;">Veriler çekiliyor, lütfen bekleyin...</td></tr>';
-
+  if(!url) return alert("API URL eksik!");
+  rowsEl.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:40px;">Yükleniyor...</td></tr>';
   try {
     const json = await loadJSONP(url, { type: type });
-    if(json.ok) renderRows(json);
-    else alert("Hata: " + json.error);
-  } catch (e) {
-    alert("Bağlantı kurulamadı! Lütfen Apps Script URL'sini kontrol edin ve Script'i 'Herkes' olarak yayına aldığınızdan emin olun.");
-    rowsEl.innerHTML = '<tr><td colspan="9" style="text-align:center; color:red;">Hata oluştu.</td></tr>';
-  }
+    if(json.ok) renderRows(json); else alert("Hata: " + json.error);
+  } catch (e) { alert("Bağlantı Hatası!"); }
 }
 </script>
-
 </body>
 </html>
