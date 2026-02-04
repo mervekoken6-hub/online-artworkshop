@@ -2,55 +2,50 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Yönetim Paneli • Workshop Management</title>
+    <title>Admin Panel • Online Art Workshop</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <style>
-        body { background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; margin: 0; }
-        .card { background: #1e293b; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 1200px; }
-        th { background: #1f2937; padding: 14px; text-align: left; font-size: 11px; text-transform: uppercase; color: #9ca3af; letter-spacing: 0.05em; border-bottom: 2px solid #334155; }
-        td { padding: 14px; border-bottom: 1px solid #334155; font-size: 13px; white-space: nowrap; }
+        body { background: #0f172a; color: #f1f5f9; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+        th { background: #334155; padding: 12px; text-align: left; font-size: 11px; text-transform: uppercase; color: #94a3b8; }
+        td { padding: 12px; border-bottom: 1px solid #334155; font-size: 13px; }
         
-        .btn-action { cursor: pointer; border: none; border-radius: 6px; padding: 7px 12px; font-weight: bold; font-size: 11px; color: white; transition: 0.2s; }
-        .btn-approve { background: #10b981; margin-right: 5px; }
-        .btn-approve:hover { background: #059669; transform: translateY(-1px); }
-        .btn-reject { background: #ef4444; }
-        .btn-reject:hover { background: #dc2626; transform: translateY(-1px); }
+        .btn { padding: 8px 16px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; color: white; }
+        .btn-nav { background: #6366f1; }
+        .btn-pdf { background: #10b981; margin-left: 10px; }
+        .btn-approve { background: #22c55e; font-size: 11px; margin-right: 4px; }
+        .btn-reject { background: #ef4444; font-size: 11px; }
         
-        .btn-nav { background: #6366f1; color: white; padding: 10px 20px; font-weight: 600; cursor: pointer; border-radius: 8px; border: none; }
-        .badge-info { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; background: #334155; border: 1px solid #475569; }
-        
-        /* Durum Yazıları */
         .status-Onaylandı { color: #4ade80; font-weight: bold; }
         .status-Reddedildi { color: #f87171; font-weight: bold; }
-        .status-Beklemede { color: #fbbf24; }
-
-        .wa-btn { color: #22c55e; text-decoration: none; font-size: 18px; margin-left: 10px; font-weight: bold; }
-        input { padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; outline: none; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; background: #0f172a; border: 1px solid #334155; }
         .hidden { display: none; }
-        tr:hover { background: rgba(255,255,255,0.03); }
+        .wa-link { color: #22c55e; text-decoration: none; font-size: 18px; margin-left: 5px; }
     </style>
 </head>
 <body>
 
     <div id="login" class="card" style="max-width:350px; margin: 100px auto; text-align:center;">
-        <h2 style="color:#a78bfa">Admin Girişi</h2>
-        <input type="password" id="pass" placeholder="Yönetici Şifresi" style="width:80%; margin-bottom:15px;">
-        <button onclick="checkPass()" class="btn-nav" style="width:85%;">Giriş Yap</button>
+        <h2>🧙 Admin Panel</h2>
+        <input type="password" id="pass" placeholder="Şifre" style="width:80%; padding:10px; margin-bottom:15px; border-radius:8px; border:none;">
+        <button onclick="checkPass()" class="btn btn-nav" style="width:85%;">Giriş</button>
     </div>
 
     <div id="panel" class="hidden">
         <div class="card">
-            <input id="url" placeholder="Apps Script URL'nizi buraya yapıştırın" style="width:65%;">
-            <button onclick="saveURL()" class="btn-nav">API Kaydet</button>
-            <button onclick="location.reload()" class="btn-nav" style="background:#475569; float:right;">Güvenli Çıkış</button>
+            <input id="url" placeholder="Apps Script URL" style="width:50%; padding:10px; border-radius:8px;">
+            <button onclick="saveURL()" class="btn btn-nav">API Kaydet</button>
+            <button onclick="downloadPDF()" id="pdfBtn" class="btn btn-pdf hidden">📄 PDF Listesi İndir</button>
         </div>
 
-        <div style="text-align:center; margin-bottom:20px; display:flex; gap:12px; justify-content:center;">
-            <button onclick="fetchData('cadi')" class="btn-nav" style="background:#7c3aed; min-width:160px;">🧙 Cadı Atölyesi Listesi</button>
-            <button onclick="fetchData('canli')" class="btn-nav" style="background:#db2777; min-width:160px;">🎥 Canlı Ders Listesi</button>
+        <div style="text-align:center; margin-bottom:20px;">
+            <button onclick="fetchData('cadi')" class="btn btn-nav" style="background:#7c3aed;">🧙 Cadı Atölyesi</button>
+            <button onclick="fetchData('canli')" class="btn btn-nav" style="background:#db2777;">🎥 Canlı Ders</button>
         </div>
 
-        <div class="card" style="overflow-x: auto;">
+        <div class="card">
             <table>
                 <thead>
                     <tr>
@@ -62,7 +57,7 @@
                         <th>Ücret</th>
                         <th>Not</th>
                         <th>Dil</th>
-                        <th style="color:#a78bfa">Kontenjan</th>
+                        <th>Kontenjan</th>
                         <th>Durum</th>
                         <th>İşlem</th>
                     </tr>
@@ -74,47 +69,38 @@
 
     <script>
         let curType = "";
-        
+        let currentRows = [];
+
         function checkPass() {
             if(document.getElementById('pass').value === "cadimagic2025") {
                 document.getElementById('login').classList.add('hidden');
                 document.getElementById('panel').classList.remove('hidden');
                 document.getElementById('url').value = localStorage.getItem('my_api') || "";
-            } else { alert("Hatalı Şifre!"); }
+            }
         }
+        function saveURL() { localStorage.setItem('my_api', document.getElementById('url').value.trim()); alert("Kaydedildi!"); }
 
-        function saveURL() {
-            localStorage.setItem('my_api', document.getElementById('url').value.trim());
-            alert("Bağlantı Ayarları Güncellendi!");
-        }
-
-        async function update(rowIdx, newStatus) {
+        async function update(idx, status) {
             const api = localStorage.getItem('my_api');
-            if(!api) return;
-            
-            // Satırda işlem yapıldığını belli et
-            document.getElementById('st-'+rowIdx).innerText = "🔄...";
-            
-            try {
-                const res = await callAPI(api, { action: "update", type: curType, rowIndex: rowIdx, status: newStatus });
-                if(res.ok) {
-                    fetchData(curType); // Tabloyu tazele
-                }
-            } catch(e) { alert("Hata oluştu!"); fetchData(curType); }
+            const res = await callAPI(api, { action: "update", type: curType, rowIndex: idx, status: status });
+            if(res.ok) {
+                fetchData(curType);
+            } else if(res.error === "limit") {
+                alert("❌ BU SEANS DOLU! En fazla 5 onaylı kişi olabilir.");
+            }
         }
 
         async function fetchData(type) {
             curType = type;
             const api = localStorage.getItem('my_api');
-            if(!api) return alert("Lütfen önce API URL kaydedin!");
-            
             const list = document.getElementById('list');
-            list.innerHTML = "<tr><td colspan='11' style='text-align:center; padding:40px;'>Veriler getiriliyor...</td></tr>";
+            list.innerHTML = "<tr><td colspan='11' style='text-align:center;'>Yükleniyor...</td></tr>";
             
             const res = await callAPI(api, { type: type });
+            currentRows = res.rows;
+            document.getElementById('pdfBtn').classList.remove('hidden');
             list.innerHTML = "";
 
-            // KONTENJAN ANALİZİ: Sadece 'Onaylandı' olanları say
             const counts = {};
             res.rows.forEach(r => {
                 if(r[9] === "Onaylandı") {
@@ -123,41 +109,52 @@
                 }
             });
 
-            // En yeni kayıt en üstte (Reverse)
-            const rowsData = [...res.rows];
-            rowsData.reverse().forEach((r, revIdx) => {
-                const realIdx = rowsData.length - 1 - revIdx;
+            const raw = [...res.rows];
+            raw.reverse().forEach((r, revIdx) => {
+                const realIdx = raw.length - 1 - revIdx;
                 const dKey = String(r[4]).split('T')[0] + "_" + String(r[5]);
-                const confirmedCount = counts[dKey] || 0;
-                
+                const c = counts[dKey] || 0;
                 const status = r[9] || "Beklemede";
-                const kayitZamani = r[0] ? new Date(r[0]).toLocaleString('tr-TR') : '—';
-                const seansTarihi = String(r[4]).split('T')[0];
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td style="font-weight:bold; color:#f8fafc">${r[1] || '—'}</td>
-                    <td style="color:#60a5fa">${r[3] || '—'}</td>
-                    <td>${seansTarihi}<br><small style="color:#94a3b8">${r[5] || '—'}</small></td>
-                    <td style="font-size:11px; color:#64748b">${kayitZamani}</td>
-                    <td style="color:#cbd5e0">${r[2] || '—'}</td>
-                    <td><span style="color:#fbbf24; font-weight:bold">${r[6] || '0'} TL</span></td>
-                    <td style="max-width:120px; overflow:hidden; text-overflow:ellipsis;" title="${r[7]}">${r[7] || '—'}</td>
-                    <td><span class="badge-info">${r[8] || 'tr'}</span></td>
+                    <td><b>${r[1] || '—'}</b></td>
+                    <td>${r[3] || '—'}</td>
+                    <td>${String(r[4]).split('T')[0]}<br><small>${r[5]}</small></td>
+                    <td><small>${r[0] ? new Date(r[0]).toLocaleString('tr-TR') : '—'}</small></td>
+                    <td>${r[2] || '—'}</td>
+                    <td>${r[6] || '0'} TL</td>
+                    <td>${r[7] || '—'}</td>
+                    <td><span class="badge">${r[8] || 'tr'}</span></td>
+                    <td><span class="badge" style="border-color:${c >= 5 ? '#ef4444' : '#22c55e'}">${c} / 5</span></td>
+                    <td class="status-${status}">${status}</td>
                     <td>
-                        <span class="badge-info" style="border-color: ${confirmedCount >= 5 ? '#ef4444' : '#10b981'}">
-                            ${confirmedCount} / 5 Kişi
-                        </span>
-                    </td>
-                    <td id="st-${realIdx}" class="status-${status.replace(/\s/g, '')}">${status}</td>
-                    <td>
-                        <button class="btn-action btn-approve" onclick="update(${realIdx}, 'Onaylandı')">Onayla</button>
-                        <button class="btn-action btn-reject" onclick="update(${realIdx}, 'Reddedildi')">Reddet</button>
-                        <a href="https://wa.me/${String(r[3]).replace(/\D/g,'')}" target="_blank" class="wa-btn" title="WhatsApp Mesaj Gönder">📲</a>
+                        <button class="btn btn-approve" onclick="update(${realIdx}, 'Onaylandı')">Onayla</button>
+                        <button class="btn btn-reject" onclick="update(${realIdx}, 'Reddedildi')">Reddet</button>
+                        <a href="https://wa.me/${String(r[3]).replace(/\D/g,'')}" target="_blank" class="wa-link">📲</a>
                     </td>
                 `;
                 list.appendChild(tr);
             });
+        }
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('l', 'mm', 'a4');
+            doc.text(`${curType.toUpperCase()} KAYIT LISTESI - ${new Date().toLocaleDateString('tr-TR')}`, 14, 15);
+            
+            const tableData = currentRows.map(r => [
+                r[1], r[3], String(r[4]).split('T')[0], r[5], r[2], r[6], r[9] || "Beklemede"
+            ]);
+
+            doc.autoTable({
+                head: [['Ad Soyad', 'Telefon', 'Tarih', 'Seans', 'E-posta', 'Ucret', 'Durum']],
+                body: tableData,
+                startY: 20,
+                theme: 'grid',
+                headStyles: { fillColor: [99, 102, 241] }
+            });
+            doc.save(`${curType}_kayit_listesi.pdf`);
         }
 
         function callAPI(url, params) {
