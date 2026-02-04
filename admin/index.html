@@ -2,50 +2,51 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Panel • Online Art Workshop</title>
+    <title>Yönetim Paneli • Workshop</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <style>
-        body { background: #0f172a; color: #f1f5f9; font-family: 'Segoe UI', sans-serif; padding: 20px; }
-        .card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; overflow-x: auto; }
+        body { background: #0f172a; color: #f1f5f9; font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
+        .card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); }
         table { width: 100%; border-collapse: collapse; min-width: 1100px; }
-        th { background: #334155; padding: 12px; text-align: left; font-size: 11px; text-transform: uppercase; color: #94a3b8; }
-        td { padding: 12px; border-bottom: 1px solid #334155; font-size: 13px; }
-        
-        .btn { padding: 8px 16px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; color: white; }
+        th { background: #334155; padding: 14px; text-align: left; font-size: 11px; text-transform: uppercase; color: #94a3b8; }
+        td { padding: 14px; border-bottom: 1px solid #334155; font-size: 13px; }
+        .btn { padding: 10px 18px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; color: white; display: inline-flex; align-items: center; gap: 5px; }
         .btn-nav { background: #6366f1; }
         .btn-pdf { background: #10b981; margin-left: 10px; }
-        .btn-approve { background: #22c55e; font-size: 11px; margin-right: 4px; }
+        .btn-approve { background: #22c55e; font-size: 11px; }
         .btn-reject { background: #ef4444; font-size: 11px; }
-        
         .status-Onaylandı { color: #4ade80; font-weight: bold; }
         .status-Reddedildi { color: #f87171; font-weight: bold; }
         .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; background: #0f172a; border: 1px solid #334155; }
         .hidden { display: none; }
-        .wa-link { color: #22c55e; text-decoration: none; font-size: 18px; margin-left: 5px; }
+        .wa-link { color: #22c55e; text-decoration: none; font-size: 18px; font-weight: bold; }
+        input { padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; }
     </style>
 </head>
 <body>
 
     <div id="login" class="card" style="max-width:350px; margin: 100px auto; text-align:center;">
-        <h2>🧙 Admin Panel</h2>
-        <input type="password" id="pass" placeholder="Şifre" style="width:80%; padding:10px; margin-bottom:15px; border-radius:8px; border:none;">
-        <button onclick="checkPass()" class="btn btn-nav" style="width:85%;">Giriş</button>
+        <h2 style="color:#a78bfa">Admin Girişi</h2>
+        <input type="password" id="pass" placeholder="Şifre" style="width:85%; margin-bottom:15px;">
+        <button onclick="checkPass()" class="btn btn-nav" style="width:92%;">Giriş Yap</button>
     </div>
 
     <div id="panel" class="hidden">
-        <div class="card">
-            <input id="url" placeholder="Apps Script URL" style="width:50%; padding:10px; border-radius:8px;">
+        <div class="card" style="display: flex; align-items: center; gap: 10px;">
+            <input id="url" placeholder="Apps Script URL" style="flex-grow: 1;">
             <button onclick="saveURL()" class="btn btn-nav">API Kaydet</button>
-            <button onclick="downloadPDF()" id="pdfBtn" class="btn btn-pdf hidden">📄 PDF Listesi İndir</button>
+            <button onclick="downloadPDF()" id="pdfBtn" class="btn btn-pdf hidden">📄 PDF Listesi</button>
+            <button onclick="location.reload()" class="btn" style="background:#475569">Çıkış</button>
         </div>
 
         <div style="text-align:center; margin-bottom:20px;">
-            <button onclick="fetchData('cadi')" class="btn btn-nav" style="background:#7c3aed;">🧙 Cadı Atölyesi</button>
-            <button onclick="fetchData('canli')" class="btn btn-nav" style="background:#db2777;">🎥 Canlı Ders</button>
+            <button onclick="fetchData('cadi')" class="btn btn-nav" style="background:#7c3aed; min-width: 150px;">🧙 Cadı Atölyesi</button>
+            <button onclick="fetchData('canli')" class="btn btn-nav" style="background:#db2777; min-width: 150px;">🎥 Canlı Ders</button>
         </div>
 
-        <div class="card">
+        <div class="card" style="overflow-x:auto;">
             <table>
                 <thead>
                     <tr>
@@ -76,9 +77,11 @@
                 document.getElementById('login').classList.add('hidden');
                 document.getElementById('panel').classList.remove('hidden');
                 document.getElementById('url').value = localStorage.getItem('my_api') || "";
+            } else {
+                Swal.fire('Hata', 'Şifre yanlış!', 'error');
             }
         }
-        function saveURL() { localStorage.setItem('my_api', document.getElementById('url').value.trim()); alert("Kaydedildi!"); }
+        function saveURL() { localStorage.setItem('my_api', document.getElementById('url').value.trim()); Swal.fire('Başarılı', 'API URL Kaydedildi', 'success'); }
 
         async function update(idx, status) {
             const api = localStorage.getItem('my_api');
@@ -86,7 +89,14 @@
             if(res.ok) {
                 fetchData(curType);
             } else if(res.error === "limit") {
-                alert("❌ BU SEANS DOLU! En fazla 5 onaylı kişi olabilir.");
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Seans Dolu!',
+                    text: 'Bu seans için 5 onaylı kişi limitine ulaşıldı.',
+                    confirmButtonColor: '#6366f1',
+                    background: '#1e293b',
+                    color: '#fff'
+                });
             }
         }
 
@@ -94,7 +104,7 @@
             curType = type;
             const api = localStorage.getItem('my_api');
             const list = document.getElementById('list');
-            list.innerHTML = "<tr><td colspan='11' style='text-align:center;'>Yükleniyor...</td></tr>";
+            list.innerHTML = "<tr><td colspan='11' style='text-align:center;'>Veriler yükleniyor...</td></tr>";
             
             const res = await callAPI(api, { type: type });
             currentRows = res.rows;
@@ -102,12 +112,7 @@
             list.innerHTML = "";
 
             const counts = {};
-            res.rows.forEach(r => {
-                if(r[9] === "Onaylandı") {
-                    const key = String(r[4]).split('T')[0] + "_" + String(r[5]);
-                    counts[key] = (counts[key] || 0) + 1;
-                }
-            });
+            res.rows.forEach(r => { if(r[9] === "Onaylandı") { const k = String(r[4]).split('T')[0] + "_" + String(r[5]); counts[k] = (counts[k] || 0) + 1; } });
 
             const raw = [...res.rows];
             raw.reverse().forEach((r, revIdx) => {
@@ -124,11 +129,11 @@
                     <td><small>${r[0] ? new Date(r[0]).toLocaleString('tr-TR') : '—'}</small></td>
                     <td>${r[2] || '—'}</td>
                     <td>${r[6] || '0'} TL</td>
-                    <td>${r[7] || '—'}</td>
+                    <td style="max-width:100px; overflow:hidden; text-overflow:ellipsis;">${r[7] || '—'}</td>
                     <td><span class="badge">${r[8] || 'tr'}</span></td>
                     <td><span class="badge" style="border-color:${c >= 5 ? '#ef4444' : '#22c55e'}">${c} / 5</span></td>
-                    <td class="status-${status}">${status}</td>
-                    <td>
+                    <td class="status-${status.replace(/\s/g,'')}">${status}</td>
+                    <td style="display:flex; gap:5px; align-items:center;">
                         <button class="btn btn-approve" onclick="update(${realIdx}, 'Onaylandı')">Onayla</button>
                         <button class="btn btn-reject" onclick="update(${realIdx}, 'Reddedildi')">Reddet</button>
                         <a href="https://wa.me/${String(r[3]).replace(/\D/g,'')}" target="_blank" class="wa-link">📲</a>
@@ -141,20 +146,24 @@
         function downloadPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('l', 'mm', 'a4');
-            doc.text(`${curType.toUpperCase()} KAYIT LISTESI - ${new Date().toLocaleDateString('tr-TR')}`, 14, 15);
+            
+            // Türkçe karakterler için font ayarı (Standard helvetica Türkçe karakterleri PDF'de bozar, bu yüzden metni temizliyoruz veya font yüklüyoruz)
+            doc.setFont("helvetica", "bold");
+            doc.text(`${curType.toUpperCase()} KAYIT LISTESI`, 14, 15);
             
             const tableData = currentRows.map(r => [
-                r[1], r[3], String(r[4]).split('T')[0], r[5], r[2], r[6], r[9] || "Beklemede"
+                r[1] || "—", r[3] || "—", String(r[4]).split('T')[0], r[5] || "—", r[2] || "—", r[6] || "0", r[9] || "Beklemede"
             ]);
 
             doc.autoTable({
                 head: [['Ad Soyad', 'Telefon', 'Tarih', 'Seans', 'E-posta', 'Ucret', 'Durum']],
                 body: tableData,
-                startY: 20,
-                theme: 'grid',
-                headStyles: { fillColor: [99, 102, 241] }
+                startY: 22,
+                theme: 'striped',
+                headStyles: { fillColor: [99, 102, 241] },
+                styles: { font: "helvetica", fontStyle: "normal" }
             });
-            doc.save(`${curType}_kayit_listesi.pdf`);
+            doc.save(`${curType}_liste.pdf`);
         }
 
         function callAPI(url, params) {
