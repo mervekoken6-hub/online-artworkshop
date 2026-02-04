@@ -19,31 +19,32 @@
         .btn-reject { background: #ef4444; font-size: 11px; }
         .status-Onaylandı { color: #4ade80; font-weight: bold; }
         .status-Reddedildi { color: #f87171; font-weight: bold; }
+        .status-Beklemede { color: #fbbf24; }
         .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; background: #0f172a; border: 1px solid #334155; }
         .hidden { display: none; }
-        .wa-link { color: #22c55e; text-decoration: none; font-size: 18px; font-weight: bold; }
-        input { padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; }
+        .wa-link { color: #22c55e; text-decoration: none; font-size: 20px; font-weight: bold; }
+        input { padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; outline: none; }
     </style>
 </head>
 <body>
 
     <div id="login" class="card" style="max-width:350px; margin: 100px auto; text-align:center;">
-        <h2 style="color:#a78bfa">Admin Girişi</h2>
-        <input type="password" id="pass" placeholder="Şifre" style="width:85%; margin-bottom:15px;">
+        <h2 style="color:#a78bfa">Admin Paneli</h2>
+        <input type="password" id="pass" placeholder="Giriş Şifresi" style="width:85%; margin-bottom:15px;">
         <button onclick="checkPass()" class="btn btn-nav" style="width:92%;">Giriş Yap</button>
     </div>
 
     <div id="panel" class="hidden">
         <div class="card" style="display: flex; align-items: center; gap: 10px;">
-            <input id="url" placeholder="Apps Script URL" style="flex-grow: 1;">
-            <button onclick="saveURL()" class="btn btn-nav">API Kaydet</button>
-            <button onclick="downloadPDF()" id="pdfBtn" class="btn btn-pdf hidden">📄 PDF Listesi</button>
+            <input id="url" placeholder="Apps Script API URL" style="flex-grow: 1;">
+            <button onclick="saveURL()" class="btn btn-nav">Bağlantıyı Kaydet</button>
+            <button onclick="downloadPDF()" id="pdfBtn" class="btn btn-pdf hidden">📄 PDF Olarak İndir</button>
             <button onclick="location.reload()" class="btn" style="background:#475569">Çıkış</button>
         </div>
 
-        <div style="text-align:center; margin-bottom:20px;">
-            <button onclick="fetchData('cadi')" class="btn btn-nav" style="background:#7c3aed; min-width: 150px;">🧙 Cadı Atölyesi</button>
-            <button onclick="fetchData('canli')" class="btn btn-nav" style="background:#db2777; min-width: 150px;">🎥 Canlı Ders</button>
+        <div style="text-align:center; margin-bottom:20px; display:flex; justify-content:center; gap:10px;">
+            <button onclick="fetchData('cadi')" class="btn btn-nav" style="background:#7c3aed; min-width: 160px;">🧙 Cadı Atölyesi</button>
+            <button onclick="fetchData('canli')" class="btn btn-nav" style="background:#db2777; min-width: 160px;">🎥 Canlı Ders</button>
         </div>
 
         <div class="card" style="overflow-x:auto;">
@@ -72,16 +73,33 @@
         let curType = "";
         let currentRows = [];
 
+        // Türkçe Karakter Temizleyici (PDF için)
+        function trToEn(text) {
+            if(!text) return "—";
+            return String(text)
+                .replace(/Ğ/g, "G").replace(/ğ/g, "g")
+                .replace(/Ü/g, "U").replace(/ü/g, "u")
+                .replace(/Ş/g, "S").replace(/ş/g, "s")
+                .replace(/İ/g, "I").replace(/ı/g, "i")
+                .replace(/Ö/g, "O").replace(/ö/g, "o")
+                .replace(/Ç/g, "C").replace(/ç/g, "c")
+                .replace(/[^\x00-\x7F]/g, ""); // Diğer tüm garip karakterleri siler
+        }
+
         function checkPass() {
             if(document.getElementById('pass').value === "cadimagic2025") {
                 document.getElementById('login').classList.add('hidden');
                 document.getElementById('panel').classList.remove('hidden');
                 document.getElementById('url').value = localStorage.getItem('my_api') || "";
             } else {
-                Swal.fire('Hata', 'Şifre yanlış!', 'error');
+                Swal.fire({ icon: 'error', title: 'Hata', text: 'Geçersiz şifre!', background: '#1e293b', color: '#fff' });
             }
         }
-        function saveURL() { localStorage.setItem('my_api', document.getElementById('url').value.trim()); Swal.fire('Başarılı', 'API URL Kaydedildi', 'success'); }
+
+        function saveURL() { 
+            localStorage.setItem('my_api', document.getElementById('url').value.trim()); 
+            Swal.fire({ icon: 'success', title: 'Başarılı', text: 'API bağlantısı kaydedildi.', background: '#1e293b', color: '#fff' }); 
+        }
 
         async function update(idx, status) {
             const api = localStorage.getItem('my_api');
@@ -91,11 +109,11 @@
             } else if(res.error === "limit") {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Seans Dolu!',
-                    text: 'Bu seans için 5 onaylı kişi limitine ulaşıldı.',
-                    confirmButtonColor: '#6366f1',
+                    title: 'Kontenjan Dolu!',
+                    text: 'Bu seansa zaten 5 kişi onaylanmış.',
                     background: '#1e293b',
-                    color: '#fff'
+                    color: '#fff',
+                    confirmButtonColor: '#6366f1'
                 });
             }
         }
@@ -104,7 +122,7 @@
             curType = type;
             const api = localStorage.getItem('my_api');
             const list = document.getElementById('list');
-            list.innerHTML = "<tr><td colspan='11' style='text-align:center;'>Veriler yükleniyor...</td></tr>";
+            list.innerHTML = "<tr><td colspan='11' style='text-align:center; padding:50px;'>Veriler getiriliyor...</td></tr>";
             
             const res = await callAPI(api, { type: type });
             currentRows = res.rows;
@@ -125,15 +143,15 @@
                 tr.innerHTML = `
                     <td><b>${r[1] || '—'}</b></td>
                     <td>${r[3] || '—'}</td>
-                    <td>${String(r[4]).split('T')[0]}<br><small>${r[5]}</small></td>
+                    <td>${String(r[4]).split('T')[0]}<br><small>${r[5] || '—'}</small></td>
                     <td><small>${r[0] ? new Date(r[0]).toLocaleString('tr-TR') : '—'}</small></td>
                     <td>${r[2] || '—'}</td>
                     <td>${r[6] || '0'} TL</td>
-                    <td style="max-width:100px; overflow:hidden; text-overflow:ellipsis;">${r[7] || '—'}</td>
+                    <td title="${r[7]}">${r[7] ? r[7].substring(0,15)+'...' : '—'}</td>
                     <td><span class="badge">${r[8] || 'tr'}</span></td>
-                    <td><span class="badge" style="border-color:${c >= 5 ? '#ef4444' : '#22c55e'}">${c} / 5</span></td>
+                    <td><span class="badge" style="border-color:${c >= 5 ? '#ef4444' : '#10b981'}">${c} / 5</span></td>
                     <td class="status-${status.replace(/\s/g,'')}">${status}</td>
-                    <td style="display:flex; gap:5px; align-items:center;">
+                    <td style="display:flex; gap:8px;">
                         <button class="btn btn-approve" onclick="update(${realIdx}, 'Onaylandı')">Onayla</button>
                         <button class="btn btn-reject" onclick="update(${realIdx}, 'Reddedildi')">Reddet</button>
                         <a href="https://wa.me/${String(r[3]).replace(/\D/g,'')}" target="_blank" class="wa-link">📲</a>
@@ -147,23 +165,30 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('l', 'mm', 'a4');
             
-            // Türkçe karakterler için font ayarı (Standard helvetica Türkçe karakterleri PDF'de bozar, bu yüzden metni temizliyoruz veya font yüklüyoruz)
             doc.setFont("helvetica", "bold");
-            doc.text(`${curType.toUpperCase()} KAYIT LISTESI`, 14, 15);
+            doc.text(trToEn(curType.toUpperCase() + " KAYIT LISTESI"), 14, 15);
             
+            // Verileri PDF için temizle (Sembolleri engelle)
             const tableData = currentRows.map(r => [
-                r[1] || "—", r[3] || "—", String(r[4]).split('T')[0], r[5] || "—", r[2] || "—", r[6] || "0", r[9] || "Beklemede"
+                trToEn(r[1]), 
+                r[3] || "—", 
+                String(r[4]).split('T')[0], 
+                trToEn(r[5]), 
+                r[2] || "—", 
+                r[6] || "0", 
+                trToEn(r[9] || "Beklemede")
             ]);
 
             doc.autoTable({
                 head: [['Ad Soyad', 'Telefon', 'Tarih', 'Seans', 'E-posta', 'Ucret', 'Durum']],
                 body: tableData,
                 startY: 22,
-                theme: 'striped',
+                theme: 'grid',
                 headStyles: { fillColor: [99, 102, 241] },
-                styles: { font: "helvetica", fontStyle: "normal" }
+                styles: { font: "helvetica", fontSize: 9 }
             });
-            doc.save(`${curType}_liste.pdf`);
+            
+            doc.save(curType + "_liste.pdf");
         }
 
         function callAPI(url, params) {
