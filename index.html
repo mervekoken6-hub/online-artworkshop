@@ -59,8 +59,8 @@ textarea{min-height:80px}
 }
 .box h3{margin:0 0 8px;font-size:14px;opacity:.95;}
 .box p{margin:6px 0;font-size:13px;opacity:.95;line-height:1.35;}
-.age-check{display:flex;gap:10px;font-size:13px;margin:16px 0;align-items:flex-start;}
-.age-check input{width:auto;margin-top:3px;}
+.age-check{display:flex;gap:10px;font-size:12px;margin:12px 0;align-items:flex-start; line-height: 1.4; color: #cbd5e1;}
+.age-check input{width:auto;margin: 0; margin-top:3px; cursor: pointer;}
 .warn{
   margin-top:16px;
   background:#3a2f12;
@@ -147,6 +147,11 @@ textarea{min-height:80px}
         <span id="t_age_label">12 yaş ve üzerindeyim, eğitime katılım şartlarını onaylıyorum.</span>
       </div>
 
+      <div class="age-check">
+        <input type="checkbox" required>
+        <span id="t_kvkk_label">Kişisel verilerimin sadece kayıt ve iletişim amacıyla kullanılacağını biliyor, aydınlatma metnini kabul ediyorum.</span>
+      </div>
+
       <div class="box">
         <h3 id="t_bank_title">Banka Havalesi Bilgileri</h3>
         <p id="t_bank_receiver"><b>Alıcı:</b> Merve Köken</p>
@@ -179,6 +184,7 @@ const dict = {
     name: "Ad Soyad", email: "E-posta", phone: "Telefon (WhatsApp)", date: "Tarih", time: "Seans Saati",
     select_time: "Saat seçiniz", price: "Ücret", note: "Not",
     age_label: "12 yaş ve üzerindeyim, eğitime katılım şartlarını onaylıyorum.",
+    kvkk_label: "Verilerimin sadece kayıt ve iletişim amacıyla kullanılacağını içeren KVKK Aydınlatma Metnini kabul ediyorum.",
     bank_title: "Banka Havalesi Bilgileri", bank_receiver: "<b>Alıcı:</b> Merve Köken",
     bank_iban: "<b>IBAN:</b> TR78 0004 6012 1488 8000 1122 48", bank_desc: "<b>Açıklama:</b> Ad Soyad – Atölye Adı",
     announce_title: "📣 Duyuru", announce_body: "Atölye ücretleri seansa göre değişiklik gösterebilir.<br>WhatsApp’tan <b>0530 916 44 25</b> yazabilirsiniz 💜",
@@ -194,6 +200,7 @@ const dict = {
     name: "Full Name", email: "Email", phone: "Phone (WhatsApp)", date: "Date", time: "Session Time",
     select_time: "Select time", price: "Fee", note: "Note",
     age_label: "I am 12 years or older, I confirm the participation terms.",
+    kvkk_label: "I accept the data protection policy that my data will be used for registration and contact only.",
     bank_title: "Bank Transfer Details", bank_receiver: "<b>Receiver:</b> Merve Köken",
     bank_iban: "<b>IBAN:</b> TR78 0004 6012 1488 8000 1122 48", bank_desc: "<b>Description:</b> Full Name – Workshop Name",
     announce_title: "📣 Announcement", announce_body: "Fees may vary. Contact us on WhatsApp at <b>+90 530 916 44 25</b> 💜",
@@ -209,6 +216,7 @@ const dict = {
     name: "نام و نام خانوادگی", email: "ایمیل", phone: "واتساپ", date: "تاریخ", time: "ساعت جلسه",
     select_time: "ساعت را انتخاب کنید", price: "هزینه", note: "یادداشت",
     age_label: "من ۱۲ سال یا بیشتر دارم و شرایط را تأیید می‌کنم.",
+    kvkk_label: "من موافقت می‌کنم که داده‌های من فقط برای ثبت نام و تماس استفاده شود.",
     bank_title: "اطلاعات بانکی", bank_receiver: "<b>گیرنده:</b> Merve Köken",
     bank_iban: "<b>IBAN:</b> TR78 0004 6012 1488 8000 1122 48", bank_desc: "<b>توضیحات:</b> نام – نام کارگاه",
     announce_title: "📣 اطلاعیه", announce_body: "هزینه تغییر می‌کند. در واتساپ به <b>+90 530 916 44 25</b> پیام دهید 💜",
@@ -219,6 +227,12 @@ const dict = {
     success_msg: "سپاسگزاریم! بعد از ارسال رسید به واتساپ، لینک زوم ارسال خواهد شد."
   }
 };
+
+function cleanText(str) {
+  return str.replace(/İ/g, "I").replace(/ı/g, "i").replace(/Ğ/g, "G").replace(/ğ/g, "g")
+            .replace(/Ü/g, "U").replace(/ü/g, "u").replace(/Ş/g, "S").replace(/ş/g, "s")
+            .replace(/Ö/g, "O").replace(/ö/g, "o").replace(/Ç/g, "C").replace(/ç/g, "c");
+}
 
 function setLang(l){
   currentLang = l;
@@ -234,6 +248,7 @@ function setLang(l){
   l_price.textContent = dict[l].price;
   l_note.textContent = dict[l].note;
   t_age_label.textContent = dict[l].age_label;
+  t_kvkk_label.textContent = dict[l].kvkk_label; // KVKK çevirisi
   t_bank_title.textContent = dict[l].bank_title;
   t_bank_receiver.innerHTML = dict[l].bank_receiver;
   t_bank_iban.innerHTML = dict[l].bank_iban;
@@ -258,7 +273,7 @@ document.getElementById("registerForm").addEventListener("submit", function(e){
   const params = new URLSearchParams({
     callback: callbackName,
     type: "canli",
-    name: document.getElementById("fullName").value,
+    name: cleanText(document.getElementById("fullName").value.trim()),
     email: document.getElementById("email").value,
     phone: document.getElementById("phone").value,
     date: document.getElementById("date").value,
@@ -292,7 +307,7 @@ document.getElementById("registerForm").addEventListener("submit", function(e){
   };
 
   script.onerror = function() {
-    alert("Connection Error! Please check your internet.");
+    alert("Connection Error!");
     btn.disabled = false;
     btn.innerText = dict[currentLang].submit;
   };
