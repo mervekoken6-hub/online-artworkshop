@@ -205,6 +205,11 @@ textarea{min-height:80px}
         </span>
       </div>
 
+      <div class="age-check">
+        <input type="checkbox" id="marketingConsent">
+        <span id="t_marketing_label">Kampanya ve duyurulardan haberdar olmak istiyorum. (İsteğe bağlı)</span>
+      </div>
+
       <div class="box">
         <h3 id="t_bank_title">Banka Havalesi Bilgileri</h3>
         <p id="t_bank_receiver"><b>Alıcı:</b> Merve Köken</p>
@@ -238,6 +243,7 @@ const dict = {
     select_time: "Saat seçiniz", price: "Ücret", note: "Not",
     age_label: "12 yaş ve üzerindeyim, eğitime katılım şartlarını onaylıyorum.",
     kvkk_label: 'Kişisel verilerimin kullanımıyla ilgili <span class="kvkk-link" onclick="openKvkk()">Aydınlatma Metnini</span> kabul ediyorum.',
+    marketing_label: "Kampanya ve duyurulardan haberdar olmak istiyorum. (İsteğe bağlı)",
     kvkk_header: "Aydınlatma Metni",
     kvkk_body: "Bu form aracılığıyla paylaştığınız veriler yalnızca atölye kaydı ve iletişim amacıyla kullanılacaktır. Kişisel verileriniz yasal süreler sonunda silinecektir ve dilediğiniz zaman silinmesini talep etme hakkınız saklıdır.",
     bank_title: "Banka Havalesi Bilgileri", bank_receiver: "<b>Alıcı:</b> Merve Köken",
@@ -256,6 +262,7 @@ const dict = {
     select_time: "Select time", price: "Fee", note: "Note",
     age_label: "I am 12 years or older, I confirm the participation terms.",
     kvkk_label: 'I accept the <span class="kvkk-link" onclick="openKvkk()">Data Protection Policy</span> for my information.',
+    marketing_label: "I want to be informed about campaigns and news. (Optional)",
     kvkk_header: "Privacy Policy",
     kvkk_body: "Your data will only be used for registration and communication purposes. Your personal data will be deleted at the end of legal periods and you reserve the right to request deletion at any time.",
     bank_title: "Bank Transfer Details", bank_receiver: "<b>Receiver:</b> Merve Köken",
@@ -274,6 +281,7 @@ const dict = {
     select_time: "ساعت را انتخاب کنید", price: "هزینه", note: "یادداشت",
     age_label: "من ۱۲ سال یا بیشتر دارم و شرایط را تأیید می‌کنم.",
     kvkk_label: 'من <span class="kvkk-link" onclick="openKvkk()">سیاست حفظ حریم خصوصی</span> را قبول می‌کنم.',
+    marketing_label: "من می‌خواهم از کمپین‌ها و اخبار مطلع شوم. (اختیاری)",
     kvkk_header: "سیاست حفظ حریم خصوصی",
     kvkk_body: "داده‌های شما فقط برای ثبت‌نام و اهداف ارتباطی استفاده می‌شود. داده‌های شخصی شما در پایان دوره‌های قانونی حذف می‌شوند و شما حق دارید در هر زمان درخواست حذف آن‌ها را داشته باشید.",
     bank_title: "اطلاعات بانکی", bank_receiver: "<b>گیرنده:</b> Merve Köken",
@@ -311,6 +319,7 @@ function setLang(l){
   l_note.textContent = dict[l].note;
   t_age_label.textContent = dict[l].age_label;
   t_kvkk_label.innerHTML = dict[l].kvkk_label;
+  t_marketing_label.textContent = dict[l].marketing_label;
   m_kvkk_header.textContent = dict[l].kvkk_header;
   m_kvkk_body.textContent = dict[l].kvkk_body;
   t_bank_title.textContent = dict[l].bank_title;
@@ -344,6 +353,7 @@ document.getElementById("registerForm").addEventListener("submit", function(e){
     session: document.getElementById("timeSlot").value,
     price: document.getElementById("price").value,
     note: document.getElementById("note").value,
+    marketing: document.getElementById("marketingConsent").checked,
     lang: currentLang
   });
 
