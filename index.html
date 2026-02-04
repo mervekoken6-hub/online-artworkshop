@@ -61,6 +61,46 @@ textarea{min-height:80px}
 .box p{margin:6px 0;font-size:13px;opacity:.95;line-height:1.35;}
 .age-check{display:flex;gap:10px;font-size:12px;margin:12px 0;align-items:flex-start; line-height: 1.4; color: #cbd5e1;}
 .age-check input{width:auto;margin: 0; margin-top:3px; cursor: pointer;}
+.kvkk-link{color: #a78bfa; text-decoration: underline; cursor: pointer;}
+
+/* Modal Stili */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.8);
+  backdrop-filter: blur(5px);
+  padding: 20px;
+}
+.modal-content {
+  background: #111827;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #374151;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 18px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.modal-header { font-weight: bold; font-size: 18px; margin-bottom: 15px; color: #a78bfa; border-bottom: 1px solid #374151; padding-bottom: 10px; }
+.modal-text { font-size: 13px; line-height: 1.6; color: #d1d5db; }
+.close-modal {
+  background: #374151;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  margin-top: 15px;
+  cursor: pointer;
+  float: right;
+}
+
 .warn{
   margin-top:16px;
   background:#3a2f12;
@@ -91,6 +131,16 @@ textarea{min-height:80px}
 </head>
 
 <body>
+
+<div id="kvkkModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header" id="m_kvkk_header">Aydınlatma Metni</div>
+    <div class="modal-text" id="m_kvkk_body">
+      Bu form aracılığıyla paylaştığınız ad, soyad, telefon ve e-posta gibi kişisel verileriniz; yalnızca atölye kaydınızın oluşturulması, ödeme kontrolü ve Zoom bağlantısının iletilmesi amacıyla kullanılacaktır. Verileriniz üçüncü şahıslarla paylaşılmaz. Kaydı göndererek bu süreci kabul etmiş sayılırsınız.
+    </div>
+    <button class="close-modal" onclick="closeKvkk()">Kapat</button>
+  </div>
+</div>
 
 <div class="card" id="formArea">
   <h1 id="t_title">Online Art Workshop</h1>
@@ -149,7 +199,10 @@ textarea{min-height:80px}
 
       <div class="age-check">
         <input type="checkbox" required>
-        <span id="t_kvkk_label">Kişisel verilerimin sadece kayıt ve iletişim amacıyla kullanılacağını biliyor, aydınlatma metnini kabul ediyorum.</span>
+        <span id="t_kvkk_label">
+          Kişisel verilerimin kullanımıyla ilgili 
+          <span class="kvkk-link" onclick="openKvkk()">Aydınlatma Metnini</span> kabul ediyorum.
+        </span>
       </div>
 
       <div class="box">
@@ -184,7 +237,9 @@ const dict = {
     name: "Ad Soyad", email: "E-posta", phone: "Telefon (WhatsApp)", date: "Tarih", time: "Seans Saati",
     select_time: "Saat seçiniz", price: "Ücret", note: "Not",
     age_label: "12 yaş ve üzerindeyim, eğitime katılım şartlarını onaylıyorum.",
-    kvkk_label: "Verilerimin sadece kayıt ve iletişim amacıyla kullanılacağını içeren KVKK Aydınlatma Metnini kabul ediyorum.",
+    kvkk_label: 'Kişisel verilerimin kullanımıyla ilgili <span class="kvkk-link" onclick="openKvkk()">Aydınlatma Metnini</span> kabul ediyorum.',
+    kvkk_header: "Aydınlatma Metni",
+    kvkk_body: "Bu form aracılığıyla paylaştığınız veriler yalnızca atölye kaydı ve iletişim amacıyla kullanılacaktır.",
     bank_title: "Banka Havalesi Bilgileri", bank_receiver: "<b>Alıcı:</b> Merve Köken",
     bank_iban: "<b>IBAN:</b> TR78 0004 6012 1488 8000 1122 48", bank_desc: "<b>Açıklama:</b> Ad Soyad – Atölye Adı",
     announce_title: "📣 Duyuru", announce_body: "Atölye ücretleri seansa göre değişiklik gösterebilir.<br>WhatsApp’tan <b>0530 916 44 25</b> yazabilirsiniz 💜",
@@ -200,7 +255,9 @@ const dict = {
     name: "Full Name", email: "Email", phone: "Phone (WhatsApp)", date: "Date", time: "Session Time",
     select_time: "Select time", price: "Fee", note: "Note",
     age_label: "I am 12 years or older, I confirm the participation terms.",
-    kvkk_label: "I accept the data protection policy that my data will be used for registration and contact only.",
+    kvkk_label: 'I accept the <span class="kvkk-link" onclick="openKvkk()">Data Protection Policy</span> for my information.',
+    kvkk_header: "Privacy Policy",
+    kvkk_body: "Your data will only be used for registration and communication purposes.",
     bank_title: "Bank Transfer Details", bank_receiver: "<b>Receiver:</b> Merve Köken",
     bank_iban: "<b>IBAN:</b> TR78 0004 6012 1488 8000 1122 48", bank_desc: "<b>Description:</b> Full Name – Workshop Name",
     announce_title: "📣 Announcement", announce_body: "Fees may vary. Contact us on WhatsApp at <b>+90 530 916 44 25</b> 💜",
@@ -216,7 +273,9 @@ const dict = {
     name: "نام و نام خانوادگی", email: "ایمیل", phone: "واتساپ", date: "تاریخ", time: "ساعت جلسه",
     select_time: "ساعت را انتخاب کنید", price: "هزینه", note: "یادداشت",
     age_label: "من ۱۲ سال یا بیشتر دارم و شرایط را تأیید می‌کنم.",
-    kvkk_label: "من موافقت می‌کنم که داده‌های من فقط برای ثبت نام و تماس استفاده شود.",
+    kvkk_label: 'من <span class="kvkk-link" onclick="openKvkk()">سیاست حفظ حریم خصوصی</span> را قبول می‌کنم.',
+    kvkk_header: "سیاست حفظ حریم خصوصی",
+    kvkk_body: "داده های شما فقط برای ثبت نام و اهداف ارتباطی استفاده می شود.",
     bank_title: "اطلاعات بانکی", bank_receiver: "<b>گیرنده:</b> Merve Köken",
     bank_iban: "<b>IBAN:</b> TR78 0004 6012 1488 8000 1122 48", bank_desc: "<b>توضیحات:</b> نام – نام کارگاه",
     announce_title: "📣 اطلاعیه", announce_body: "هزینه تغییر می‌کند. در واتساپ به <b>+90 530 916 44 25</b> پیام دهید 💜",
@@ -227,6 +286,9 @@ const dict = {
     success_msg: "سپاسگزاریم! بعد از ارسال رسید به واتساپ، لینک زوم ارسال خواهد شد."
   }
 };
+
+function openKvkk() { document.getElementById("kvkkModal").style.display = "block"; }
+function closeKvkk() { document.getElementById("kvkkModal").style.display = "none"; }
 
 function cleanText(str) {
   return str.replace(/İ/g, "I").replace(/ı/g, "i").replace(/Ğ/g, "G").replace(/ğ/g, "g")
@@ -248,7 +310,9 @@ function setLang(l){
   l_price.textContent = dict[l].price;
   l_note.textContent = dict[l].note;
   t_age_label.textContent = dict[l].age_label;
-  t_kvkk_label.textContent = dict[l].kvkk_label; // KVKK çevirisi
+  t_kvkk_label.innerHTML = dict[l].kvkk_label;
+  m_kvkk_header.textContent = dict[l].kvkk_header;
+  m_kvkk_body.textContent = dict[l].kvkk_body;
   t_bank_title.textContent = dict[l].bank_title;
   t_bank_receiver.innerHTML = dict[l].bank_receiver;
   t_bank_iban.innerHTML = dict[l].bank_iban;
